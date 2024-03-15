@@ -1,0 +1,154 @@
+<resources>
+    <string name="app_name" translatable="false">Journey</string>
+    <!--  On Boarding  -->
+    <string name="onboarding_title_1">Mencari Pekerjaan &amp; Kandidat Pekerja</string>
+    <string name="onboarding_title_2">Dapatkan Lowongan Pekerjaan Yang Sesuai</string>
+    <string name="onboarding_title_3">Mengirim Lamaran Cepat &amp; Efisien</string>
+    <string name="onboarding_description_1">Memudahkan untuk menemukan dan memilih peluang pekerjaan atau kandidat pekerja yang sesuai dengan kriteria, menghemat waktu dan energi dalam proses pencarian pekerjaan atau kandidat.</string>
+    <string name="onboarding_description_2">Memungkinkan Kamu untuk mengakses informasi terbaru tentang lowongan pekerjaan, memperluas jangkauan pencarian Anda, dan meningkatkan peluang untuk mendapatkan pekerjaan yang diinginkan.</string>
+    <string name="onboarding_description_3">Mengirimkan lamaran secara online dengan cepat dan efisien, mengoptimalkan kemungkinan Anda untuk mendapatkan tanggapan dari perusahaan dan mempercepat proses mendapatkan pekerjaan baru.</string>
+    <string name="skip_onboarding" translatable="false">Skip</string>
+
+    <!--  Login  -->
+    <string name="login_title">Masuk Akun</string>
+    <string name="login_description">Masukkan field yang dibutuhkan untuk masuk akun</string>
+    <string name="login_ask">Belum punya akun?</string>
+    <string name="register_in_login">Daftar disini</string>
+    <string name="btn_login">Masuk Sekarang</string>
+
+    <!--  Register  -->
+    <string name="register_title">Daftar Akun</string>
+    <string name="register_description">Masukkan field yang dibutuhkan untuk daftar akun</string>
+    <string name="register_ask">Sudah punya akun?</string>
+    <string name="login_in_register">Masuk disini</string>
+    <string name="btn_register">Daftar Sekarang</string>
+    <string name="choose_skills">Pilih Skill Anda</string>
+
+    <!--  Started -> After On Boarding  -->
+    <string name="auth_title">Memulai</string>
+    <string name="auth_description">Dapatkan Pekerjaan Dengan Mudah Berdasarkan Disabilitas Anda</string>
+    <string name="auth_jobseeker">Lanjut sebagai Pelamar</string>
+    <string name="auth_jobprovider">Lanjut sebagai Rekruiter</string>
+
+    <!--  Field  -->
+    <string name="fullname">Nama Lengkap</string>
+    <string name="email" translatable="false">Email</string>
+    <string name="disability">Disabilitas</string>
+    <string name="phone_number">Nomor Telepon</string>
+    <string name="age">Umur</string>
+    <string name="gender">Jenis Kelamin</string>
+    <string name="password" translatable="false">Password</string>
+    <string name="address">Alamat</string>
+    <string name="company_name">Nama Perusahaan</string>
+    <string name="province">Provinsi</string>
+    <string name="city">Kota</string>
+    <string name="sector">Sektor Perusahaan</string>
+    <string name="total_employee">Jumlah Karyawan</string>
+    <string name="clear">Hapus</string>
+    <string name="fullname_placeholder">Masukan nama lengkap</string>
+    <string name="email_placeholder">Masukan email</string>
+    <string name="address_placeholder">Masukan alamat</string>
+    <string name="age_placeholder">Masukan umur</string>
+    <string name="phonenumber_placeholder">Masukan nomor telepon</string>
+    <string name="password_placeholder">Masukan password</string>
+    <string name="disability_placeholder">Pilih jenis disabilitas</string>
+    <string name="gender_placeholder">Pilih jenis kelamin</string>
+    <string name="disability_job_placeholder">Pilih jenis disabilitas untuk lowongan ini</string>
+    <string name="companyname_placeholder">Masukan nama perusahaan</string>
+    <string name="province_placeholder">Pilih provinsi</string>
+    <string name="city_placeholder">Pilih kota</string>
+    <string name="sector_placeholder">Pilih sektor perusahaan</string>
+    <string name="totalemployee_placeholder">Masukan jumlah karyawan</string>
+    <string name="loading">Memuat…</string>
+    <string name="search_placeholder">Cari pekerjaan</string>
+    <string name="your_skills">Skill Anda</string>
+    <string name="profile_photo">Foto Profil</string>
+    <string name="photo">Foto</string>
+    <string name="placement_address_placeholder">Posisi apa yang dibutuhkan?</string>
+    <string name="description_placeholder">Deskripsi pekerjaan</string>
+    <string name="deadline_time_placeholder">Batas waktu</string>
+    <string name="skill_one_placeholder">Skill pertama yang dibutuhkan</string>
+    <string name="skill_two_placeholder">Skill kedua yang dibutuhkan</string>
+    <string name="job_type_placeholder">Jenis pekerjaan</string>
+    <string name="current_email">Email saat ini</string>
+    <string name="new_email">Email baru</string>
+    <string name="current_password" translatable="false">Password saat ini</string>
+    <string name="current_password_placeholder" translatable="false">Masukkan password saat ini</string>
+    <string name="current_password_confirm" translatable="false">Konfirmasi password saat ini</string>
+    <string name="current_password_confirm_placeholder" translatable="false">Masukkan konfirmasi password saat ini</string>
+    <string name="new_password" translatable="false">Password baru</string>
+    <string name="new_password_placeholder" translatable="false">Masukkan password baru</string>
+    <string name="new_password_confirm" translatable="false">Konfirmasi password baru</string>
+    <string name="new_password_confirm_placeholder" translatable="false">Masukkan konfirmasi password baru</string>
+
+    <!--  Title  -->
+    <string name="vacancy">Lowongan</string>
+    <string name="jobseeker">Pelamar</string>
+    <string name="jobprovider">Rekruiter</string>
+    <string name="profile">Profil</string>
+    <string name="settings">Pengaturan</string>
+    <string name="job_apply">Lamaran Kerja</string>
+    <string name="job_vacancy">Lowongan Anda</string>
+    <string name="job_vacancy_user">Pelamar Kerja</string>
+    <string name="add_vacancy">Tambah Lowongan</string>
+    <string name="detail_vacancy">Detail Lowongan</string>
+
+    <!--  Button  -->
+    <string name="search">Cari</string>
+    <string name="cancel">Batal</string>
+    <string name="ok">OK</string>
+    <string name="logout">Keluar Akun</string>
+    <string name="submit" translatable="false">Submit</string>
+    <string name="apply">Lamar</string>
+    <string name="continue_register">Lanjutkan</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
+
+    <!--  Menu  -->
+    <string name="menu" translatable="false">Menu</string>
+    <string name="languages">Bahasa</string>
+    <string name="about_app">Tentang Aplikasi</string>
+    <string name="recommended_for_you">Rekomendasi untuk anda</string>
+    <string name="most_popular">Terpopuler</string>
+    <string name="newest">Terbaru</string>
+    <string name="all">Semua</string>
+    <string name="edit_vacancy">Ubah Lowongan Pekerjaan</string>
+
+    <!--  Dialog  -->
+    <string name="logout_confirm">Keluar</string>
+    <string name="update_confirm">Ubah</string>
+    <string name="logout_desc">Ingin keluar akun sekarang?</string>
+    <string name="update_email_desc">Ingin memperbarui email sekarang? akun anda akan keluar setelah ini</string>
+    <string name="update_password_desc">Ingin memperbarui password pada akun ini? akun anda akan keluar setelah ini</string>
+
+    <!--  Error  -->
+    <string name="network_error">Koneksi Bermasalah</string>
+    <string name="fields_empty">Semua field harus di isi</string>
+    <string name="error_confirm_current_password">Konfirmasi password tidak sama dengan password saat ini</string>
+    <string name="new_email_same_as_old">Email lama tidak boleh sama dengan email saat ini</string>
+
+    <!--  Profile  -->
+    <string name="title_update_profile">Ubah Profil</string>
+    <string name="title_update_email">Ubah Email</string>
+    <string name="title_update_password">Ubah Password</string>
+
+    <!--  General  -->
+    <string name="deadline_close">Tutup pada</string>
+    <string name="apply_before">Lamar sebelum</string>
+    <string name="vacancy_apply">Lowongan ini untuk</string>
+    <string name="skill_requiremnt">Syarat Kemampuan</string>
+    <string name="man">Laki-laki</string>
+    <string name="woman">Perempuan</string>
+    <string name="job_apply_empty">Tidak ada lowongan yang dilamar</string>
+    <string name="job_applicant_empty">Tidak ada pelamar</string>
+    <string name="vacancy_empty">Tidak ada lowongan</string>
+    <string name="applied_at">Dilamar pada</string>
+    <string name="skill_applicant">Kemampuan yang dimiliki</string>
+    <string name="back">Kembali</string>
+    <string name="try_again">Coba lagi</string>
+    <string name="pending">Menunggu</string>
+    <string name="accepted">Diterima</string>
+    <string name="not_accepted">Belum diterima</string>
+    <string name="reset_search">Reset Search</string>
+    <string name="closed_at">Tutup pada</string>
+</resources>

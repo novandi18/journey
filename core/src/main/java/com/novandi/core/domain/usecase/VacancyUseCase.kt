@@ -1,0 +1,19 @@
+package com.novandi.core.domain.usecase
+
+import androidx.paging.PagingData
+import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.VacancyRequest
+import com.novandi.core.domain.model.GeneralResult
+import com.novandi.core.domain.model.Vacancy
+import kotlinx.coroutines.flow.Flow
+
+interface VacancyUseCase {
+    fun getVacancies(key: String): Flow<PagingData<Vacancy>>
+    fun getLatestVacancies(): Flow<PagingData<Vacancy>>
+    fun getPopularVacancies(): Flow<PagingData<Vacancy>>
+    fun getVacancy(id: String): Flow<Resource<Vacancy>>
+    fun getVacanciesWithoutPager(): Flow<Resource<List<Vacancy>>>
+    fun addVacancy(token: String, companyId: String, request: VacancyRequest): Flow<Resource<GeneralResult>>
+    fun searchVacancy(position: String): Flow<PagingData<Vacancy>>
+    fun getJobProviderVacancies(token: String, companyId: String): Flow<Resource<List<Vacancy>>>
+}
