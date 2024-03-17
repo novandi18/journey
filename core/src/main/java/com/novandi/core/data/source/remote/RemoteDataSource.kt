@@ -8,6 +8,7 @@ import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
+import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
 import com.novandi.core.data.source.remote.request.JobSeekerRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
@@ -22,12 +23,14 @@ import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegencyItem
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import okhttp3.MultipartBody
 import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -404,6 +407,96 @@ class RemoteDataSource @Inject constructor(
             : Flow<ApiResponse<GeneralResponse>> = flow {
         try {
             val response = apiService.updateJobProviderPassword(token, companyId, request)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun updateJobProviderLogo(companyId: String, logo: MultipartBody.Part)
+            : Flow<ApiResponse<UpdateProfilePhotoResponse>> = flow {
+        try {
+            val response = apiService.updateJobProviderLogo(companyId, logo)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun updateJobSeeker(token: String, userId: String, request: JobSeekerEditRequest)
+            : Flow<ApiResponse<GeneralResponse>> = flow {
+        try {
+            val response = apiService.updateJobSeeker(token, userId, request)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun updateJobSeekerEmail(token: String, userId: String, request: UpdateEmailRequest)
+            : Flow<ApiResponse<GeneralResponse>> = flow {
+        try {
+            val response = apiService.updateJobSeekerEmail(token, userId, request)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun updateJobSeekerPassword(token: String, userId: String, request: UpdatePasswordRequest)
+            : Flow<ApiResponse<GeneralResponse>> = flow {
+        try {
+            val response = apiService.updateJobSeekerPassword(token, userId, request)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun updateJobSeekerPhoto(userId: String, photo: MultipartBody.Part)
+            : Flow<ApiResponse<UpdateProfilePhotoResponse>> = flow {
+        try {
+            val response = apiService.updateJobSeekerPhoto(userId, photo)
             emit(ApiResponse.Success(response))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

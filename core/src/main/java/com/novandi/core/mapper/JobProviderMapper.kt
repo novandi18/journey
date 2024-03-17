@@ -10,7 +10,10 @@ import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
+import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.utility.data.dateFormatter
+import com.novandi.utility.image.imageProfileUrl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -30,7 +33,7 @@ object JobProviderMapper {
             address = input.company.address,
             city = input.company.city,
             province = input.company.province,
-            logo = input.company.logo,
+            logo = input.company.logo.imageProfileUrl(),
             employees = input.company.employees,
             email = input.company.email,
             roleId = input.company.roleId,
@@ -60,4 +63,9 @@ object JobProviderMapper {
     fun mapGeneralResponseToDomain(input: GeneralResponse): Flow<GeneralResult> = flowOf(
         GeneralResult(input.message)
     )
+
+    fun updateProfilePhotoResponseToDomain(input: UpdateProfilePhotoResponse)
+        : Flow<UpdateProfilePhotoResult> = flowOf(
+            UpdateProfilePhotoResult(input.message, input.message)
+        )
 }

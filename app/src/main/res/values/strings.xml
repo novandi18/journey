@@ -80,6 +80,8 @@
     <string name="new_password_placeholder" translatable="false">Masukkan password baru</string>
     <string name="new_password_confirm" translatable="false">Konfirmasi password baru</string>
     <string name="new_password_confirm_placeholder" translatable="false">Masukkan konfirmasi password baru</string>
+    <string name="first_skills">Skill pertama</string>
+    <string name="second_skills">Skill kedua</string>
 
     <!--  Title  -->
     <string name="vacancy">Lowongan</string>
@@ -92,6 +94,7 @@
     <string name="job_vacancy_user">Pelamar Kerja</string>
     <string name="add_vacancy">Tambah Lowongan</string>
     <string name="detail_vacancy">Detail Lowongan</string>
+    <string name="image_preview">Preview Gambar</string>
 
     <!--  Button  -->
     <string name="search">Cari</string>
@@ -99,6 +102,7 @@
     <string name="ok">OK</string>
     <string name="logout">Keluar Akun</string>
     <string name="submit" translatable="false">Submit</string>
+    <string name="upload">Unggah</string>
     <string name="apply">Lamar</string>
     <string name="continue_register">Lanjutkan</string>
     <string name="accept">Accept</string>

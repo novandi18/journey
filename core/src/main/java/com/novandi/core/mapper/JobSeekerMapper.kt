@@ -11,6 +11,7 @@ import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.utility.data.dateFormatter
+import com.novandi.utility.image.imageProfileUrl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -35,7 +36,7 @@ object JobSeekerMapper {
             gender = input.user.gender,
             age = input.user.age,
             phoneNumber = input.user.phoneNumber,
-            profilePhotoUrl = input.user.profilePhotoUrl
+            profilePhotoUrl = input.user.profilePhotoUrl.imageProfileUrl()
         )
     )
 

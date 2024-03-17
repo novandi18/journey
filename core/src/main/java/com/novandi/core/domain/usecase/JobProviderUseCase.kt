@@ -12,7 +12,9 @@ import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.RegisterResult
+import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MultipartBody
 
 interface JobProviderUseCase {
     fun loginJobProvider(loginRequest: LoginRequest): Flow<Resource<LoginResult>>
@@ -28,7 +30,9 @@ interface JobProviderUseCase {
     fun updateJobProvider(companyId: String, request: JobProviderEditRequest)
         : Flow<Resource<GeneralResult>>
     fun updateJobProviderEmail(token: String, companyId: String, request: UpdateEmailRequest)
-            : Flow<Resource<GeneralResult>>
+        : Flow<Resource<GeneralResult>>
     fun updateJobProviderPassword(token: String, companyId: String, request: UpdatePasswordRequest)
-            : Flow<Resource<GeneralResult>>
+        : Flow<Resource<GeneralResult>>
+    fun updateJobProviderLogo(companyId: String, logo: MultipartBody.Part)
+        : Flow<Resource<UpdateProfilePhotoResult>>
 }

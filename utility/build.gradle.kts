@@ -44,10 +44,6 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
 
-    // Tensorflow
-    implementation(libs.tensorflow.lite.support)
-    implementation(libs.tensorflow.lite.metadata)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

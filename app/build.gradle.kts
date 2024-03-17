@@ -89,6 +89,9 @@ dependencies {
     implementation(libs.androidx.paging)
     implementation(libs.androidx.paging.compose)
 
+    // Easy Crop
+    implementation(libs.easycrop)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -2,6 +2,7 @@ package com.novandi.core.data.source.remote.network
 
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
+import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
 import com.novandi.core.data.source.remote.request.JobSeekerRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
@@ -15,13 +16,17 @@ import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -167,4 +172,39 @@ interface ApiService {
         @Path("id") companyId: String,
         @Body request: UpdatePasswordRequest
     ): GeneralResponse
+
+    @Multipart
+    @PUT("companies/logo/{id}")
+    suspend fun updateJobProviderLogo(
+        @Path("id") companyId: String,
+        @Part logo: MultipartBody.Part
+    ): UpdateProfilePhotoResponse
+
+    @PUT("users/{id}")
+    suspend fun updateJobSeeker(
+        @Header("Authorization") token: String,
+        @Path("id") userId: String,
+        @Body request: JobSeekerEditRequest
+    ): GeneralResponse
+
+    @PUT("users/email/{id}")
+    suspend fun updateJobSeekerEmail(
+        @Header("Authorization") token: String,
+        @Path("id") userId: String,
+        @Body request: UpdateEmailRequest
+    ): GeneralResponse
+
+    @PUT("users/password/{id}")
+    suspend fun updateJobSeekerPassword(
+        @Header("Authorization") token: String,
+        @Path("id") userId: String,
+        @Body request: UpdatePasswordRequest
+    ): GeneralResponse
+
+    @Multipart
+    @PUT("users/photo/{id}")
+    suspend fun updateJobSeekerPhoto(
+        @Path("id") userId: String,
+        @Part photo: MultipartBody.Part
+    ): UpdateProfilePhotoResponse
 }

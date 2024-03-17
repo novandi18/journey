@@ -57,7 +57,7 @@ import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.domain.model.JobProvider
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.auth.AuthTitle
-import com.novandi.journey.presentation.ui.component.field.JDropdownField
+import com.novandi.journey.presentation.ui.component.field.JDropdownDialog
 import com.novandi.journey.presentation.ui.component.field.JPasswordField
 import com.novandi.journey.presentation.ui.component.field.JTextField
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -215,13 +215,12 @@ fun JobProviderRegisterContent(
                 textValue = viewModel.password,
                 isReadOnly = viewModel.isLoading
             )
-            JDropdownField(
-                label = stringResource(id = R.string.sector_placeholder),
+            JDropdownDialog(
                 icon = Icons.Filled.Factory,
-                data = viewModel.sectors.map { it.sector },
-                itemSelected = viewModel.sector,
-                setItemSelected = viewModel::setOnSector,
-                isReadOnly = viewModel.isLoading
+                label = stringResource(id = R.string.sector_placeholder),
+                items = viewModel.sectors.map { it.sector },
+                selectedIndex = viewModel.sector,
+                setSelectedItem = viewModel::setOnSector
             )
             JTextField(
                 leadingIcon = Icons.Filled.MapsHomeWork,
@@ -241,25 +240,23 @@ fun JobProviderRegisterContent(
                 textValue = viewModel.employees,
                 isReadOnly = viewModel.isLoading
             )
-            JDropdownField(
-                label = stringResource(id = R.string.province_placeholder),
+            JDropdownDialog(
                 icon = Icons.Filled.LocationOn,
-                data = viewModel.provinces,
-                itemSelected = viewModel.province,
-                setItemSelected = {
+                label = stringResource(id = R.string.province_placeholder),
+                items = viewModel.provinces,
+                selectedIndex = viewModel.province,
+                setSelectedItem = {
                     viewModel.setOnProvince(it)
                     viewModel.setOnCity(-1)
                     viewModel.getRegencies()
-                },
-                isReadOnly = viewModel.isLoading
+                }
             )
-            JDropdownField(
-                label = stringResource(id = R.string.city_placeholder),
+            JDropdownDialog(
                 icon = Icons.Filled.LocationCity,
-                data = viewModel.regencies,
-                itemSelected = viewModel.city,
-                setItemSelected = viewModel::setOnCity,
-                isReadOnly = viewModel.isLoading
+                label = stringResource(id = R.string.city_placeholder),
+                items = viewModel.regencies,
+                selectedIndex = viewModel.city,
+                setSelectedItem = viewModel::setOnCity
             )
             Box(
                 modifier = Modifier.padding(vertical = 56.dp, horizontal = 24.dp)

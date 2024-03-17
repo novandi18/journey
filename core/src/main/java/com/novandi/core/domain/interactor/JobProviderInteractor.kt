@@ -12,9 +12,11 @@ import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.RegisterResult
+import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.repository.JobProviderRepository
 import com.novandi.core.domain.usecase.JobProviderUseCase
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class JobProviderInteractor @Inject constructor(
@@ -82,5 +84,12 @@ class JobProviderInteractor @Inject constructor(
         request: UpdatePasswordRequest
     ): Flow<Resource<GeneralResult>> = jobProviderRepository.updateJobProviderPassword(
         token, companyId, request
+    )
+
+    override fun updateJobProviderLogo(
+        companyId: String,
+        logo: MultipartBody.Part
+    ): Flow<Resource<UpdateProfilePhotoResult>> = jobProviderRepository.updateJobProviderLogo(
+        companyId, logo
     )
 }

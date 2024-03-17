@@ -1,5 +1,7 @@
 package com.novandi.journey.presentation.screen
 
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -14,12 +16,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.filled.Apartment
-import androidx.compose.material.icons.filled.Factory
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.LocationCity
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.MapsHomeWork
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.rounded.Password
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -35,73 +33,50 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.data.response.Resource
-import com.novandi.core.data.source.remote.request.JobProviderEditRequest
-import com.novandi.core.domain.model.ProfileJobProvider
+import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.journey.R
-import com.novandi.journey.presentation.ui.component.field.JDropdownDialog
+import com.novandi.journey.presentation.ui.component.dialog.JDialog
+import com.novandi.journey.presentation.ui.component.field.JPasswordField
 import com.novandi.journey.presentation.ui.component.field.JTextField
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.Blue80
-import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.ui.theme.Light
-import com.novandi.journey.presentation.viewmodel.JobProviderEditViewModel
+import com.novandi.journey.presentation.viewmodel.JobSeekerPasswordViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobProviderEditScreen(
-    viewModel: JobProviderEditViewModel = hiltViewModel(),
-    profile: ProfileJobProvider?,
+fun JobSeekerPasswordScreen(
+    viewModel: JobSeekerPasswordViewModel = hiltViewModel(),
+    navigateToStarted: () -> Unit,
     back: () -> Unit
 ) {
     val context = LocalContext.current
-    val regenciesData by viewModel.regenciesData.observeAsState()
+    val openDialog = remember { mutableStateOf(false) }
+    val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
     val response by viewModel.response.collectAsState()
-
-    LaunchedEffect(Unit) {
-        if (profile != null) {
-            viewModel.setOnName(profile.name)
-            viewModel.setOnSectorId(viewModel.sectors.map { it.sector }.indexOf(profile.sectorName))
-            viewModel.setOnAddress(profile.address)
-            viewModel.setOnProvince(viewModel.provinces.indexOf(profile.province))
-            viewModel.setOnEmployees(profile.employees)
-        }
-
-        viewModel.getRegencies()
-    }
-
-    LaunchedEffect(regenciesData is Resource.Loading) {
-        when (regenciesData) {
-            is Resource.Loading -> viewModel.setOnRegencies(listOf())
-            is Resource.Success -> {
-                if (regenciesData?.data != null) {
-                    viewModel.setOnRegencies(regenciesData!!.data!!)
-                    if (viewModel.regencies.isNotEmpty())
-                        viewModel.setOnRegency(viewModel.regencies.indexOf(profile!!.city))
-                }
-            }
-            is Resource.Error -> {}
-            else -> {}
-        }
-    }
 
     LaunchedEffect(response is Resource.Loading) {
         when (response) {
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 Toast.makeText(context, response?.data?.message, Toast.LENGTH_SHORT).show()
+                viewModel.logout()
                 viewModel.setOnLoading(false)
-                back()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    navigateToStarted()
+                }, 500)
             }
             is Resource.Error -> {
                 Toast.makeText(context, response?.message, Toast.LENGTH_SHORT).show()
@@ -111,11 +86,32 @@ fun JobProviderEditScreen(
         }
     }
 
+    when {
+        openDialog.value -> {
+            JDialog(
+                onDismissRequest = { openDialog.value = false },
+                onConfirmation = {
+                    openDialog.value = false
+                    val request = UpdatePasswordRequest(
+                        email = viewModel.email,
+                        oldPassword = viewModel.currentPassword,
+                        newPassword = viewModel.newPassword
+                    )
+                    viewModel.update(token.toString(), accountId.toString(), request)
+                },
+                dialogTitle = stringResource(id = R.string.title_update_password),
+                dialogText = stringResource(id = R.string.update_password_desc),
+                confirmText = stringResource(id = R.string.update_confirm),
+                icon = Icons.Rounded.Password
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.title_update_profile))
+                    Text(text = stringResource(id = R.string.title_update_password))
                 },
                 navigationIcon = {
                     IconButton(onClick = back) {
@@ -145,57 +141,35 @@ fun JobProviderEditScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 JTextField(
-                    leadingIcon = Icons.Filled.Apartment,
-                    label = stringResource(id = R.string.company_name),
-                    placeholder = stringResource(id = R.string.companyname_placeholder),
-                    onKeyUp = viewModel::setOnName,
-                    textValue = viewModel.name,
+                    keyboardType = KeyboardType.Email,
+                    leadingIcon = Icons.Filled.Email,
+                    label = stringResource(id = R.string.current_email),
+                    placeholder = stringResource(id = R.string.current_email),
+                    onKeyUp = viewModel::setOnEmail,
+                    textValue = viewModel.email,
                     isReadOnly = viewModel.loading
                 )
-                JDropdownDialog(
-                    icon = Icons.Filled.Factory,
-                    label = stringResource(id = R.string.sector_placeholder),
-                    items = viewModel.sectors.map { it.sector },
-                    selectedIndex = viewModel.sectorId,
-                    setSelectedItem = viewModel::setOnSectorId
-                )
-                JTextField(
-                    leadingIcon = Icons.Filled.MapsHomeWork,
-                    label = stringResource(id = R.string.address),
-                    keyboardType = KeyboardType.Text,
-                    placeholder = stringResource(id = R.string.address_placeholder),
-                    onKeyUp = viewModel::setOnAddress,
-                    textValue = viewModel.address,
+                JPasswordField(
+                    label = stringResource(id = R.string.current_password),
+                    placeholder = stringResource(id = R.string.current_password_placeholder),
+                    onKeyUp = viewModel::setOnCurrentPassword,
+                    textValue = viewModel.currentPassword,
                     isReadOnly = viewModel.loading
                 )
-                JDropdownDialog(
-                    icon = Icons.Filled.LocationOn,
-                    label = stringResource(id = R.string.province_placeholder),
-                    items = viewModel.provinces,
-                    selectedIndex = viewModel.province,
-                    setSelectedItem = {
-                        viewModel.setOnProvince(it)
-                        viewModel.setOnRegency(-1)
-                        viewModel.getRegencies()
-                    }
-                )
-                JDropdownDialog(
-                    icon = Icons.Filled.LocationCity,
-                    label = stringResource(id = R.string.city_placeholder),
-                    items = viewModel.regencies,
-                    selectedIndex = viewModel.regency,
-                    setSelectedItem = viewModel::setOnRegency
-                )
-                JTextField(
-                    leadingIcon = Icons.Filled.Groups,
-                    label = stringResource(id = R.string.total_employee),
-                    keyboardType = KeyboardType.Number,
-                    placeholder = stringResource(id = R.string.totalemployee_placeholder),
-                    onKeyUp = { total -> viewModel.setOnEmployees(total.toInt()) },
-                    textValue = viewModel.employees.toString(),
+                JPasswordField(
+                    label = stringResource(id = R.string.new_password),
+                    placeholder = stringResource(id = R.string.new_password_placeholder),
+                    onKeyUp = viewModel::setOnNewPassword,
+                    textValue = viewModel.newPassword,
                     isReadOnly = viewModel.loading
                 )
-
+                JPasswordField(
+                    label = stringResource(id = R.string.new_password_confirm),
+                    placeholder = stringResource(id = R.string.new_password_confirm_placeholder),
+                    onKeyUp = viewModel::setOnNewPasswordConfirm,
+                    textValue = viewModel.newPasswordConfirm,
+                    isReadOnly = viewModel.loading
+                )
                 ElevatedButton(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -209,15 +183,15 @@ fun JobProviderEditScreen(
                     enabled = !viewModel.loading,
                     onClick = {
                         if (viewModel.validateFields()) {
-                            val request = JobProviderEditRequest(
-                                name = viewModel.name,
-                                address = viewModel.address,
-                                city = viewModel.regencies[viewModel.regency],
-                                province = viewModel.provinces[viewModel.province],
-                                employees = viewModel.employees,
-                                sectorId = viewModel.sectors[viewModel.sectorId].id
-                            )
-                            viewModel.update(accountId.toString(), request)
+                            if (viewModel.newPasswordConfirm != viewModel.newPassword) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.error_confirm_current_password),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                openDialog.value = true
+                            }
                         } else {
                             Toast.makeText(
                                 context,
@@ -237,7 +211,7 @@ fun JobProviderEditScreen(
                             color = Light,
                             fontSize = 16.sp
                         )
-                        AnimatedVisibility(viewModel.loading) {
+                        AnimatedVisibility(false) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(28.dp),
                                 color = Light
@@ -247,16 +221,5 @@ fun JobProviderEditScreen(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun Preview() {
-    JourneyTheme {
-        JobProviderEditScreen(
-            profile = ProfileJobProvider(),
-            back = {}
-        )
     }
 }

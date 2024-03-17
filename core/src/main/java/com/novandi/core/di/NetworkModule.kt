@@ -1,5 +1,6 @@
 package com.novandi.core.di
 
+import com.novandi.core.consts.NetworkUrls
 import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
 import dagger.Module
@@ -19,7 +20,8 @@ class NetworkModule {
     @Singleton
     @Provides
     fun provideOkHttpClient(): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        val loggingInterceptor = HttpLoggingInterceptor()
+            .setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
@@ -38,7 +40,7 @@ class NetworkModule {
     @Provides
     fun provideApi(client: OkHttpClient): ApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/api/")
+            .baseUrl(NetworkUrls.JOURNEY)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -49,7 +51,7 @@ class NetworkModule {
     @Provides
     fun provideRegencyApi(client: OkHttpClient): RegencyApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://www.emsifa.com/api-wilayah-indonesia/api/")
+            .baseUrl(NetworkUrls.REGENCY)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

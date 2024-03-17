@@ -16,13 +16,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AssistWalker
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Man
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Person3
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.rounded.AssistWalker
+import androidx.compose.material.icons.rounded.Man
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -51,7 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.domain.model.JobSeeker
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.auth.AuthTitle
-import com.novandi.journey.presentation.ui.component.field.JDropdownField
+import com.novandi.journey.presentation.ui.component.field.JDropdownDialog
 import com.novandi.journey.presentation.ui.component.field.JPasswordField
 import com.novandi.journey.presentation.ui.component.field.JTextField
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -197,19 +197,19 @@ fun JobSeekerRegisterContent(
                 onKeyUp = viewModel::setOnAge,
                 textValue = viewModel.age
             )
-            JDropdownField(
-                icon = Icons.Filled.Man,
+            JDropdownDialog(
+                icon = Icons.Rounded.Man,
                 label = stringResource(id = R.string.gender_placeholder),
-                data = genders,
-                itemSelected = viewModel.gender,
-                setItemSelected = viewModel::setOnGender
+                items = genders,
+                selectedIndex = viewModel.gender,
+                setSelectedItem = viewModel::setOnGender
             )
-            JDropdownField(
-                icon = Icons.Filled.AssistWalker,
+            JDropdownDialog(
+                icon = Icons.Rounded.AssistWalker,
                 label = stringResource(id = R.string.disability_placeholder),
-                data = disabilities,
-                itemSelected = viewModel.disability,
-                setItemSelected = viewModel::setOnDisability
+                items = disabilities,
+                selectedIndex = viewModel.disability,
+                setSelectedItem = viewModel::setOnDisability
             )
             JPasswordField(
                 onKeyUp = viewModel::setOnPassword,

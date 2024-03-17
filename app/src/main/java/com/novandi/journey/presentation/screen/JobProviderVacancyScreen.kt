@@ -15,8 +15,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
-import androidx.compose.material.icons.filled.AssistWalker
 import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.rounded.AssistWalker
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,7 +44,7 @@ import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.field.JDatePickerField
-import com.novandi.journey.presentation.ui.component.field.JDropdownField
+import com.novandi.journey.presentation.ui.component.field.JDropdownDialog
 import com.novandi.journey.presentation.ui.component.field.JTextAreaField
 import com.novandi.journey.presentation.ui.component.field.JTextField
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -142,37 +142,33 @@ fun JobProviderVacancyScreen(
                     value = viewModel.description,
                     isReadOnly = viewModel.loading
                 )
-                JDropdownField(
-                    label = stringResource(id = R.string.job_type_placeholder),
+                JDropdownDialog(
                     icon = Icons.Filled.Work,
-                    data = viewModel.jobTypes,
-                    setItemSelected = viewModel::setOnJobType,
-                    itemSelected = viewModel.jobType,
-                    isReadOnly = viewModel.loading
+                    label = stringResource(id = R.string.job_type_placeholder),
+                    items = viewModel.jobTypes,
+                    selectedIndex = viewModel.jobType,
+                    setSelectedItem = viewModel::setOnJobType
                 )
-                JDropdownField(
+                JDropdownDialog(
+                    icon = Icons.Rounded.AssistWalker,
                     label = stringResource(id = R.string.disability_job_placeholder),
-                    icon = Icons.Filled.AssistWalker,
-                    data = viewModel.disabilities.map { it.disability },
-                    setItemSelected = viewModel::setOnDisability,
-                    itemSelected = viewModel.disability,
-                    isReadOnly = viewModel.loading
+                    items = viewModel.disabilities.map { it.disability },
+                    selectedIndex = viewModel.disability,
+                    setSelectedItem = viewModel::setOnDisability
                 )
-                JDropdownField(
+                JDropdownDialog(
+                    icon = Icons.AutoMirrored.Filled.StarHalf,
                     label = stringResource(id = R.string.skill_one_placeholder),
-                    icon = Icons.AutoMirrored.Filled.StarHalf,
-                    data = viewModel.skills.map { it.skill },
-                    setItemSelected = viewModel::setOnSkillOne,
-                    itemSelected = viewModel.skillOne,
-                    isReadOnly = viewModel.loading
+                    items = viewModel.skills.map { it.skill },
+                    selectedIndex = viewModel.skillOne,
+                    setSelectedItem = viewModel::setOnSkillOne
                 )
-                JDropdownField(
-                    label = stringResource(id = R.string.skill_two_placeholder),
+                JDropdownDialog(
                     icon = Icons.AutoMirrored.Filled.StarHalf,
-                    data = viewModel.skills.map { it.skill },
-                    setItemSelected = viewModel::setOnSkillTwo,
-                    itemSelected = viewModel.skillTwo,
-                    isReadOnly = viewModel.loading
+                    label = stringResource(id = R.string.skill_two_placeholder),
+                    items = viewModel.skills.map { it.skill },
+                    selectedIndex = viewModel.skillTwo,
+                    setSelectedItem = viewModel::setOnSkillTwo
                 )
                 JDatePickerField(
                     setDate = viewModel::setOnDeadline,

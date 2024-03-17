@@ -4,21 +4,28 @@ import com.novandi.core.data.response.NetworkOnlyResource
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.RemoteDataSource
 import com.novandi.core.data.source.remote.network.ApiResponse
+import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
 import com.novandi.core.data.source.remote.request.JobSeekerRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
+import com.novandi.core.data.source.remote.request.UpdateEmailRequest
+import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.JobApplyStatusResponse
 import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.JobApplyStatus
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
+import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.repository.JobSeekerRepository
+import com.novandi.core.mapper.JobProviderMapper
 import com.novandi.core.mapper.JobSeekerMapper
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class JobSeekerRepositoryImpl @Inject constructor(
@@ -74,5 +81,57 @@ class JobSeekerRepositoryImpl @Inject constructor(
 
             override suspend fun createCall(): Flow<ApiResponse<JobApplyStatusResponse>> =
                 remoteDataSource.getApplyStatus(token, userId)
+        }.asFlow()
+
+    override fun updateJobSeeker(
+        token: String,
+        userId: String,
+        request: JobSeekerEditRequest
+    ): Flow<Resource<GeneralResult>> =
+        object : NetworkOnlyResource<GeneralResult, GeneralResponse>() {
+            override fun loadFromNetwork(data: GeneralResponse): Flow<GeneralResult> =
+                JobSeekerMapper.mapGeneralResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<GeneralResponse>> =
+                remoteDataSource.updateJobSeeker(token, userId, request)
+        }.asFlow()
+
+    override fun updateJobSeekerEmail(
+        token: String,
+        userId: String,
+        request: UpdateEmailRequest
+    ): Flow<Resource<GeneralResult>> =
+        object : NetworkOnlyResource<GeneralResult, GeneralResponse>() {
+            override fun loadFromNetwork(data: GeneralResponse): Flow<GeneralResult> =
+                JobSeekerMapper.mapGeneralResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<GeneralResponse>> =
+                remoteDataSource.updateJobSeekerEmail(token, userId, request)
+        }.asFlow()
+
+    override fun updateJobSeekerPassword(
+        token: String,
+        userId: String,
+        request: UpdatePasswordRequest
+    ): Flow<Resource<GeneralResult>> =
+        object : NetworkOnlyResource<GeneralResult, GeneralResponse>() {
+            override fun loadFromNetwork(data: GeneralResponse): Flow<GeneralResult> =
+                JobSeekerMapper.mapGeneralResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<GeneralResponse>> =
+                remoteDataSource.updateJobSeekerPassword(token, userId, request)
+        }.asFlow()
+
+    override fun updateJobSeekerPhoto(
+        userId: String,
+        photo: MultipartBody.Part
+    ): Flow<Resource<UpdateProfilePhotoResult>> =
+        object : NetworkOnlyResource<UpdateProfilePhotoResult, UpdateProfilePhotoResponse>() {
+            override fun loadFromNetwork(data: UpdateProfilePhotoResponse)
+                    : Flow<UpdateProfilePhotoResult> =
+                JobProviderMapper.updateProfilePhotoResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<UpdateProfilePhotoResponse>> =
+                remoteDataSource.updateJobSeekerPhoto(userId, photo)
         }.asFlow()
 }

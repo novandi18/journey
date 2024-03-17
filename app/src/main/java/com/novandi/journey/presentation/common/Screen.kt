@@ -18,6 +18,9 @@ sealed class Screen(val route: String) {
     data object JobProviderEdit: Screen("job_provider_edit")
     data object JobProviderEmail: Screen("job_provider_email")
     data object JobProviderPassword: Screen("job_provider_password")
+    data object JobSeekerEdit: Screen("job_seeker_edit")
+    data object JobSeekerEmail: Screen("job_seeker_email")
+    data object JobSeekerPassword: Screen("job_seeker_password")
     data object JobProviderApplicantDetail: Screen("job_provider_applicant/{vacancyId}") {
         fun createRoute(vacancyId: String) = "job_provider_applicant/$vacancyId"
     }
