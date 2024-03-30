@@ -24,6 +24,7 @@ import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegencyItem
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
+import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import kotlinx.coroutines.Dispatchers
@@ -510,4 +511,7 @@ class RemoteDataSource @Inject constructor(
             Log.e("RemoteDataSource", e.toString())
         }
     }.flowOn(Dispatchers.IO)
+
+    suspend fun getUpdatedApplyStatus(token: String, userId: String): List<UpdatedJobStatusItem> =
+        apiService.getUpdatedApplyStatus(token, userId)
 }

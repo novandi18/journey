@@ -45,6 +45,7 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
     implementation(libs.androidx.hilt.navigation)
+    implementation(libs.hilt.work)
 
     // Retrofit
     api(libs.retrofit)
@@ -65,6 +66,9 @@ dependencies {
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
     ksp(libs.room.compiler)
+
+    // Work Manager
+    implementation(libs.work.manager)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

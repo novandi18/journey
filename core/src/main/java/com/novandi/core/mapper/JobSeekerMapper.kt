@@ -10,6 +10,8 @@ import com.novandi.core.data.source.remote.response.JobApplyStatusResponse
 import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
+import com.novandi.core.domain.model.UpdatedJobStatus
 import com.novandi.utility.data.dateFormatter
 import com.novandi.utility.image.imageProfileUrl
 import kotlinx.coroutines.flow.Flow
@@ -60,4 +62,9 @@ object JobSeekerMapper {
                 )
             }
         )
+
+    fun updatedJobStatusResponseToDomain(input: List<UpdatedJobStatusItem>): List<UpdatedJobStatus> =
+        input.map {
+            UpdatedJobStatus(it.position, it.company, it.status)
+        }
 }

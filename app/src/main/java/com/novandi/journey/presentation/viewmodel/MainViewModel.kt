@@ -1,6 +1,7 @@
 package com.novandi.journey.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.journey.presentation.navigation.AuthNavigation
@@ -20,6 +21,9 @@ class MainViewModel @Inject constructor(
 ): ViewModel() {
     private val _startedDestination = MutableStateFlow(WelcomeNavigation.WELCOME_ROUTE)
     val startedDestination: StateFlow<String> = _startedDestination
+
+    val token = dataStoreManager.token.asLiveData()
+    val userId = dataStoreManager.accountId.asLiveData()
 
     init {
         welcomed()

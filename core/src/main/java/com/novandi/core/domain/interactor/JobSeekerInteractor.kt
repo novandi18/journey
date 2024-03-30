@@ -12,6 +12,7 @@ import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
+import com.novandi.core.domain.model.UpdatedJobStatus
 import com.novandi.core.domain.repository.JobSeekerRepository
 import com.novandi.core.domain.usecase.JobSeekerUseCase
 import kotlinx.coroutines.flow.Flow
@@ -71,4 +72,7 @@ class JobSeekerInteractor @Inject constructor(
     ): Flow<Resource<UpdateProfilePhotoResult>> = jobSeekerRepository.updateJobSeekerPhoto(
         userId, photo
     )
+
+    override suspend fun getUpdatedJobStatus(token: String, userId: String): List<UpdatedJobStatus> =
+        jobSeekerRepository.getUpdatedJobStatus(token, userId)
 }

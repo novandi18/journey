@@ -21,6 +21,7 @@ import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
+import com.novandi.core.domain.model.UpdatedJobStatus
 import com.novandi.core.domain.repository.JobSeekerRepository
 import com.novandi.core.mapper.JobProviderMapper
 import com.novandi.core.mapper.JobSeekerMapper
@@ -134,4 +135,12 @@ class JobSeekerRepositoryImpl @Inject constructor(
             override suspend fun createCall(): Flow<ApiResponse<UpdateProfilePhotoResponse>> =
                 remoteDataSource.updateJobSeekerPhoto(userId, photo)
         }.asFlow()
+
+    override suspend fun getUpdatedJobStatus(
+        token: String,
+        userId: String
+    ): List<UpdatedJobStatus> {
+        val data = remoteDataSource.getUpdatedApplyStatus(token, userId)
+        return JobSeekerMapper.updatedJobStatusResponseToDomain(data)
+    }
 }

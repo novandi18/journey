@@ -12,6 +12,7 @@ import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
+import com.novandi.core.domain.model.UpdatedJobStatus
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 
@@ -29,4 +30,5 @@ interface JobSeekerRepository {
         : Flow<Resource<GeneralResult>>
     fun updateJobSeekerPhoto(userId: String, photo: MultipartBody.Part)
         : Flow<Resource<UpdateProfilePhotoResult>>
+    suspend fun getUpdatedJobStatus(token: String, userId: String): List<UpdatedJobStatus>
 }

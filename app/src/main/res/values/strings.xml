@@ -155,4 +155,10 @@
     <string name="not_accepted">Belum diterima</string>
     <string name="reset_search">Reset Search</string>
     <string name="closed_at">Tutup pada</string>
+
+    <!--  Notification Channel  -->
+    <string name="channel_name">Journey Notifikasi</string>
+    <string name="channel_desc">Journey Notifikasi Deskripsi</string>
+    <string name="vacancy_accepted_channel">Lamaran Diterima</string>
+    <string name="vacancy_accepted_desc">Selamat! lamaran anda diterima oleh %1$s pada posisi %2$s</string>
 </resources>

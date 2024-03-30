@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,9 +14,13 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import com.novandi.journey.presentation.service.NotificationService
 import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,6 +42,21 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             setContent {
+                val context = LocalContext.current
+                val token by viewModel.token.observeAsState()
+                val userId by viewModel.userId.observeAsState()
+                if (
+                    (token != null && token!!.isNotEmpty()) &&
+                    (userId != null && userId!!.isNotEmpty())
+                ) {
+                    val service = Intent(context, NotificationService::class.java)
+                    val bundle = Bundle()
+                    bundle.putString(NotificationService.TOKEN, token)
+                    bundle.putString(NotificationService.USER_ID, userId)
+                    service.putExtras(bundle)
+                    context.startService(service)
+                }
+
                 JourneyTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),

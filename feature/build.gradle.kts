@@ -36,22 +36,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
-
     // Hilt
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
-
-    // Retrofit
-    api(libs.retrofit)
-    api(libs.retrofit.gson)
-    implementation(libs.okhttp.logging.interceptor)
-
-    // Paging 3
-    implementation(libs.androidx.pager)
-    implementation(libs.androidx.paging)
-    implementation(libs.androidx.paging.compose)
 
     // DataStore
     implementation(libs.datastore.preferences)

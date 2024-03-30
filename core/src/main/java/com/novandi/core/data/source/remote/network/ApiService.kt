@@ -17,6 +17,7 @@ import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
+import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import okhttp3.MultipartBody
@@ -207,4 +208,10 @@ interface ApiService {
         @Path("id") userId: String,
         @Part photo: MultipartBody.Part
     ): UpdateProfilePhotoResponse
+
+    @GET("users/applicants/updated/{userId}")
+    suspend fun getUpdatedApplyStatus(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: String
+    ): List<UpdatedJobStatusItem>
 }

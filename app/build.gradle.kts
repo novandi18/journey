@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt)
     id("kotlin-parcelize")
+    kotlin("kapt")
 }
 
 android {
@@ -57,6 +58,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":utility"))
+    implementation(project(":feature"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
@@ -80,6 +82,7 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
     implementation(libs.androidx.hilt.navigation)
+    implementation(libs.hilt.work)
 
     // Shimmer
     implementation(libs.compose.shimmer)
@@ -91,6 +94,9 @@ dependencies {
 
     // Easy Crop
     implementation(libs.easycrop)
+
+    // Work Manager
+    implementation(libs.work.manager)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
