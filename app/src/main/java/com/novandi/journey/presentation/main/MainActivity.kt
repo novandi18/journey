@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import com.novandi.journey.presentation.service.NotificationService
 import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.viewmodel.MainViewModel
+import com.novandi.utility.service.isServiceRunning
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -43,18 +44,21 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             setContent {
                 val context = LocalContext.current
-                val token by viewModel.token.observeAsState()
-                val userId by viewModel.userId.observeAsState()
-                if (
-                    (token != null && token!!.isNotEmpty()) &&
-                    (userId != null && userId!!.isNotEmpty())
-                ) {
-                    val service = Intent(context, NotificationService::class.java)
-                    val bundle = Bundle()
-                    bundle.putString(NotificationService.TOKEN, token)
-                    bundle.putString(NotificationService.USER_ID, userId)
-                    service.putExtras(bundle)
-                    context.startService(service)
+                val roleId by viewModel.roleId.observeAsState()
+                if (!isServiceRunning(context, NotificationService::class.java) && roleId == 1) {
+                    val token by viewModel.token.observeAsState()
+                    val userId by viewModel.userId.observeAsState()
+                    if (
+                        (token != null && token!!.isNotEmpty()) &&
+                        (userId != null && userId!!.isNotEmpty())
+                    ) {
+                        val service = Intent(context, NotificationService::class.java)
+                        val bundle = Bundle()
+                        bundle.putString(NotificationService.TOKEN, token)
+                        bundle.putString(NotificationService.USER_ID, userId)
+                        service.putExtras(bundle)
+                        context.startService(service)
+                    }
                 }
 
                 JourneyTheme {

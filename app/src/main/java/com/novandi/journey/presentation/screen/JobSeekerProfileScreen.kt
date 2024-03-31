@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.screen
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Handler
@@ -70,6 +71,7 @@ import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.novandi.core.data.response.Resource
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.journey.R
+import com.novandi.journey.presentation.service.NotificationService
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialogImagePreview
 import com.novandi.journey.presentation.ui.component.skeleton.ProfileSkeleton
@@ -237,6 +239,8 @@ fun JobSeekerProfileContent(
                 onDismissRequest = { openDialog.value = false },
                 onConfirmation = {
                     openDialog.value = false
+                    val service = Intent(context, NotificationService::class.java)
+                    context.stopService(service)
                     logout()
                 },
                 dialogTitle = stringResource(id = R.string.logout),

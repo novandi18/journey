@@ -24,6 +24,7 @@ class MainViewModel @Inject constructor(
 
     val token = dataStoreManager.token.asLiveData()
     val userId = dataStoreManager.accountId.asLiveData()
+    val roleId = dataStoreManager.roleId.asLiveData()
 
     init {
         welcomed()
