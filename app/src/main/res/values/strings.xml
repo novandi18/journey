@@ -53,7 +53,7 @@
     <string name="password_placeholder">Masukan password</string>
     <string name="disability_placeholder">Pilih jenis disabilitas</string>
     <string name="gender_placeholder">Pilih jenis kelamin</string>
-    <string name="disability_job_placeholder">Pilih jenis disabilitas untuk lowongan ini</string>
+    <string name="disability_job_placeholder">Pilih jenis disabilitas</string>
     <string name="companyname_placeholder">Masukan nama perusahaan</string>
     <string name="province_placeholder">Pilih provinsi</string>
     <string name="city_placeholder">Pilih kota</string>
@@ -67,8 +67,8 @@
     <string name="placement_address_placeholder">Posisi apa yang dibutuhkan?</string>
     <string name="description_placeholder">Deskripsi pekerjaan</string>
     <string name="deadline_time_placeholder">Batas waktu</string>
-    <string name="skill_one_placeholder">Skill pertama yang dibutuhkan</string>
-    <string name="skill_two_placeholder">Skill kedua yang dibutuhkan</string>
+    <string name="skill_one_placeholder">Skill pertama</string>
+    <string name="skill_two_placeholder">Skill kedua</string>
     <string name="job_type_placeholder">Jenis pekerjaan</string>
     <string name="current_email">Email saat ini</string>
     <string name="new_email">Email baru</string>

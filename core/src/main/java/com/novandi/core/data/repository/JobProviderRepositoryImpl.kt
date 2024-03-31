@@ -16,14 +16,17 @@ import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
+import com.novandi.core.data.source.remote.response.VacancyResponse
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
+import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.domain.repository.JobProviderRepository
 import com.novandi.core.mapper.JobProviderMapper
+import com.novandi.core.mapper.VacancyMapper
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -161,5 +164,17 @@ class JobProviderRepositoryImpl @Inject constructor(
 
             override suspend fun createCall(): Flow<ApiResponse<UpdateProfilePhotoResponse>> =
                 remoteDataSource.updateJobProviderLogo(companyId, logo)
+        }.asFlow()
+
+    override fun getVacanciesApplicants(
+        token: String,
+        companyId: String
+    ): Flow<Resource<List<Vacancy>>> =
+        object : NetworkOnlyResource<List<Vacancy>, VacancyResponse>() {
+            override fun loadFromNetwork(data: VacancyResponse): Flow<List<Vacancy>> =
+                VacancyMapper.mapNoPagerResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<VacancyResponse>> =
+                remoteDataSource.getJobProviderApplicants(token, companyId)
         }.asFlow()
 }

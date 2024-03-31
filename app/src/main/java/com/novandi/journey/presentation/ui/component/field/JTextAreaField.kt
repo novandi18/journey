@@ -3,7 +3,9 @@ package com.novandi.journey.presentation.ui.component.field
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,12 +39,11 @@ fun JTextAreaField(
         BasicTextField(
             value = value,
             onValueChange = { newText -> onKeyUp(newText) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
             singleLine = false,
             interactionSource = interactionSource,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             minLines = 7,
-            maxLines = 7,
             readOnly = isReadOnly
         ) {
             OutlinedTextFieldDefaults.DecorationBox(

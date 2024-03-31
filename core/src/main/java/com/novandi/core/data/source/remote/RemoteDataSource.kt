@@ -258,6 +258,24 @@ class RemoteDataSource @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
+    suspend fun getJobProviderApplicants(token: String, companyId: String)
+            : Flow<ApiResponse<VacancyResponse>> = flow {
+        try {
+            val response = apiService.getJobProviderApplicants(token, companyId)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
     suspend fun addVacancy(token: String, companyId: String, vacancyRequest: VacancyRequest)
         : Flow<ApiResponse<GeneralResponse>> = flow {
         try {

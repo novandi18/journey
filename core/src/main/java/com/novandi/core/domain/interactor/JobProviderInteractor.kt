@@ -13,6 +13,7 @@ import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
+import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.domain.repository.JobProviderRepository
 import com.novandi.core.domain.usecase.JobProviderUseCase
 import kotlinx.coroutines.flow.Flow
@@ -91,5 +92,12 @@ class JobProviderInteractor @Inject constructor(
         logo: MultipartBody.Part
     ): Flow<Resource<UpdateProfilePhotoResult>> = jobProviderRepository.updateJobProviderLogo(
         companyId, logo
+    )
+
+    override fun getVacanciesApplicants(
+        token: String,
+        companyId: String
+    ): Flow<Resource<List<Vacancy>>> = jobProviderRepository.getVacanciesApplicants(
+        token, companyId
     )
 }

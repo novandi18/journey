@@ -11,7 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Vacancy
-import com.novandi.core.domain.usecase.VacancyUseCase
+import com.novandi.core.domain.usecase.JobProviderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class JobProviderApplicantViewModel @Inject constructor(
-    private val vacancyUseCase: VacancyUseCase,
+    private val jobProviderUseCase: JobProviderUseCase,
     dataStoreManager: DataStoreManager
 ): ViewModel() {
     private val _vacancies = MutableLiveData<Resource<List<Vacancy>>>(null)
@@ -44,7 +44,7 @@ class JobProviderApplicantViewModel @Inject constructor(
 
     fun vacancies(token: String, companyId: String) {
         viewModelScope.launch {
-            vacancyUseCase.getJobProviderVacancies(token, companyId)
+            jobProviderUseCase.getVacanciesApplicants(token, companyId)
                 .catch { err ->
                     _vacancies.value = Resource.Error(err.message.toString())
                 }

@@ -107,6 +107,12 @@ interface ApiService {
         @Path("companyId") companyId: String
     ): VacancyResponse
 
+    @GET("companies/{companyId}/applicants")
+    suspend fun getJobProviderApplicants(
+        @Header("Authorization") token: String,
+        @Path("companyId") companyId: String
+    ): VacancyResponse
+
     @POST("companies/{companyId}/vacancies")
     suspend fun addVacancy(
         @Header("Authorization") token: String,

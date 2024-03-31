@@ -70,7 +70,10 @@ fun JobProviderHomeScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Blue40,
                     titleContentColor = Light
-                )
+                ),
+                actions = {
+
+                }
             )
         },
         floatingActionButton = {
