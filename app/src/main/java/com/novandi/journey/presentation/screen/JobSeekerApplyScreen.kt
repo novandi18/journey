@@ -5,12 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,6 +33,7 @@ import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardApply
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
+import com.novandi.journey.presentation.ui.component.state.PullToRefreshLazyColumn
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
@@ -119,17 +118,18 @@ fun JobSeekerJobApplyScreen(
                     }
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items(viewModel.vacanciesData!!.size) { index ->
+                PullToRefreshLazyColumn(
+                    items = viewModel.vacanciesData!!,
+                    content = { jobApplyStatus ->
                         JCardApply(
-                            data = viewModel.vacanciesData!![index]
+                            data = jobApplyStatus
                         )
+                    },
+                    isRefreshing = viewModel.loading,
+                    onRefresh = {
+                        viewModel.getVacancies(token.toString(), accountId.toString())
                     }
-                }
+                )
             }
         }
     }

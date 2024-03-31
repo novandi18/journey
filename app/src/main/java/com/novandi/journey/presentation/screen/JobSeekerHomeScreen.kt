@@ -3,11 +3,11 @@ package com.novandi.journey.presentation.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,14 +45,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCard
-import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
-import com.novandi.journey.presentation.ui.component.state.LoadStateError
+import com.novandi.journey.presentation.ui.component.state.LazyColumnPaging
+import com.novandi.journey.presentation.ui.component.state.PullToRefreshPaging
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.Dark
 import com.novandi.journey.presentation.ui.theme.DarkGray40
@@ -171,10 +171,13 @@ fun JobSeekerHomeScreen(
                 if (isDoSearching) {
                     val vacancies = viewModel.searchVacancies(searchText).collectAsLazyPagingItems()
 
-                    JobSeekerHomeContent(
-                        vacancies = vacancies,
-                        navigateToVacancy = { id ->
-                            navigateToVacancy(id)
+                    LazyColumnPaging(
+                        items = vacancies,
+                        content = { vacancy ->
+                            JCard(
+                                vacancy = vacancy,
+                                setClick = navigateToVacancy
+                            )
                         }
                     )
                 } else {
@@ -224,50 +227,15 @@ fun JobSeekerHomeScreen(
             }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            ScrollableTabRow(
-                modifier = Modifier.fillMaxWidth(),
-                selectedTabIndex = tabSelected,
-                edgePadding = 16.dp,
-                containerColor = Blue40,
-                contentColor = Light,
-                indicator = { tabPositions ->
-                    SecondaryIndicator(
-                        modifier = Modifier
-                            .tabIndicatorOffset(tabPositions[tabSelected])
-                            .fillMaxWidth(),
-                        color = Color.Transparent
-                    )
-                }
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    TextButton(
-                        modifier = Modifier.padding(
-                            bottom = 12.dp,
-                            end = if (index < tabs.lastIndex) 4.dp else 0.dp
-                        ),
-                        colors = ButtonDefaults.textButtonColors(
-                            containerColor = if (tabSelected == index) Light else Light.copy(.2f)
-                        ),
-                        onClick = {
-                            tabSelected = index
-                        },
-                    ) {
-                        Text(
-                            text = tab,
-                            color = if (tabSelected == index) Blue40 else Light
-                        )
-                    }
-                }
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(top = 56.dp)
                     .background(Light)
             ) {
                 when (tabSelected) {
@@ -309,6 +277,46 @@ fun JobSeekerHomeScreen(
                     }
                 }
             }
+
+            ScrollableTabRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter),
+                selectedTabIndex = tabSelected,
+                edgePadding = 16.dp,
+                containerColor = Blue40,
+                contentColor = Light,
+                indicator = { tabPositions ->
+                    SecondaryIndicator(
+                        modifier = Modifier
+                            .tabIndicatorOffset(tabPositions[tabSelected])
+                            .fillMaxWidth(),
+                        color = Color.Transparent
+                    )
+                }
+            ) {
+                tabs.forEachIndexed { index, tab ->
+                    TextButton(
+                        modifier = Modifier
+                            .padding(
+                                bottom = 12.dp,
+                                end = if (index < tabs.lastIndex) 4.dp else 0.dp
+                            )
+                            .height(48.dp),
+                        colors = ButtonDefaults.textButtonColors(
+                            containerColor = if (tabSelected == index) Light else Light.copy(.2f)
+                        ),
+                        onClick = {
+                            tabSelected = index
+                        },
+                    ) {
+                        Text(
+                            text = tab,
+                            color = if (tabSelected == index) Blue40 else Light
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -316,53 +324,27 @@ fun JobSeekerHomeScreen(
 @Composable
 fun JobSeekerHomeContent(
     vacancies: LazyPagingItems<Vacancy>,
-    navigateToVacancy: (String) -> Unit
+    navigateToVacancy: (String) -> Unit,
+    isSearch: Boolean = false
 ) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        items(vacancies.itemCount) { index ->
-            if (vacancies[index] != null) {
-                JCard(
-                    vacancy = vacancies[index]!!,
-                    setClick = navigateToVacancy
-                )
-            }
-        }
-
-        vacancies.apply {
-            when {
-                loadState.refresh is LoadState.Loading -> {
-                    item {
-                        JCardSkeleton(3)
-                    }
-                }
-
-                loadState.refresh is LoadState.Error -> {
-                    val error = vacancies.loadState.refresh as LoadState.Error
-                    item {
-                        LoadStateError(errorMessage = error.error.localizedMessage!!) {
-                            retry()
-                        }
-                    }
-                }
-
-                loadState.append is LoadState.Loading -> {
-                    item {
-                        JCardSkeleton(3)
-                    }
-                }
-
-                loadState.append is LoadState.Error -> {
-                    val error = vacancies.loadState.refresh as LoadState.Error
-                    item {
-                        LoadStateError(errorMessage = error.error.localizedMessage!!) {
-                            retry()
-                        }
-                    }
-                }
-            }
-        }
+    var isRefreshing by remember {
+        mutableStateOf(false)
     }
+
+    PullToRefreshPaging(
+        items = vacancies,
+        content = { vacancy ->
+            JCard(
+                vacancy = vacancy,
+                setClick = navigateToVacancy
+            )
+        },
+        isRefreshing = if (!isSearch) isRefreshing else false,
+        setIsRefreshing = {
+            if (!isSearch) isRefreshing = it
+        },
+        onRefresh = {
+            vacancies.refresh()
+        }
+    )
 }

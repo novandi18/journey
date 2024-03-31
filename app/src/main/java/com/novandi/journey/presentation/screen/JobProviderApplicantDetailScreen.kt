@@ -6,12 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +39,7 @@ import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardApplicant
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
+import com.novandi.journey.presentation.ui.component.state.PullToRefreshLazyColumn
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
@@ -156,31 +155,32 @@ fun JobProviderApplicantDetailScreen(
                     }
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(viewModel.data!!.size) { index ->
+                PullToRefreshLazyColumn(
+                    items = viewModel.data!!,
+                    content = { applicant ->
                         JCardApplicant(
-                            applicant = viewModel.data!![index],
+                            applicant = applicant,
                             onAccept = { isAccept ->
                                 if (isAccept) {
                                     viewModel.acceptApplicant(
                                         token.toString(), accountId.toString(),
-                                        vacancyId, viewModel.data!![index].id
+                                        vacancyId, applicant.id
                                     )
                                 } else {
                                     viewModel.rejectApplicant(
                                         token.toString(), accountId.toString(),
-                                        vacancyId, viewModel.data!![index].id
+                                        vacancyId, applicant.id
                                     )
                                 }
                             },
                             isLoading = viewModel.responseLoading
                         )
+                    },
+                    isRefreshing = viewModel.loading,
+                    onRefresh = {
+                        viewModel.getApplicants(token.toString(), accountId.toString(), vacancyId)
                     }
-                }
+                )
             }
         }
     }

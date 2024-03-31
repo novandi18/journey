@@ -1,12 +1,9 @@
 package com.novandi.journey.presentation.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +26,7 @@ import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardVacancy
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
+import com.novandi.journey.presentation.ui.component.state.PullToRefreshLazyColumn
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.JobProviderHomeViewModel
@@ -105,17 +103,19 @@ fun JobProviderHomeScreen(
                     viewModel.vacancies(token.toString(), accountId.toString())
                 }
             } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items(viewModel.data!!.size) { index ->
+                PullToRefreshLazyColumn(
+                    items = viewModel.data!!,
+                    content = { vacancy ->
                         JCardVacancy(
-                            vacancy = viewModel.data!![index],
+                            vacancy = vacancy,
                             navigateToDetail = navigateToVacancy
                         )
+                    },
+                    isRefreshing = viewModel.loading,
+                    onRefresh = {
+                        viewModel.vacancies(token.toString(), accountId.toString())
                     }
-                }
+                )
             }
         }
     }
