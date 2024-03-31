@@ -48,7 +48,7 @@ object JobProviderMapper {
                 fullName = it.fullName,
                 email = it.email,
                 address = it.address,
-                profilePhotoUrl = it.profilePhotoUrl,
+                profilePhotoUrl = it.profilePhotoUrl.imageProfileUrl(),
                 gender = it.gender,
                 age = it.age,
                 phoneNumber = it.phoneNumber,

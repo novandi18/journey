@@ -6,6 +6,7 @@ import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import com.novandi.utility.data.dateFormatter
+import com.novandi.utility.image.imageProfileUrl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -23,7 +24,7 @@ object VacancyMapper {
                 skillOne = it.skillOne,
                 skillTwo = it.skillTwo,
                 disabilityName = it.disabilityName,
-                companyLogo = it.companyLogo,
+                companyLogo = it.companyLogo.imageProfileUrl(),
                 sectorName = it.sectorName,
                 companyName = it.companyName
             )
@@ -41,7 +42,7 @@ object VacancyMapper {
             skillOne = input.vacancy.skillOne,
             skillTwo = input.vacancy.skillTwo,
             disabilityName = input.vacancy.disabilityName,
-            companyLogo = input.vacancy.companyLogo,
+            companyLogo = input.vacancy.companyLogo.imageProfileUrl(),
             sectorName = input.vacancy.sectorName,
             companyName = input.vacancy.companyName
         )
@@ -60,7 +61,7 @@ object VacancyMapper {
                 skillOne = it.skillOne,
                 skillTwo = it.skillTwo,
                 disabilityName = it.disabilityName,
-                companyLogo = it.companyLogo,
+                companyLogo = it.companyLogo.imageProfileUrl(),
                 sectorName = it.sectorName,
                 companyName = it.companyName
             )
