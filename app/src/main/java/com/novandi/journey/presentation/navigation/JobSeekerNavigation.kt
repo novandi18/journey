@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.journey.presentation.common.Screen
+import com.novandi.journey.presentation.screen.AssistantScreen
 import com.novandi.journey.presentation.screen.JobSeekerEditScreen
 import com.novandi.journey.presentation.screen.JobSeekerEmailScreen
 import com.novandi.journey.presentation.screen.JobSeekerHomeScreen
@@ -99,6 +100,9 @@ fun NavGraphBuilder.jobSeekerGraph(navController: NavController) {
                     }
                 }
             )
+        }
+        composable(Screen.Assistant.route) {
+            AssistantScreen()
         }
     }
 }

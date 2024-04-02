@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -61,7 +62,11 @@ fun BottomBar(
                         )
                     },
                     label = {
-                        Text(text = stringResource(id = item.title))
+                        Text(
+                            text = stringResource(id = item.title),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = Blue40,

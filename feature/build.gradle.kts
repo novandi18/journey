@@ -41,10 +41,6 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
 
-    // DataStore
-    implementation(libs.datastore.preferences)
-    implementation(libs.datastore.core)
-
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)

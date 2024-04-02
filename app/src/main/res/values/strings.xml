@@ -82,6 +82,7 @@
     <string name="new_password_confirm_placeholder" translatable="false">Masukkan konfirmasi password baru</string>
     <string name="first_skills">Skill pertama</string>
     <string name="second_skills">Skill kedua</string>
+    <string name="ask_something">Tanya sesuatu</string>
 
     <!--  Title  -->
     <string name="vacancy">Lowongan</string>
@@ -95,6 +96,8 @@
     <string name="add_vacancy">Tambah Lowongan</string>
     <string name="detail_vacancy">Detail Lowongan</string>
     <string name="image_preview">Preview Gambar</string>
+    <string name="assistant">Asisten</string>
+    <string name="journey_assistant">Journey Asisten</string>
 
     <!--  Button  -->
     <string name="search">Cari</string>
@@ -107,6 +110,7 @@
     <string name="continue_register">Lanjutkan</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
+    <string name="delete_all_chat">Hapus semua chat</string>
 
     <!--  Menu  -->
     <string name="menu" translatable="false">Menu</string>
@@ -155,6 +159,7 @@
     <string name="not_accepted">Belum diterima</string>
     <string name="reset_search">Reset Search</string>
     <string name="closed_at">Tutup pada</string>
+    <string name="assistant_welcome">Selamat datang di Journey Assisten! Chatbot yang membantu kamu menjelajahi segala hal tentang Journey dengan nyaman dan mudah.</string>
 
     <!--  Notification Channel  -->
     <string name="channel_name">Journey Notifikasi</string>

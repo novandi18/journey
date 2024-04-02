@@ -3,6 +3,7 @@ package com.novandi.core.di
 import android.content.Context
 import androidx.room.Room
 import com.novandi.core.consts.Rooms
+import com.novandi.core.data.source.local.dao.AssistantDao
 import com.novandi.core.data.source.local.dao.SearchDao
 import com.novandi.core.data.source.local.room.JourneyDatabase
 import dagger.Module
@@ -24,4 +25,7 @@ class DatabaseModule {
 
     @Provides
     fun provideSearchDao(database: JourneyDatabase): SearchDao = database.searchDao()
+
+    @Provides
+    fun provideAssistantDao(database: JourneyDatabase): AssistantDao = database.assistantDao()
 }

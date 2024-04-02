@@ -1,5 +1,6 @@
 package com.novandi.core.data.source.remote.network
 
+import com.novandi.core.data.source.remote.request.AssistantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
@@ -9,6 +10,7 @@ import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.response.ApplicantItem
+import com.novandi.core.data.source.remote.response.AssistantResponse
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.JobApplyStatusResponse
 import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
@@ -220,4 +222,9 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("userId") userId: String
     ): List<UpdatedJobStatusItem>
+
+    @POST("assistant")
+    suspend fun getAssistantResult(
+        @Body request: AssistantRequest
+    ): AssistantResponse
 }

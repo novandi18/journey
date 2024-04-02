@@ -50,7 +50,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/{DEPENDENCIES,INDEX.LIST,AL2.0,LGPL2.1}"
         }
     }
 }
@@ -58,7 +58,6 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":utility"))
-    implementation(project(":feature"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)

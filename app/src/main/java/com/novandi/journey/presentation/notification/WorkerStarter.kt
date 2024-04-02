@@ -2,7 +2,6 @@ package com.novandi.journey.presentation.notification
 
 import android.content.Context
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.novandi.utility.data.isInternetAvailable
@@ -17,7 +16,7 @@ class WorkerStarter(
 
     operator fun invoke(token: String, userId: String) {
         if (
-            !isInternetAvailable(context) && isWorkerAlreadyRunning() &&
+            !isInternetAvailable(context) &&
             token.isEmpty() && userId.isEmpty()
         ) {
             return
@@ -32,14 +31,5 @@ class WorkerStarter(
         )
         request.addTag(NotificationWorker.TAG)
         workManager.enqueue(request.build())
-    }
-
-    private fun isWorkerAlreadyRunning(): Boolean {
-        val workInfo = workManager.getWorkInfosByTag(NotificationWorker.TAG).get()
-        workInfo.forEach { work ->
-            if(work.state == WorkInfo.State.ENQUEUED || work.state == WorkInfo.State.RUNNING)
-                return true
-        }
-        return false
     }
 }

@@ -6,6 +6,7 @@ import com.novandi.core.data.response.ErrorResponse
 import com.novandi.core.data.source.remote.network.ApiResponse
 import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
+import com.novandi.core.data.source.remote.request.AssistantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
@@ -15,6 +16,7 @@ import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.response.ApplicantItem
+import com.novandi.core.data.source.remote.response.AssistantResponse
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.JobApplyStatusResponse
 import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
@@ -532,4 +534,21 @@ class RemoteDataSource @Inject constructor(
 
     suspend fun getUpdatedApplyStatus(token: String, userId: String): List<UpdatedJobStatusItem> =
         apiService.getUpdatedApplyStatus(token, userId)
+
+    suspend fun getAssistantResult(request: AssistantRequest): Flow<ApiResponse<AssistantResponse>> = flow {
+        try {
+            val response = apiService.getAssistantResult(request)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
 }

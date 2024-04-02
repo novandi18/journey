@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SearchDao {
     @Query("SELECT * FROM search ORDER BY id DESC")
-    fun getSearch() : Flow<List<SearchEntity>>
+    fun getSearch(): Flow<List<SearchEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveSearch(search: SearchEntity)

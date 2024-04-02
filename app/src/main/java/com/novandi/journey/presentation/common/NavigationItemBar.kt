@@ -1,6 +1,7 @@
 package com.novandi.journey.presentation.common
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Work
@@ -14,6 +15,12 @@ object NavigationItemBar {
             icon = Icons.Rounded.Home,
             screen = Screen.JobSeekerHome,
             contentDescription = R.string.vacancy
+        ),
+        NavigationItem(
+            title = R.string.assistant,
+            icon = Icons.Rounded.AutoAwesome,
+            screen = Screen.Assistant,
+            contentDescription = R.string.assistant
         ),
         NavigationItem(
             title = R.string.job_apply,
