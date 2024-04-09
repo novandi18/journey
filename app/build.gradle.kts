@@ -58,6 +58,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":utility"))
+    implementation(project(":feature"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
@@ -96,6 +97,9 @@ dependencies {
 
     // Work Manager
     implementation(libs.work.manager)
+
+    // Lottie
+    implementation(libs.lottie)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

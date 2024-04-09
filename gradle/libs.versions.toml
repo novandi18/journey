@@ -27,6 +27,7 @@ room = "2.6.1"
 easycrop = "0.1.1"
 work-manager = "2.9.0"
 hilt-work = "1.2.0"
+lottie = "6.0.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -74,6 +75,7 @@ easycrop = { group = "io.github.mr0xf00", name = "easycrop", version.ref = "easy
 work-manager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-manager" }
 hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hilt-work" }
 hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hilt-work" }
+lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

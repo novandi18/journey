@@ -1,4 +1,4 @@
-package com.novandi.core.consts
+package com.novandi.utility.consts
 
 object NetworkUrls {
     const val JOURNEY = "http://10.0.2.2:3000/api/"

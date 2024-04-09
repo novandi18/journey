@@ -4,10 +4,9 @@ import androidx.compose.ui.graphics.Color
 
 val Light = Color(0xFFFFFFFF)
 val Dark = Color(0xFF141414)
-val Black = Color(0xFF0A0A0A)
 val Blue40 = Color(0xFF4288E3)
 val Blue80 = Color(0xFF18519A)
-val DarkGray = Color(0xFFF1F1F1)
+val DarkGray = Color(0xFFF7F7F7)
 val DarkGray40 = Color(0xFFB8B8B8)
 val DarkGray60 = Color(0xFF808080)
 val DarkGray80 = Color(0xFF424242)

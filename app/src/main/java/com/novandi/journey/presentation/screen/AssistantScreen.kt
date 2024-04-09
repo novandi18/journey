@@ -1,5 +1,8 @@
 package com.novandi.journey.presentation.screen
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -34,14 +37,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novandi.core.data.response.Resource
 import com.novandi.core.domain.model.AssistantChat
+import com.novandi.feature.assistant.VoiceToTextParser
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.assistant.AssistantSheet
 import com.novandi.journey.presentation.ui.component.assistant.AssistantWelcome
@@ -62,6 +68,26 @@ fun AssistantScreen(
     val chats by viewModel.chats.observeAsState(emptyList())
     val listState = rememberLazyListState()
     var showBottomSheet by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val voiceToTextParser = remember {
+        VoiceToTextParser(context)
+    }
+
+    var record by remember {
+        mutableStateOf(false)
+    }
+
+    val recordAudioLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        record = isGranted
+    }
+
+    val voiceState by voiceToTextParser.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(recordAudioLauncher) {
+        recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO)
+    }
 
     LaunchedEffect(chats) {
         if (chats.isNotEmpty()) {
@@ -97,6 +123,15 @@ fun AssistantScreen(
             },
             showBottomSheet = { showBottomSheet = it }
         )
+    }
+
+    LaunchedEffect(voiceState.spokenText) {
+        if (voiceState.spokenText.isNotEmpty()) {
+            viewModel.addChat(
+                AssistantChat(voiceState.spokenText, true)
+            )
+            viewModel.ask(voiceState.spokenText)
+        }
     }
 
     Scaffold(
@@ -184,7 +219,9 @@ fun AssistantScreen(
                 },
                 ask = { prompt ->
                     viewModel.ask(prompt)
-                }
+                },
+                voiceState = voiceState,
+                voiceParser = voiceToTextParser
             )
         }
     }

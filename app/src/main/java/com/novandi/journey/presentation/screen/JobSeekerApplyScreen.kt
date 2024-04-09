@@ -86,7 +86,11 @@ fun JobSeekerJobApplyScreen(
                 .background(Light)
         ) {
             if (viewModel.loading) {
-                JCardSkeleton()
+                Box(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    JCardSkeleton(total = 3)
+                }
             } else if (viewModel.vacanciesData == null) {
                 NetworkError {
                     viewModel.getVacancies(token.toString(), accountId.toString())

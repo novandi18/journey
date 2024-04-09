@@ -33,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.MultipartBody
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -173,8 +174,14 @@ class RemoteDataSource @Inject constructor(
     suspend fun getJobSeeker(token: String, id: String)
         : Flow<ApiResponse<ProfileJobSeekerResponse>> = flow {
         try {
-            val response = apiService.getJobSeeker(token, id)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(TIMEOUT_MILLIS) {
+                apiService.getJobSeeker(token, id)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Connection error"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {
@@ -191,8 +198,14 @@ class RemoteDataSource @Inject constructor(
     suspend fun getJobProvider(token: String, id: String)
         : Flow<ApiResponse<ProfileJobProviderResponse>> = flow {
         try {
-            val response = apiService.getJobProvider(token, id)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(TIMEOUT_MILLIS) {
+                apiService.getJobProvider(token, id)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Connection error"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {
@@ -227,8 +240,14 @@ class RemoteDataSource @Inject constructor(
     suspend fun getApplyStatus(token: String, userId: String)
         : Flow<ApiResponse<JobApplyStatusResponse>> = flow {
         try {
-            val response = apiService.getApplyStatus(token, userId)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(TIMEOUT_MILLIS) {
+                apiService.getApplyStatus(token, userId)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Connection error"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {
@@ -245,8 +264,14 @@ class RemoteDataSource @Inject constructor(
     suspend fun getJobProviderVacancies(token: String, companyId: String)
         : Flow<ApiResponse<VacancyResponse>> = flow {
         try {
-            val response = apiService.getJobProviderVacancies(token, companyId)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(TIMEOUT_MILLIS) {
+                apiService.getJobProviderVacancies(token, companyId)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Connection error"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {
@@ -263,8 +288,14 @@ class RemoteDataSource @Inject constructor(
     suspend fun getJobProviderApplicants(token: String, companyId: String)
             : Flow<ApiResponse<VacancyResponse>> = flow {
         try {
-            val response = apiService.getJobProviderApplicants(token, companyId)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(TIMEOUT_MILLIS) {
+                apiService.getJobProviderApplicants(token, companyId)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Connection error"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {
@@ -334,8 +365,14 @@ class RemoteDataSource @Inject constructor(
     suspend fun getApplicants(token: String, companyId: String, vacancyId: String)
         : Flow<ApiResponse<List<ApplicantItem>>> = flow {
         try {
-            val response = apiService.getApplicants(token, companyId, vacancyId)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(TIMEOUT_MILLIS) {
+                apiService.getApplicants(token, companyId, vacancyId)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Connection error"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {
@@ -537,8 +574,14 @@ class RemoteDataSource @Inject constructor(
 
     suspend fun getAssistantResult(request: AssistantRequest): Flow<ApiResponse<AssistantResponse>> = flow {
         try {
-            val response = apiService.getAssistantResult(request)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(TIMEOUT_MILLIS) {
+                apiService.getAssistantResult(request)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {
@@ -551,4 +594,8 @@ class RemoteDataSource @Inject constructor(
             Log.e("RemoteDataSource", e.toString())
         }
     }.flowOn(Dispatchers.IO)
+
+    companion object {
+        const val TIMEOUT_MILLIS: Long = 10_000
+    }
 }

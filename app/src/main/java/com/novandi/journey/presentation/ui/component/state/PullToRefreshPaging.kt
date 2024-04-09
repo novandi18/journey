@@ -15,9 +15,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.Light
@@ -60,9 +62,10 @@ fun <T: Any> PullToRefreshPaging(
 
                     loadState.refresh is LoadState.Error -> {
                         setIsRefreshing(false)
-                        val error = items.loadState.refresh as LoadState.Error
                         item {
-                            LoadStateError(errorMessage = error.error.localizedMessage!!) {
+                            LoadStateError(
+                                errorMessage = stringResource(id = R.string.network_error)
+                            ) {
                                 retry()
                             }
                         }
@@ -75,9 +78,10 @@ fun <T: Any> PullToRefreshPaging(
                     }
 
                     loadState.append is LoadState.Error -> {
-                        val error = items.loadState.refresh as LoadState.Error
                         item {
-                            LoadStateError(errorMessage = error.error.localizedMessage!!) {
+                            LoadStateError(
+                                errorMessage = stringResource(id = R.string.network_error)
+                            ) {
                                 retry()
                             }
                         }

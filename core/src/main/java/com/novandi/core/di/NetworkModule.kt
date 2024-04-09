@@ -1,8 +1,8 @@
 package com.novandi.core.di
 
-import com.novandi.core.consts.NetworkUrls
 import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
+import com.novandi.utility.consts.NetworkUrls
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
