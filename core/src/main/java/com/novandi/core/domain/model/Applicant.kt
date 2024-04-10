@@ -12,5 +12,6 @@ data class Applicant(
     val appliedAt: String,
     val disabilityName: String,
     val skillOne: String,
-    val skillTwo: String
+    val skillTwo: String,
+    val status: String
 )

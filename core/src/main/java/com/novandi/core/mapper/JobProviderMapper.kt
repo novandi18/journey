@@ -55,7 +55,8 @@ object JobProviderMapper {
                 appliedAt = dateFormatter(it.appliedAt, true),
                 disabilityName = it.disabilityName,
                 skillOne = it.skillOne,
-                skillTwo = it.skillTwo
+                skillTwo = it.skillTwo,
+                status = it.status
             )
         }
     )

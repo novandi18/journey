@@ -37,5 +37,8 @@ data class ApplicantItem(
     val skillOne: String,
 
     @SerializedName("skill_two_name")
-    val skillTwo: String
+    val skillTwo: String,
+
+    @SerializedName("status")
+    val status: String
 )

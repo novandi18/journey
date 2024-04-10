@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Applicant
+import com.novandi.core.domain.model.ApplicantItemStatus
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.usecase.JobProviderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,23 +38,34 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
     var loading by mutableStateOf(false)
         private set
 
-    var responseLoading by mutableStateOf(false)
+    var responseLoading by mutableStateOf<List<Pair<String, Boolean>>>(emptyList())
         private set
 
     var data by mutableStateOf<List<Applicant>?>(null)
+        private set
+
+    var done by mutableStateOf<List<ApplicantItemStatus>>(emptyList())
         private set
 
     fun setOnLoading(isLoading: Boolean) {
         loading = isLoading
     }
 
-    fun setOnResponseLoading(isLoading: Boolean) {
-        responseLoading = isLoading
+    fun setOnResponseLoading(applicantId: String, status: Boolean) {
+        responseLoading = responseLoading + listOf(Pair(applicantId, status))
+    }
+
+    private fun setOnRemoveResponseLoading(applicantId: String) {
+        responseLoading = responseLoading.filter { it.first != applicantId }
     }
 
 
     fun setOnData(values: List<Applicant>?) {
         data = values
+    }
+
+    private fun setOnDone(applicantItemStatus: ApplicantItemStatus) {
+        done = done + listOf(applicantItemStatus)
     }
 
     fun getApplicants(token: String, companyId: String, vacancyId: String) {
@@ -73,9 +85,14 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
             jobProviderUseCase.postAcceptApplicants(token, companyId, vacancyId, applicantId)
                 .catch { err ->
                     _response.value = Resource.Error(err.message.toString())
+                    setOnRemoveResponseLoading(applicantId)
                 }
                 .collect { result ->
                     _response.value = result
+                    setOnDone(
+                        ApplicantItemStatus(applicantId, true)
+                    )
+                    setOnRemoveResponseLoading(applicantId)
                 }
         }
     }
@@ -85,9 +102,14 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
             jobProviderUseCase.postRejectApplicants(token, companyId, vacancyId, applicantId)
                 .catch { err ->
                     _response.value = Resource.Error(err.message.toString())
+                    setOnRemoveResponseLoading(applicantId)
                 }
                 .collect { result ->
                     _response.value = result
+                    setOnDone(
+                        ApplicantItemStatus(applicantId, false)
+                    )
+                    setOnRemoveResponseLoading(applicantId)
                 }
         }
     }

@@ -44,6 +44,7 @@ import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.JobProviderApplicantDetailViewModel
+import com.novandi.utility.field.ApplicantStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,16 +76,14 @@ fun JobProviderApplicantDetailScreen(
 
     LaunchedEffect(response is Resource.Loading) {
         when (response) {
-            is Resource.Loading -> viewModel.setOnResponseLoading(true)
+            is Resource.Loading -> {}
             is Resource.Success -> {
                 Toast.makeText(context, response!!.data?.message, Toast.LENGTH_SHORT).show()
-                viewModel.setOnResponseLoading(false)
             }
             is Resource.Error -> {
                 Toast.makeText(context, response!!.message, Toast.LENGTH_SHORT).show()
-                viewModel.setOnResponseLoading(false)
             }
-            else -> viewModel.setOnResponseLoading(false)
+            else -> {}
         }
     }
 
@@ -172,8 +171,16 @@ fun JobProviderApplicantDetailScreen(
                                         vacancyId, applicant.id
                                     )
                                 }
+                                viewModel.setOnResponseLoading(applicant.id, isAccept)
                             },
-                            isLoading = viewModel.responseLoading
+                            loading = viewModel.responseLoading,
+                            status = when (applicant.status.lowercase()) {
+                                ApplicantStatus.ACCEPTED.value -> true
+                                ApplicantStatus.REJECTED.value -> false
+                                else -> viewModel.done.find {
+                                    it.applicantId == applicant.id
+                                }?.isAccepted
+                            }
                         )
                     },
                     isRefreshing = viewModel.loading,
