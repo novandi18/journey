@@ -111,7 +111,10 @@ fun JobSeekerPasswordScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.title_update_password))
+                    Text(
+                        text = stringResource(id = R.string.title_update_password),
+                        fontSize = 16.sp
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = back) {

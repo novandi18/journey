@@ -20,6 +20,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.data.response.Resource
 import com.novandi.journey.R
@@ -65,15 +66,15 @@ fun JobProviderHomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.job_vacancy))
+                    Text(
+                        text = stringResource(id = R.string.job_vacancy),
+                        fontSize = 16.sp
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Blue40,
                     titleContentColor = Light
-                ),
-                actions = {
-
-                }
+                )
             )
         },
         floatingActionButton = {

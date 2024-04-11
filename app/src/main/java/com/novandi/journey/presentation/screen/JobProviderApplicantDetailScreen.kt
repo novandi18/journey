@@ -129,7 +129,8 @@ fun JobProviderApplicantDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.job_vacancy_user)
+                        text = stringResource(id = R.string.job_vacancy_user),
+                        fontSize = 16.sp
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.data.response.Resource
 import com.novandi.journey.R
@@ -57,7 +58,8 @@ fun JobProviderApplicantScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.job_vacancy_user)
+                        text = stringResource(id = R.string.job_vacancy_user),
+                        fontSize = 16.sp
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

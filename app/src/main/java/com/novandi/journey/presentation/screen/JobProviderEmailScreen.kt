@@ -121,7 +121,10 @@ fun JobProviderEmailScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.title_update_email))
+                    Text(
+                        text = stringResource(id = R.string.title_update_email),
+                        fontSize = 16.sp
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = back) {
