@@ -48,5 +48,8 @@ data class VacancyItem(
     val sectorName: String,
 
     @SerializedName("company_name")
-    val companyName: String
+    val companyName: String,
+
+    @SerializedName("total_applicants")
+    val totalApplicants: Int? = null
 )

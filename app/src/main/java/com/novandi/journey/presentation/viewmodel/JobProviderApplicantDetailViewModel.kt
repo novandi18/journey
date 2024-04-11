@@ -13,7 +13,9 @@ import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.ApplicantItemStatus
 import com.novandi.core.domain.model.GeneralResult
+import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.domain.usecase.JobProviderUseCase
+import com.novandi.core.domain.usecase.VacancyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class JobProviderApplicantDetailViewModel @Inject constructor(
     private val jobProviderUseCase: JobProviderUseCase,
+    private val vacancyUseCase: VacancyUseCase,
     dataStoreManager: DataStoreManager
 ): ViewModel() {
     private val _applicants = MutableLiveData<Resource<List<Applicant>>>(Resource.Loading())
@@ -31,6 +34,9 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
 
     private val _response = MutableStateFlow<Resource<GeneralResult>?>(null)
     val response: StateFlow<Resource<GeneralResult>?> get() = _response
+
+    private val _vacancy = MutableLiveData<Resource<Vacancy>>(Resource.Loading())
+    val vacancy: LiveData<Resource<Vacancy>> get() = _vacancy
 
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
@@ -45,6 +51,9 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
         private set
 
     var done by mutableStateOf<List<ApplicantItemStatus>>(emptyList())
+        private set
+
+    var vacancyData by mutableStateOf<Vacancy?>(null)
         private set
 
     fun setOnLoading(isLoading: Boolean) {
@@ -66,6 +75,10 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
 
     private fun setOnDone(applicantItemStatus: ApplicantItemStatus) {
         done = done + listOf(applicantItemStatus)
+    }
+
+    fun setOnVacancyData(value: Vacancy?) {
+        vacancyData = value
     }
 
     fun getApplicants(token: String, companyId: String, vacancyId: String) {
@@ -110,6 +123,18 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
                         ApplicantItemStatus(applicantId, false)
                     )
                     setOnRemoveResponseLoading(applicantId)
+                }
+        }
+    }
+
+    fun getVacancyById(vacancyId: String) {
+        viewModelScope.launch {
+            vacancyUseCase.getVacancy(vacancyId)
+                .catch { err ->
+                    _vacancy.value = Resource.Error(err.message.toString())
+                }
+                .collect { result ->
+                    _vacancy.value = result
                 }
         }
     }

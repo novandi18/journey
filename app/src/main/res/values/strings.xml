@@ -33,7 +33,7 @@
     <!--  Field  -->
     <string name="fullname">Nama Lengkap</string>
     <string name="email" translatable="false">Email</string>
-    <string name="disability">Disabilitas</string>
+    <string name="disability">Disabilitas:</string>
     <string name="phone_number">Nomor Telepon</string>
     <string name="age">Umur</string>
     <string name="gender">Jenis Kelamin</string>
@@ -163,6 +163,7 @@
     <string name="reset_search">Reset Search</string>
     <string name="closed_at">Tutup pada</string>
     <string name="assistant_welcome">Selamat datang di Journey Assisten! Chatbot yang membantu kamu menjelajahi segala hal tentang Journey dengan nyaman dan mudah.</string>
+    <string name="total_applicants">%1$s Pelamar</string>
 
     <!--  Notification Channel  -->
     <string name="channel_name">Journey Notifikasi</string>

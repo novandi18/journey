@@ -86,7 +86,8 @@ fun JobProviderApplicantScreen(
                         JCardVacancy(
                             vacancy = vacancy,
                             navigateToDetail = navigateToApplicant,
-                            simple = true
+                            simple = true,
+                            totalApplicants = vacancy.totalApplicants ?: 0
                         )
                     },
                     isRefreshing = viewModel.loading,

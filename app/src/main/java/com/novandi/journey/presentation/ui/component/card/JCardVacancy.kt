@@ -35,6 +35,7 @@ import com.novandi.core.domain.model.Vacancy
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
+import com.novandi.journey.presentation.ui.theme.Green
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 
@@ -42,7 +43,8 @@ import com.novandi.journey.presentation.ui.theme.Red
 fun JCardVacancy(
     vacancy: Vacancy,
     navigateToDetail: (String) -> Unit,
-    simple: Boolean = false
+    simple: Boolean = false,
+    totalApplicants: Int = 0
 ) {
     var showMore by rememberSaveable { mutableStateOf(false) }
 
@@ -57,20 +59,20 @@ fun JCardVacancy(
                     navigateToDetail(vacancy.id)
                 }
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = vacancy.placementAddress,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = JobTypes.types()[vacancy.jobType - 1],
-                fontSize = 14.sp,
+                fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = DarkGray80
@@ -85,22 +87,32 @@ fun JCardVacancy(
                         .background(color = Blue40, shape = RoundedCornerShape(8.dp))
                         .padding(vertical = 2.dp, horizontal = 8.dp),
                     text = vacancy.skillOne,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
                     color = Light,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     modifier = Modifier
                         .background(color = Blue40, shape = RoundedCornerShape(8.dp))
                         .padding(vertical = 2.dp, horizontal = 8.dp),
                     text = vacancy.skillTwo,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
                     color = Light,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            if (totalApplicants > 0) {
+                Text(
+                    modifier = Modifier
+                        .background(color = Green, shape = RoundedCornerShape(8.dp))
+                        .padding(vertical = 2.dp, horizontal = 12.dp),
+                    text = stringResource(id = R.string.total_applicants, totalApplicants.toString()),
+                    fontSize = 12.sp,
+                    color = Light
                 )
             }
         }
@@ -152,7 +164,9 @@ fun JCardVacancy(
                     color = DarkGray80
                 )
                 Text(
-                    text = vacancy.disabilityName
+                    text = vacancy.disabilityName,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -171,7 +185,8 @@ fun JCardVacancy(
             Text(
                 text = vacancy.deadlineTime,
                 fontWeight = FontWeight.Medium,
-                color = Red
+                color = Red,
+                fontSize = 14.sp
             )
         }
     }

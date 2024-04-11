@@ -23,6 +23,7 @@ import com.novandi.journey.presentation.ui.theme.Light
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> PullToRefreshLazyColumn(
+    paddingValues: PaddingValues = PaddingValues(16.dp),
     items: List<T>,
     content: @Composable (T) -> Unit,
     isRefreshing: Boolean,
@@ -37,7 +38,7 @@ fun <T> PullToRefreshLazyColumn(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = lazyListState,
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = paddingValues,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items) {

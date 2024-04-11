@@ -63,7 +63,8 @@ object VacancyMapper {
                 disabilityName = it.disabilityName,
                 companyLogo = it.companyLogo.imageProfileUrl(),
                 sectorName = it.sectorName,
-                companyName = it.companyName
+                companyName = it.companyName,
+                totalApplicants = it.totalApplicants
             )
         }
     )
