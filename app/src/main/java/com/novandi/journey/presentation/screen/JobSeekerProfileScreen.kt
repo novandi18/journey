@@ -318,7 +318,7 @@ fun JobSeekerProfileContent(
                     modifier = Modifier.fillMaxWidth(),
                     text = data.fullName,
                     textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = Light
                 )
@@ -326,7 +326,8 @@ fun JobSeekerProfileContent(
                     modifier = Modifier.fillMaxWidth(),
                     text = data.email,
                     textAlign = TextAlign.Center,
-                    color = Light
+                    color = Light,
+                    fontSize = 16.sp
                 )
             }
         }
@@ -359,7 +360,8 @@ fun JobSeekerProfileContent(
                         color = DarkGray80
                     )
                     Text(
-                        text = data.address
+                        text = data.address,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -391,7 +393,8 @@ fun JobSeekerProfileContent(
                         color = DarkGray80
                     )
                     Text(
-                        text = data.phoneNumber
+                        text = data.phoneNumber,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -423,7 +426,8 @@ fun JobSeekerProfileContent(
                         color = DarkGray80
                     )
                     Text(
-                        text = data.disabilityName
+                        text = data.disabilityName,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -506,7 +510,8 @@ fun JobSeekerProfileContent(
                     )
                     Text(
                         text = stringResource(id = R.string.title_update_email),
-                        color = Green
+                        color = Green,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -536,7 +541,8 @@ fun JobSeekerProfileContent(
                     )
                     Text(
                         text = stringResource(id = R.string.title_update_password),
-                        color = Green
+                        color = Green,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -567,7 +573,8 @@ fun JobSeekerProfileContent(
                     )
                     Text(
                         text = stringResource(id = R.string.logout),
-                        color = Red
+                        color = Red,
+                        fontSize = 14.sp
                     )
                 }
             }

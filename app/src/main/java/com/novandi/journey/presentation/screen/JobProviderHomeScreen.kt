@@ -68,7 +68,7 @@ fun JobProviderHomeScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.job_vacancy),
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

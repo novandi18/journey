@@ -312,7 +312,7 @@ fun JobProviderProfileContent(
                     modifier = Modifier.fillMaxWidth(),
                     text = data.name,
                     textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = Light
                 )
@@ -320,7 +320,8 @@ fun JobProviderProfileContent(
                     modifier = Modifier.fillMaxWidth(),
                     text = data.sectorName,
                     textAlign = TextAlign.Center,
-                    color = Light
+                    color = Light,
+                    fontSize = 16.sp
                 )
             }
         }
@@ -358,7 +359,8 @@ fun JobProviderProfileContent(
                             text = data.email,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            color = DarkGray80
+                            color = DarkGray80,
+                            fontSize = 14.sp
                         )
                     }
                 }
@@ -403,7 +405,8 @@ fun JobProviderProfileContent(
                         text = data.address,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = DarkGray80
+                        color = DarkGray80,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -438,7 +441,8 @@ fun JobProviderProfileContent(
                         text = data.employees.toString(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = DarkGray80
+                        color = DarkGray80,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -469,7 +473,8 @@ fun JobProviderProfileContent(
                 )
                 Text(
                     text = stringResource(id = R.string.title_update_password),
-                    color = Green
+                    color = Green,
+                    fontSize = 14.sp
                 )
             }
         }
@@ -499,7 +504,8 @@ fun JobProviderProfileContent(
                 )
                 Text(
                     text = stringResource(id = R.string.logout),
-                    color = Red
+                    color = Red,
+                    fontSize = 14.sp
                 )
             }
         }

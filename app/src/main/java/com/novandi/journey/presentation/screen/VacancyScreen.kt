@@ -136,7 +136,7 @@ fun VacancyScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.detail_vacancy),
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -239,7 +239,7 @@ fun VacancyContent(
             ) {
                 Text(
                     text = vacancy.placementAddress,
-                    fontSize = 24.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 32.sp
                 )
@@ -253,7 +253,7 @@ fun VacancyContent(
             }
             Text(
                 text = vacancy.description,
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
         }
         HorizontalDivider()
@@ -273,7 +273,9 @@ fun VacancyContent(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = vacancy.companyName
+                    text = vacancy.companyName,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = vacancy.sectorName,
@@ -303,7 +305,11 @@ fun VacancyContent(
                     fontSize = 12.sp,
                     color = Dark.copy(.8f)
                 )
-                Text(text = vacancy.disabilityName)
+                Text(
+                    text = vacancy.disabilityName,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
         HorizontalDivider()
@@ -334,7 +340,9 @@ fun VacancyContent(
                         .padding(horizontal = 16.dp, vertical = 4.dp),
                     text = vacancy.skillOne,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
                 Text(
                     modifier = Modifier
@@ -342,7 +350,9 @@ fun VacancyContent(
                         .padding(horizontal = 16.dp, vertical = 4.dp),
                     text = vacancy.skillTwo,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }

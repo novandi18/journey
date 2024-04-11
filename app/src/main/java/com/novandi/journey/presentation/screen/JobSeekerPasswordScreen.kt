@@ -113,7 +113,7 @@ fun JobSeekerPasswordScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.title_update_password),
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     )
                 },
                 navigationIcon = {

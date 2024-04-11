@@ -45,7 +45,7 @@ fun JCardApply(
                 modifier = Modifier.fillMaxWidth(),
                 text = data.vacancyPlacementAddress,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -69,7 +69,7 @@ fun JCardApply(
                         .padding(vertical = 2.dp, horizontal = 8.dp),
                     text = data.skillOne,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     color = Light,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -80,7 +80,7 @@ fun JCardApply(
                         .padding(vertical = 2.dp, horizontal = 8.dp),
                     text = data.skillTwo,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     color = Light,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -97,7 +97,8 @@ fun JCardApply(
                 color = DarkGray80
             )
             Text(
-                text = data.disabilityName
+                text = data.disabilityName,
+                fontSize = 14.sp
             )
         }
         Column(
@@ -110,7 +111,8 @@ fun JCardApply(
                 color = DarkGray80
             )
             Text(
-                text = data.appliedAt
+                text = data.appliedAt,
+                fontSize = 14.sp
             )
         }
         Row(
@@ -134,7 +136,8 @@ fun JCardApply(
                     ApplicantStatus.REJECTED.value -> stringResource(id = R.string.not_accepted)
                     else -> stringResource(id = R.string.pending)
                 },
-                color = Light
+                color = Light,
+                fontSize = 14.sp
             )
         }
     }

@@ -97,7 +97,10 @@ fun JobProviderVacancyScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.add_vacancy))
+                    Text(
+                        text = stringResource(id = R.string.add_vacancy),
+                        fontSize = 18.sp
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Blue40,

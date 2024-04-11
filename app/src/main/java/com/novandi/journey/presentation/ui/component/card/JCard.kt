@@ -60,19 +60,18 @@ fun JCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 AsyncImage(
-                    modifier = Modifier.size(50.dp).clip(CircleShape),
+                    modifier = Modifier.size(42.dp).clip(CircleShape),
                     model = vacancy.companyLogo,
                     contentDescription = vacancy.placementAddress
                 )
                 Column(
-                    modifier = Modifier.align(alignment = Alignment.CenterVertically),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.align(alignment = Alignment.CenterVertically)
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = vacancy.placementAddress,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
+                        fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -84,7 +83,7 @@ fun JCard(
                         Text(
                             text = JobTypes.types()[vacancy.jobType - 1],
                             fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp
+                            fontSize = 12.sp
                         )
                         Icon(
                             modifier = Modifier.size(4.dp),
@@ -94,7 +93,7 @@ fun JCard(
                         Text(
                             text = vacancy.disabilityName,
                             fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp,
+                            fontSize = 12.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

@@ -33,7 +33,7 @@
     <!--  Field  -->
     <string name="fullname">Nama Lengkap</string>
     <string name="email" translatable="false">Email</string>
-    <string name="disability">Disabilitas:</string>
+    <string name="disability">Disabilitas</string>
     <string name="phone_number">Nomor Telepon</string>
     <string name="age">Umur</string>
     <string name="gender">Jenis Kelamin</string>

@@ -117,7 +117,7 @@ fun JobProviderEditScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.title_update_profile),
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     )
                 },
                 navigationIcon = {

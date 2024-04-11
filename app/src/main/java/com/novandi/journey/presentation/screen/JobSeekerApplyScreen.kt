@@ -70,7 +70,7 @@ fun JobSeekerJobApplyScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.job_apply),
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

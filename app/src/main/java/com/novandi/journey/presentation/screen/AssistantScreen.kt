@@ -141,7 +141,7 @@ fun AssistantScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.journey_assistant),
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
