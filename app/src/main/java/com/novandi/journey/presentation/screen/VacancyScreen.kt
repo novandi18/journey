@@ -145,9 +145,7 @@ fun VacancyScreen(
                 ),
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            navigateBack()
-                        }
+                        onClick = navigateBack
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

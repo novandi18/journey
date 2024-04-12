@@ -231,12 +231,12 @@ fun JobSeekerHomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(Light)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 56.dp)
-                    .background(Light)
             ) {
                 when (tabSelected) {
                     0 -> {

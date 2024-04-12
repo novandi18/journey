@@ -41,8 +41,9 @@ import com.novandi.journey.presentation.viewmodel.JobSeekerApplyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobSeekerJobApplyScreen(
-    viewModel: JobSeekerApplyViewModel = hiltViewModel()
+fun JobSeekerApplyScreen(
+    viewModel: JobSeekerApplyViewModel = hiltViewModel(),
+    navigateToDetail: (vacancyId: String) -> Unit
 ) {
     val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
@@ -127,7 +128,8 @@ fun JobSeekerJobApplyScreen(
                     items = viewModel.vacanciesData!!,
                     content = { jobApplyStatus ->
                         JCardApply(
-                            data = jobApplyStatus
+                            data = jobApplyStatus,
+                            onClick = navigateToDetail
                         )
                     },
                     isRefreshing = viewModel.loading,

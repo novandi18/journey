@@ -98,6 +98,7 @@
     <string name="image_preview">Preview Gambar</string>
     <string name="assistant">Asisten</string>
     <string name="journey_assistant">Journey Asisten</string>
+    <string name="your_job_apply">Lamaran Anda</string>
 
     <!--  Button  -->
     <string name="search">Cari</string>
@@ -164,6 +165,10 @@
     <string name="closed_at">Tutup pada</string>
     <string name="assistant_welcome">Selamat datang di Journey Assisten! Chatbot yang membantu kamu menjelajahi segala hal tentang Journey dengan nyaman dan mudah.</string>
     <string name="total_applicants">%1$s Pelamar</string>
+    <string name="job_accepted_desc">Selamat! Anda diterima pada perusahaan ini, segera melakukan pengecekan informasi pada catatan yang diberikan oleh perusahaan.</string>
+    <string name="job_rejected_desc">Maaf, anda belum keterima pada perusahaan, jangan menyerah dan terus berusaha ya!</string>
+    <string name="job_pending_desc">Saat ini lamaran anda masih dalam proses oleh perusahaan, terus pantau informasi status lamaran anda ya.</string>
+    <string name="your_vacancy_applied">Anda melamar pada lowongan berikut:</string>
 
     <!--  Notification Channel  -->
     <string name="channel_name">Journey Notifikasi</string>

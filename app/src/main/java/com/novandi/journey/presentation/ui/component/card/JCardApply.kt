@@ -30,12 +30,16 @@ import com.novandi.utility.field.ApplicantStatus
 
 @Composable
 fun JCardApply(
-    data: JobApplyStatus
+    data: JobApplyStatus,
+    onClick: (vacancyId: String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Light),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+        onClick = {
+            onClick(data.vacancyId)
+        }
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

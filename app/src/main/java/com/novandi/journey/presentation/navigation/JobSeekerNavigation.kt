@@ -3,15 +3,18 @@ package com.novandi.journey.presentation.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.journey.presentation.common.Screen
 import com.novandi.journey.presentation.screen.AssistantScreen
+import com.novandi.journey.presentation.screen.JobSeekerApplyDetailScreen
+import com.novandi.journey.presentation.screen.JobSeekerApplyScreen
 import com.novandi.journey.presentation.screen.JobSeekerEditScreen
 import com.novandi.journey.presentation.screen.JobSeekerEmailScreen
 import com.novandi.journey.presentation.screen.JobSeekerHomeScreen
-import com.novandi.journey.presentation.screen.JobSeekerJobApplyScreen
 import com.novandi.journey.presentation.screen.JobSeekerPasswordScreen
 import com.novandi.journey.presentation.screen.JobSeekerProfileScreen
 
@@ -30,7 +33,13 @@ fun NavGraphBuilder.jobSeekerGraph(navController: NavController) {
             )
         }
         composable(Screen.JobSeekerApply.route) {
-            JobSeekerJobApplyScreen()
+            JobSeekerApplyScreen(
+                navigateToDetail = { vacancyId ->
+                    navController.navigate(
+                        Screen.JobSeekerApplyDetail.createRoute(vacancyId)
+                    )
+                }
+            )
         }
         composable(Screen.JobSeekerProfile.route) {
             JobSeekerProfileScreen(
@@ -103,6 +112,18 @@ fun NavGraphBuilder.jobSeekerGraph(navController: NavController) {
         }
         composable(Screen.Assistant.route) {
             AssistantScreen()
+        }
+        composable(
+            route = Screen.JobSeekerApplyDetail.route,
+            arguments = listOf(navArgument("vacancyId") { type = NavType.StringType })
+        ) {
+            val vacancyId = it.arguments?.getString("vacancyId") ?: ""
+            JobSeekerApplyDetailScreen(
+                vacancyId = vacancyId,
+                back = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }
