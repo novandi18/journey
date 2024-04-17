@@ -11,6 +11,7 @@ import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
+import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
@@ -37,4 +38,6 @@ interface JobProviderUseCase {
     fun updateJobProviderLogo(companyId: String, logo: MultipartBody.Part)
         : Flow<Resource<UpdateProfilePhotoResult>>
     fun getVacanciesApplicants(token: String, companyId: String): Flow<Resource<List<Vacancy>>>
+    fun getApplicantById(token: String, companyId: String, applicantId: String)
+        : Flow<Resource<ProfileJobSeeker>>
 }

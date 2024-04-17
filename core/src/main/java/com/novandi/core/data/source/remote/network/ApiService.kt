@@ -227,4 +227,11 @@ interface ApiService {
     suspend fun getAssistantResult(
         @Body request: AssistantRequest
     ): AssistantResponse
+
+    @GET("companies/{companyId}/applicants/{applicantId}")
+    suspend fun getApplicantById(
+        @Header("Authorization") token: String,
+        @Path("companyId") companyId: String,
+        @Path("applicantId") applicantId: String
+    ): ProfileJobSeekerResponse
 }

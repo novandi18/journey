@@ -11,6 +11,7 @@ import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.journey.presentation.common.Screen
 import com.novandi.journey.presentation.screen.JobProviderApplicantDetailScreen
+import com.novandi.journey.presentation.screen.JobProviderApplicantProfileScreen
 import com.novandi.journey.presentation.screen.JobProviderApplicantScreen
 import com.novandi.journey.presentation.screen.JobProviderEditScreen
 import com.novandi.journey.presentation.screen.JobProviderEmailScreen
@@ -82,6 +83,11 @@ fun NavGraphBuilder.jobProviderGraph(navController: NavController) {
                 vacancyId = vacancyId,
                 back = {
                     navController.navigateUp()
+                },
+                navigateToApplicantProfile = { applicantId ->
+                    navController.navigate(
+                        Screen.JobProviderApplicantProfile.createRoute(applicantId)
+                    )
                 }
             )
         }
@@ -138,6 +144,19 @@ fun NavGraphBuilder.jobProviderGraph(navController: NavController) {
                             inclusive = true
                         }
                     }
+                }
+            )
+        }
+        composable(
+            route = Screen.JobProviderApplicantProfile.route,
+            arguments = listOf(navArgument("applicantId") { type = NavType.StringType })
+        ) {
+            val applicantId = it.arguments?.getString("applicantId") ?: ""
+
+            JobProviderApplicantProfileScreen(
+                applicantId = applicantId,
+                back = {
+                    navController.navigateUp()
                 }
             )
         }

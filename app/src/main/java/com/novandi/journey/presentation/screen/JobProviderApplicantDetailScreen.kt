@@ -71,7 +71,8 @@ import com.valentinilk.shimmer.shimmer
 fun JobProviderApplicantDetailScreen(
     viewModel: JobProviderApplicantDetailViewModel = hiltViewModel(),
     vacancyId: String,
-    back: () -> Unit
+    back: () -> Unit,
+    navigateToApplicantProfile: (applicantId: String) -> Unit
 ) {
     val context = LocalContext.current
     val token by viewModel.token.observeAsState()
@@ -224,7 +225,8 @@ fun JobProviderApplicantDetailScreen(
                                 else -> viewModel.done.find {
                                     it.applicantId == applicant.id
                                 }?.isAccepted
-                            }
+                            },
+                            navigateToApplicantProfile = navigateToApplicantProfile
                         )
                     },
                     isRefreshing = viewModel.loading,

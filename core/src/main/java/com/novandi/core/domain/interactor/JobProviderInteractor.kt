@@ -11,6 +11,7 @@ import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
+import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
@@ -99,5 +100,13 @@ class JobProviderInteractor @Inject constructor(
         companyId: String
     ): Flow<Resource<List<Vacancy>>> = jobProviderRepository.getVacanciesApplicants(
         token, companyId
+    )
+
+    override fun getApplicantById(
+        token: String,
+        companyId: String,
+        applicantId: String
+    ): Flow<Resource<ProfileJobSeeker>> = jobProviderRepository.getApplicantById(
+        token, companyId, applicantId
     )
 }

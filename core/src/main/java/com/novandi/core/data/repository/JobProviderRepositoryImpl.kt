@@ -14,6 +14,7 @@ import com.novandi.core.data.source.remote.response.ApplicantItem
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
+import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
@@ -21,11 +22,13 @@ import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
+import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.domain.repository.JobProviderRepository
 import com.novandi.core.mapper.JobProviderMapper
+import com.novandi.core.mapper.JobSeekerMapper
 import com.novandi.core.mapper.VacancyMapper
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
@@ -176,5 +179,18 @@ class JobProviderRepositoryImpl @Inject constructor(
 
             override suspend fun createCall(): Flow<ApiResponse<VacancyResponse>> =
                 remoteDataSource.getJobProviderApplicants(token, companyId)
+        }.asFlow()
+
+    override fun getApplicantById(
+        token: String,
+        companyId: String,
+        applicantId: String
+    ): Flow<Resource<ProfileJobSeeker>> =
+        object : NetworkOnlyResource<ProfileJobSeeker, ProfileJobSeekerResponse>() {
+            override fun loadFromNetwork(data: ProfileJobSeekerResponse): Flow<ProfileJobSeeker> =
+                JobSeekerMapper.mapProfileResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<ProfileJobSeekerResponse>> =
+                remoteDataSource.getApplicantById(token, companyId, applicantId)
         }.asFlow()
 }

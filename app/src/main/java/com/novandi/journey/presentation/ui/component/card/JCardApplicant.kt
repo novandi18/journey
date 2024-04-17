@@ -2,6 +2,7 @@ package com.novandi.journey.presentation.ui.component.card
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +42,8 @@ fun JCardApplicant(
     applicant: Applicant,
     onAccept: (Boolean) -> Unit,
     loading: List<Pair<String, Boolean>>,
-    status: Boolean? = null
+    status: Boolean? = null,
+    navigateToApplicantProfile: (applicantId: String) -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -49,7 +51,9 @@ fun JCardApplicant(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.clickable {
+                navigateToApplicantProfile(applicant.id)
+            }.padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

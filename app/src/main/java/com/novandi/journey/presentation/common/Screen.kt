@@ -31,4 +31,7 @@ sealed class Screen(val route: String) {
     data object JobSeekerApplyDetail: Screen("job_seeker_apply/{vacancyId}") {
         fun createRoute(vacancyId: String) = "job_seeker_apply/$vacancyId"
     }
+    data object JobProviderApplicantProfile: Screen("job_provider_applicant_profile/{applicantId}") {
+        fun createRoute(applicantId: String) = "job_provider_applicant_profile/$applicantId"
+    }
 }
