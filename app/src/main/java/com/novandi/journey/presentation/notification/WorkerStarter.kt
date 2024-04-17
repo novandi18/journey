@@ -22,7 +22,7 @@ class WorkerStarter(
             return
         }
 
-        val request = PeriodicWorkRequestBuilder<NotificationWorker>(2, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.MINUTES)
         request.setInputData(
             workDataOf(
                 NotificationWorker.TOKEN to token,

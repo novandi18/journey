@@ -41,7 +41,7 @@ class NotificationWorker @AssistedInject constructor(
                             updatedJobStatus.company,
                             updatedJobStatus.position
                         )
-                        showNotification(text)
+                        showNotification(text, updatedJobStatus.vacancyId)
                     }
                 }
 
@@ -54,9 +54,10 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    private fun showNotification(text: String) {
+    private fun showNotification(text: String, vacancyId: String) {
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(JOB_APPLY, vacancyId)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
@@ -81,5 +82,6 @@ class NotificationWorker @AssistedInject constructor(
         const val TAG = "journey_tag"
         const val TOKEN = "token"
         const val USER_ID = "user_id"
+        const val JOB_APPLY = "job_apply"
     }
 }

@@ -65,6 +65,6 @@ object JobSeekerMapper {
 
     fun updatedJobStatusResponseToDomain(input: List<UpdatedJobStatusItem>): List<UpdatedJobStatus> =
         input.map {
-            UpdatedJobStatus(it.position, it.company, it.status)
+            UpdatedJobStatus(it.vacancyId, it.position, it.company, it.status)
         }
 }

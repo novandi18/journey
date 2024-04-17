@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,6 +50,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.journey.R
+import com.novandi.journey.presentation.notification.NotificationWorker
 import com.novandi.journey.presentation.ui.component.card.JCard
 import com.novandi.journey.presentation.ui.component.state.LazyColumnPaging
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshPaging
@@ -58,19 +60,23 @@ import com.novandi.journey.presentation.ui.theme.DarkGray40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.JobSeekerHomeViewModel
+import com.novandi.utility.data.IntentExtra
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobSeekerHomeScreen(
     viewModel: JobSeekerHomeViewModel = hiltViewModel(),
-    navigateToVacancy: (String) -> Unit
+    navigateToVacancy: (String) -> Unit,
+    navigateToJobApplyDetail: (vacancyId: String) -> Unit
 ) {
+    val context = LocalContext.current
     val token by viewModel.token.observeAsState()
     val searchText by viewModel.searchText.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val isDoSearching by viewModel.isDoSearching.collectAsState()
     var tabSelected by remember { mutableIntStateOf(0) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val jobApplyExtra = IntentExtra.getExtra(context, NotificationWorker.JOB_APPLY)
 
     val searches = viewModel.searches.observeAsState(listOf())
     val searchByQuery = searches.value.filter { search ->
@@ -83,6 +89,11 @@ fun JobSeekerHomeScreen(
         stringResource(id = R.string.all),
         stringResource(id = R.string.most_popular),
     )
+
+    if (jobApplyExtra != null) {
+        navigateToJobApplyDetail(jobApplyExtra)
+        IntentExtra.deleteExtra(context, NotificationWorker.JOB_APPLY)
+    }
 
     Scaffold(
         topBar = {

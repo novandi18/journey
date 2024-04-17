@@ -29,6 +29,11 @@ fun NavGraphBuilder.jobSeekerGraph(navController: NavController) {
                     navController.navigate(
                         Screen.Vacancy.createRoute(vacancyId = id)
                     )
+                },
+                navigateToJobApplyDetail = { vacancyId ->
+                    navController.navigate(
+                        Screen.JobSeekerApplyDetail.createRoute(vacancyId)
+                    )
                 }
             )
         }
