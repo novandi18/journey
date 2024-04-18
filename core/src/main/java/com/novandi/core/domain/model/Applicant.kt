@@ -13,5 +13,6 @@ data class Applicant(
     val disabilityName: String,
     val skillOne: String,
     val skillTwo: String,
-    val status: String
+    val status: String,
+    var notes: String? = null
 )

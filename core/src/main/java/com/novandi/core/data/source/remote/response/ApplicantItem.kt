@@ -40,5 +40,8 @@ data class ApplicantItem(
     val skillTwo: String,
 
     @SerializedName("status")
-    val status: String
+    val status: String,
+
+    @SerializedName("notes")
+    val notes: String? = null
 )

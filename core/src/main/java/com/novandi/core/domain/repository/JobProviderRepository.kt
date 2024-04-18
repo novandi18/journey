@@ -1,6 +1,7 @@
 package com.novandi.core.domain.repository
 
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
@@ -23,8 +24,10 @@ interface JobProviderRepository {
     fun registerJobProvider(request: JobProviderRegisterRequest): Flow<Resource<RegisterResult>>
     fun getJobProvider(token: String, id: String): Flow<Resource<ProfileJobProvider>>
     fun getApplicants(token: String, companyId: String, vacancyId: String): Flow<Resource<List<Applicant>>>
-    fun postAcceptApplicants(token: String, companyId: String, vacancyId: String, applicantId: String)
-        : Flow<Resource<GeneralResult>>
+    fun postAcceptApplicants(
+        token: String, companyId: String, vacancyId: String, applicantId: String,
+        request: AcceptApplicantRequest
+    ): Flow<Resource<GeneralResult>>
     fun postRejectApplicants(token: String, companyId: String, vacancyId: String, applicantId: String)
         : Flow<Resource<GeneralResult>>
     fun updateVacancy(companyId: String, vacancyId: String, request: VacancyRequest)

@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.consts.JobTypes
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardApplicant
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
@@ -204,11 +205,14 @@ fun JobProviderApplicantDetailScreen(
                     content = { applicant ->
                         JCardApplicant(
                             applicant = applicant,
-                            onAccept = { isAccept ->
-                                if (isAccept) {
+                            onAccept = { isAccept, notes ->
+                                if (isAccept && notes != null) {
                                     viewModel.acceptApplicant(
-                                        token.toString(), accountId.toString(),
-                                        vacancyId, applicant.id
+                                        token = token.toString(),
+                                        companyId = accountId.toString(),
+                                        vacancyId = vacancyId,
+                                        applicant = applicant,
+                                        request = AcceptApplicantRequest(notes)
                                     )
                                 } else {
                                     viewModel.rejectApplicant(

@@ -56,7 +56,8 @@ object JobProviderMapper {
                 disabilityName = it.disabilityName,
                 skillOne = it.skillOne,
                 skillTwo = it.skillTwo,
-                status = it.status
+                status = it.status,
+                notes = it.notes
             )
         }
     )

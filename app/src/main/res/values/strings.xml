@@ -83,6 +83,9 @@
     <string name="first_skills">Skill pertama</string>
     <string name="second_skills">Skill kedua</string>
     <string name="ask_something">Tanya sesuatu</string>
+    <string name="notes_for_job_seeker">Catatan untuk pelamar</string>
+    <string name="notes_placeholder">Kontak yang perlu dihubungi, langkah selanjutnya setelah pelamar diterima, dll</string>
+    <string name="no_notes">Tidak ada catatan</string>
 
     <!--  Title  -->
     <string name="vacancy">Lowongan</string>
@@ -109,8 +112,8 @@
     <string name="upload">Unggah</string>
     <string name="apply">Lamar</string>
     <string name="continue_register">Lanjutkan</string>
-    <string name="accept">Accept</string>
-    <string name="reject">Reject</string>
+    <string name="accept">Terima</string>
+    <string name="reject">Tolak</string>
     <string name="delete_all_chat">Hapus semua chat</string>
     <string name="record">Rekam</string>
     <string name="stop">Berhenti</string>
@@ -138,6 +141,7 @@
     <string name="error_confirm_current_password">Konfirmasi password tidak sama dengan password saat ini</string>
     <string name="new_email_same_as_old">Email lama tidak boleh sama dengan email saat ini</string>
     <string name="speak_error">Tidak ada suara yang dikeluarkan, silahkan coba lagi</string>
+    <string name="notes_required">Catatan harus di isi</string>
 
     <!--  Profile  -->
     <string name="title_update_profile">Ubah Profil</string>
@@ -169,6 +173,7 @@
     <string name="job_rejected_desc">Maaf, anda belum keterima pada perusahaan, jangan menyerah dan terus berusaha ya!</string>
     <string name="job_pending_desc">Saat ini lamaran anda masih dalam proses oleh perusahaan, terus pantau informasi status lamaran anda ya.</string>
     <string name="your_vacancy_applied">Anda melamar pada lowongan berikut:</string>
+    <string name="notes_job_seeker_alert">* Isi jika pelamar diterima pada lowongan ini.</string>
 
     <!--  Notification Channel  -->
     <string name="channel_name">Journey Notifikasi</string>

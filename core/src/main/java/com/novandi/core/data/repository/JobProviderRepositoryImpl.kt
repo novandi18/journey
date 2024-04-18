@@ -4,6 +4,7 @@ import com.novandi.core.data.response.NetworkOnlyResource
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.RemoteDataSource
 import com.novandi.core.data.source.remote.network.ApiResponse
+import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
@@ -81,14 +82,17 @@ class JobProviderRepositoryImpl @Inject constructor(
         token: String,
         companyId: String,
         vacancyId: String,
-        applicantId: String
+        applicantId: String,
+        request: AcceptApplicantRequest
     ): Flow<Resource<GeneralResult>> =
         object : NetworkOnlyResource<GeneralResult, GeneralResponse>() {
             override fun loadFromNetwork(data: GeneralResponse): Flow<GeneralResult> =
                 JobProviderMapper.mapGeneralResponseToDomain(data)
 
             override suspend fun createCall(): Flow<ApiResponse<GeneralResponse>> =
-                remoteDataSource.postAcceptApplicants(token, companyId, vacancyId, applicantId)
+                remoteDataSource.postAcceptApplicants(
+                    token, companyId, vacancyId, applicantId, request
+                )
         }.asFlow()
 
     override fun postRejectApplicants(

@@ -6,6 +6,7 @@ import com.novandi.core.data.response.ErrorResponse
 import com.novandi.core.data.source.remote.network.ApiResponse
 import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
+import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.AssistantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
@@ -386,10 +387,14 @@ class RemoteDataSource @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun postAcceptApplicants(token: String, companyId: String, vacancyId: String, applicantsId: String)
-        : Flow<ApiResponse<GeneralResponse>> = flow {
+    suspend fun postAcceptApplicants(
+        token: String, companyId: String, vacancyId: String, applicantsId: String,
+        request: AcceptApplicantRequest
+    ): Flow<ApiResponse<GeneralResponse>> = flow {
         try {
-            val response = apiService.postAcceptApplicants(token, companyId, vacancyId, applicantsId)
+            val response = apiService.postAcceptApplicants(
+                token, companyId, vacancyId, applicantsId, request
+            )
             emit(ApiResponse.Success(response))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

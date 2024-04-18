@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.ApplicantItemStatus
@@ -68,7 +69,6 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
         responseLoading = responseLoading.filter { it.first != applicantId }
     }
 
-
     fun setOnData(values: List<Applicant>?) {
         data = values
     }
@@ -79,6 +79,11 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
 
     fun setOnVacancyData(value: Vacancy?) {
         vacancyData = value
+    }
+
+    private fun setUpdateNotesOnData(applicant: Applicant, note: String) {
+        val applicantIndex = data?.indexOf(applicant)
+        if (applicantIndex != null) data?.get(applicantIndex)?.notes = note
     }
 
     fun getApplicants(token: String, companyId: String, vacancyId: String) {
@@ -93,19 +98,25 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
         }
     }
 
-    fun acceptApplicant(token: String, companyId: String, vacancyId: String, applicantId: String) {
+    fun acceptApplicant(
+        token: String, companyId: String, vacancyId: String, applicant: Applicant,
+        request: AcceptApplicantRequest
+    ) {
         viewModelScope.launch {
-            jobProviderUseCase.postAcceptApplicants(token, companyId, vacancyId, applicantId)
+            jobProviderUseCase.postAcceptApplicants(
+                token, companyId, vacancyId, applicant.id, request
+            )
                 .catch { err ->
                     _response.value = Resource.Error(err.message.toString())
-                    setOnRemoveResponseLoading(applicantId)
+                    setOnRemoveResponseLoading(applicant.id)
                 }
                 .collect { result ->
                     _response.value = result
                     setOnDone(
-                        ApplicantItemStatus(applicantId, true)
+                        ApplicantItemStatus(applicant.id, true)
                     )
-                    setOnRemoveResponseLoading(applicantId)
+                    setOnRemoveResponseLoading(applicant.id)
+                    setUpdateNotesOnData(applicant, request.notes)
                 }
         }
     }

@@ -1,5 +1,6 @@
 package com.novandi.core.data.source.remote.network
 
+import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.AssistantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
@@ -144,7 +145,8 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("companyId") companyId: String,
         @Path("vacancyId") vacancyId: String,
-        @Path("applicantsId") applicantsId: String
+        @Path("applicantsId") applicantsId: String,
+        @Body request: AcceptApplicantRequest
     ): GeneralResponse
 
     @PUT("companies/{companyId}/vacancies/{vacancyId}/applicants/{applicantsId}/reject")

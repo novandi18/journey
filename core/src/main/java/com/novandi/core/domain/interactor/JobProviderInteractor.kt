@@ -1,6 +1,7 @@
 package com.novandi.core.domain.interactor
 
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
@@ -43,9 +44,10 @@ class JobProviderInteractor @Inject constructor(
         token: String,
         companyId: String,
         vacancyId: String,
-        applicantId: String
+        applicantId: String,
+        request: AcceptApplicantRequest
     ): Flow<Resource<GeneralResult>> = jobProviderRepository.postAcceptApplicants(
-        token, companyId, vacancyId, applicantId
+        token, companyId, vacancyId, applicantId, request
     )
 
     override fun postRejectApplicants(
