@@ -36,5 +36,8 @@ data class JobApplyStatusItem(
     val skillOne: String,
 
     @SerializedName("skill_two_name")
-    val skillTwo: String
+    val skillTwo: String,
+
+    @SerializedName("notes")
+    val notes: String? = null
 )

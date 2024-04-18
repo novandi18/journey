@@ -3,6 +3,7 @@ package com.novandi.journey.presentation.ui.component.skeleton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,14 +22,16 @@ import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.valentinilk.shimmer.shimmer
 
 @Composable
-fun VacancySkeleton() {
+fun VacancySkeleton(
+    paddingValues: PaddingValues = PaddingValues(24.dp)
+) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp)
+                .padding(paddingValues)
                 .shimmer(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -68,7 +71,9 @@ fun VacancySkeleton() {
                 .background(DarkGray40)
             )
         }
-        HorizontalDivider()
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 24.dp)
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()

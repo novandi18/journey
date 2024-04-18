@@ -85,7 +85,7 @@
     <string name="ask_something">Tanya sesuatu</string>
     <string name="notes_for_job_seeker">Catatan untuk pelamar</string>
     <string name="notes_placeholder">Kontak yang perlu dihubungi, langkah selanjutnya setelah pelamar diterima, dll</string>
-    <string name="no_notes">Tidak ada catatan</string>
+    <string name="no_notes">Tidak ada catatan.</string>
 
     <!--  Title  -->
     <string name="vacancy">Lowongan</string>
@@ -174,6 +174,7 @@
     <string name="job_pending_desc">Saat ini lamaran anda masih dalam proses oleh perusahaan, terus pantau informasi status lamaran anda ya.</string>
     <string name="your_vacancy_applied">Anda melamar pada lowongan berikut:</string>
     <string name="notes_job_seeker_alert">* Isi jika pelamar diterima pada lowongan ini.</string>
+    <string name="notes_from_job_provider">Catatan dari perusahaan:</string>
 
     <!--  Notification Channel  -->
     <string name="channel_name">Journey Notifikasi</string>

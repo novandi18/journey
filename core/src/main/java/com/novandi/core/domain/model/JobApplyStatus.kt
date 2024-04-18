@@ -9,5 +9,6 @@ data class JobApplyStatus(
     val vacancyPlacementAddress: String = "",
     val disabilityName: String = "",
     val skillOne: String = "",
-    val skillTwo: String = ""
+    val skillTwo: String = "",
+    val notes: String? = null
 )

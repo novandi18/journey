@@ -58,7 +58,8 @@ object JobSeekerMapper {
                     vacancyPlacementAddress = it.vacancyPlacementAddress,
                     disabilityName = it.disabilityName,
                     skillOne = it.skillOne,
-                    skillTwo = it.skillTwo
+                    skillTwo = it.skillTwo,
+                    notes = it.notes
                 )
             }
         )
