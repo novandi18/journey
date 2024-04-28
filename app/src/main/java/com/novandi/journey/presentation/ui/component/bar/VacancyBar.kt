@@ -47,7 +47,7 @@ fun VacancyBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.apply_before),
@@ -57,7 +57,8 @@ fun VacancyBar(
             Text(
                 text = vacancy.deadlineTime,
                 fontWeight = FontWeight.Medium,
-                color = Red
+                color = Red,
+                fontSize = 14.sp
             )
         }
         if (vacancyStatus != null) {

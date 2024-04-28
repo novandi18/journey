@@ -82,7 +82,6 @@ fun VacancyScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getVacancy(vacancyId)
-        viewModel.getVacancyStatus(token.toString(), accountId.toString())
     }
 
     LaunchedEffect(vacancy is Resource.Loading) {
@@ -90,9 +89,14 @@ fun VacancyScreen(
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 viewModel.setOnVacancyData(vacancy?.data)
+                viewModel.getVacancyStatus(token.toString(), accountId.toString())
+                viewModel.resetVacancyState()
                 viewModel.setOnLoading(false)
             }
-            is Resource.Error -> viewModel.setOnLoading(false)
+            is Resource.Error -> {
+                viewModel.resetVacancyState()
+                viewModel.setOnLoading(false)
+            }
             else -> viewModel.setOnLoading(false)
         }
     }
@@ -102,15 +106,20 @@ fun VacancyScreen(
             is Resource.Loading -> {}
             is Resource.Success -> {
                 viewModel.setOnVacancyStatusData(applies?.data)
+                viewModel.setOnAppliesLoading(false)
+                viewModel.resetAppliesState()
             }
-            is Resource.Error -> {}
-            else -> {}
+            is Resource.Error -> {
+                viewModel.setOnAppliesLoading(false)
+                viewModel.resetAppliesState()
+            }
+            else -> viewModel.setOnAppliesLoading(false)
         }
     }
 
     LaunchedEffect(applyStatus is Resource.Loading) {
         when (applyStatus) {
-            is Resource.Loading -> viewModel.setOnApplyLoading(true)
+            is Resource.Loading -> {}
             is Resource.Success -> {
                 val newApplies = listOf(
                     JobApplyStatus(
@@ -121,10 +130,12 @@ fun VacancyScreen(
                 )
                 viewModel.setOnVacancyStatusData(newApplies)
                 viewModel.setOnApplyLoading(false)
+                viewModel.resetApplyResultState()
             }
             is Resource.Error -> {
                 Toast.makeText(context, applyStatus?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnApplyLoading(false)
+                viewModel.resetApplyResultState()
             }
             else -> viewModel.setOnApplyLoading(false)
         }
@@ -180,7 +191,7 @@ fun VacancyScreen(
                     containerColor = Light,
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
-                    if (viewModel.loading) {
+                    if (viewModel.loading && viewModel.appliesLoading) {
                         VacancyBarSkeleton()
                     } else if (viewModel.vacancyData != null && viewModel.vacancyStatusData != null) {
                         val status = viewModel.vacancyStatusData!!.filter {
@@ -263,7 +274,9 @@ fun VacancyContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                modifier = Modifier.size(48.dp).clip(CircleShape),
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape),
                 model = vacancy.companyLogo,
                 contentDescription = null
             )

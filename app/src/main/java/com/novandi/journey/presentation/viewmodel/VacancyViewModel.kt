@@ -39,7 +39,10 @@ class VacancyViewModel @Inject constructor(
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
 
-    var loading by mutableStateOf(false)
+    var loading by mutableStateOf(true)
+        private set
+
+    var appliesLoading by mutableStateOf(true)
         private set
 
     var applyLoading by mutableStateOf(false)
@@ -65,6 +68,22 @@ class VacancyViewModel @Inject constructor(
 
     fun setOnVacancyStatusData(data: List<JobApplyStatus>?) {
         vacancyStatusData = data
+    }
+
+    fun setOnAppliesLoading(isLoading: Boolean) {
+        appliesLoading = isLoading
+    }
+
+    fun resetVacancyState() {
+        _vacancy.value = null
+    }
+
+    fun resetApplyResultState() {
+        _applyResult.value = null
+    }
+
+    fun resetAppliesState() {
+        _applies.value = null
     }
 
     fun getVacancy(id: String) {
