@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.work.Configuration
+import com.novandi.utility.consts.NotificationConsts
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -16,8 +17,8 @@ class HiltApplication: Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.channel_name)
-            val descriptionText = getString(R.string.channel_desc)
+            val name = NotificationConsts.CHANNEL_NAME_APPLICANT
+            val descriptionText = NotificationConsts.CHANNEL_DESCRIPTION_APPLICANT
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText

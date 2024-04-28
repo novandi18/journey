@@ -11,6 +11,7 @@ import com.novandi.core.domain.model.JobApplyStatus
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
+import com.novandi.core.domain.model.UpdateCvResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.UpdatedJobStatus
 import com.novandi.core.domain.repository.JobSeekerRepository
@@ -75,4 +76,9 @@ class JobSeekerInteractor @Inject constructor(
 
     override suspend fun getUpdatedJobStatus(token: String, userId: String): List<UpdatedJobStatus> =
         jobSeekerRepository.getUpdatedJobStatus(token, userId)
+
+    override fun updateJobSeekerCv(
+        userId: String,
+        cv: MultipartBody.Part
+    ): Flow<Resource<UpdateCvResult>> = jobSeekerRepository.updateJobSeekerCv(userId, cv)
 }

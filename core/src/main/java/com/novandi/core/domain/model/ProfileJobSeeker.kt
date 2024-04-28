@@ -15,5 +15,6 @@ data class ProfileJobSeeker(
     val gender: String,
     val age: String,
     val phoneNumber: String,
-    val profilePhotoUrl: String
+    val profilePhotoUrl: String,
+    var cv: String? = null
 ): Parcelable

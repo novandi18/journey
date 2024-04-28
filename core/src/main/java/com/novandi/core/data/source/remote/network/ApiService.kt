@@ -19,6 +19,7 @@ import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateCvResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
@@ -236,4 +237,11 @@ interface ApiService {
         @Path("companyId") companyId: String,
         @Path("applicantId") applicantId: String
     ): ProfileJobSeekerResponse
+
+    @Multipart
+    @PUT("users/cv/{id}")
+    suspend fun updateJobSeekerCv(
+        @Path("id") userId: String,
+        @Part cv: MultipartBody.Part
+    ): UpdateCvResponse
 }

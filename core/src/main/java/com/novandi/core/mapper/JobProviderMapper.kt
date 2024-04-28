@@ -68,6 +68,6 @@ object JobProviderMapper {
 
     fun updateProfilePhotoResponseToDomain(input: UpdateProfilePhotoResponse)
         : Flow<UpdateProfilePhotoResult> = flowOf(
-            UpdateProfilePhotoResult(input.message, input.message)
+            UpdateProfilePhotoResult(input.message, input.imageUrl)
         )
 }

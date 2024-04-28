@@ -42,5 +42,8 @@ data class ProfileJobSeekerItem(
     val phoneNumber: String,
 
     @SerializedName("profile_photo_url")
-    val profilePhotoUrl: String
+    val profilePhotoUrl: String,
+
+    @SerializedName("cv")
+    val cv: String? = null
 )

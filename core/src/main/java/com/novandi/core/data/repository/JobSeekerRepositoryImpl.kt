@@ -14,12 +14,14 @@ import com.novandi.core.data.source.remote.response.JobApplyStatusResponse
 import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateCvResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.JobApplyStatus
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
+import com.novandi.core.domain.model.UpdateCvResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.UpdatedJobStatus
 import com.novandi.core.domain.repository.JobSeekerRepository
@@ -143,4 +145,16 @@ class JobSeekerRepositoryImpl @Inject constructor(
         val data = remoteDataSource.getUpdatedApplyStatus(token, userId)
         return JobSeekerMapper.updatedJobStatusResponseToDomain(data)
     }
+
+    override fun updateJobSeekerCv(
+        userId: String,
+        cv: MultipartBody.Part
+    ): Flow<Resource<UpdateCvResult>> =
+        object : NetworkOnlyResource<UpdateCvResult, UpdateCvResponse>() {
+            override fun loadFromNetwork(data: UpdateCvResponse): Flow<UpdateCvResult> =
+                JobSeekerMapper.updateCvResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<UpdateCvResponse>> =
+                remoteDataSource.updateJobSeekerCv(userId, cv)
+        }.asFlow()
 }

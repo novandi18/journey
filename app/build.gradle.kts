@@ -98,9 +98,6 @@ dependencies {
     // Work Manager
     implementation(libs.work.manager)
 
-    // Lottie
-    implementation(libs.lottie)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

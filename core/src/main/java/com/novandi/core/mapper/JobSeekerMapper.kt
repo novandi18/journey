@@ -10,7 +10,9 @@ import com.novandi.core.data.source.remote.response.JobApplyStatusResponse
 import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateCvResponse
 import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
+import com.novandi.core.domain.model.UpdateCvResult
 import com.novandi.core.domain.model.UpdatedJobStatus
 import com.novandi.utility.data.dateFormatter
 import com.novandi.utility.image.imageProfileUrl
@@ -38,7 +40,8 @@ object JobSeekerMapper {
             gender = input.user.gender,
             age = input.user.age,
             phoneNumber = input.user.phoneNumber,
-            profilePhotoUrl = input.user.profilePhotoUrl.imageProfileUrl()
+            profilePhotoUrl = input.user.profilePhotoUrl.imageProfileUrl(),
+            cv = input.user.cv
         )
     )
 
@@ -68,4 +71,8 @@ object JobSeekerMapper {
         input.map {
             UpdatedJobStatus(it.vacancyId, it.position, it.company, it.status)
         }
+
+    fun updateCvResponseToDomain(input: UpdateCvResponse): Flow<UpdateCvResult> = flowOf(
+        UpdateCvResult(input.message, input.cv)
+    )
 }

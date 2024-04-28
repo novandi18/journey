@@ -1,21 +1,21 @@
 [versions]
 agp = "8.3.2"
 kotlin = "1.9.22"
-core-ktx = "1.12.0"
+core-ktx = "1.13.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.7.0"
-activity-compose = "1.8.2"
-compose-bom = "2024.04.00"
+activity-compose = "1.9.0"
+compose-bom = "2024.04.01"
 retrofit = "2.9.0"
 okHttp = "4.11.0"
 ksp = "1.9.22-1.0.17"
 hilt = "2.49"
 composeNavigation = "2.7.7"
 androidxHiltNavigation = "1.2.0"
-androidxFoundation = "1.7.0-alpha06"
-datastore = "1.0.0"
+androidxFoundation = "1.7.0-alpha07"
+datastore = "1.1.0"
 paging = "3.3.0-beta01"
 splashscreen = "1.0.1"
 secretsGradle = "2.0.1"
@@ -27,7 +27,6 @@ room = "2.6.1"
 easycrop = "0.1.1"
 work-manager = "2.9.0"
 hilt-work = "1.2.0"
-lottie = "6.0.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -74,8 +73,6 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 easycrop = { group = "io.github.mr0xf00", name = "easycrop", version.ref = "easycrop" }
 work-manager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-manager" }
 hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hilt-work" }
-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hilt-work" }
-lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

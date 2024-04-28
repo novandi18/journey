@@ -21,10 +21,21 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import com.novandi.core.domain.model.File
+import com.novandi.journey.presentation.notification.FileDownloadWorker
 import com.novandi.journey.presentation.service.NotificationService
 import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.viewmodel.MainViewModel
+import com.novandi.utility.consts.WorkerConsts
 import com.novandi.utility.service.isServiceRunning
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -84,5 +95,41 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    fun fileDownloadStarter(
+        file: File,
+        running: (LiveData<WorkInfo>) -> Unit
+//        success: (String) -> Unit,
+//        failed: (String) -> Unit,
+//        running: () -> Unit
+    ) {
+        val workManager = WorkManager.getInstance(this)
+        val data = Data.Builder()
+
+        data.apply {
+            putString(WorkerConsts.KEY_FILE_NAME, file.name)
+            putString(WorkerConsts.KEY_FILE_URL, file.url)
+            putString(WorkerConsts.KEY_FILE_TYPE, file.type)
+        }
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresStorageNotLow(true)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val fileDownloadWorker = OneTimeWorkRequestBuilder<FileDownloadWorker>()
+            .setConstraints(constraints)
+            .setInputData(data.build())
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "oneFileDownloadWork_${System.currentTimeMillis()}",
+            ExistingWorkPolicy.KEEP,
+            fileDownloadWorker
+        )
+
+        running(workManager.getWorkInfoByIdLiveData(fileDownloadWorker.id))
     }
 }

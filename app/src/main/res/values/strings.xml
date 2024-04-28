@@ -86,6 +86,8 @@
     <string name="notes_for_job_seeker">Catatan untuk pelamar</string>
     <string name="notes_placeholder">Kontak yang perlu dihubungi, langkah selanjutnya setelah pelamar diterima, dll</string>
     <string name="no_notes">Tidak ada catatan.</string>
+    <string name="cv" translatable="false">Curriculum Vitae</string>
+    <string name="cv_empty">Tidak ada CV</string>
 
     <!--  Title  -->
     <string name="vacancy">Lowongan</string>
@@ -134,6 +136,8 @@
     <string name="logout_desc">Ingin keluar akun sekarang?</string>
     <string name="update_email_desc">Ingin memperbarui email sekarang? akun anda akan keluar setelah ini</string>
     <string name="update_password_desc">Ingin memperbarui password pada akun ini? akun anda akan keluar setelah ini</string>
+    <string name="cv_desc">Ingin memilih file ini untuk upload sebagai Curriculum Vitae?</string>
+    <string name="cv_confirm">Ya, upload</string>
 
     <!--  Error  -->
     <string name="network_error">Koneksi Bermasalah</string>
@@ -142,6 +146,7 @@
     <string name="new_email_same_as_old">Email lama tidak boleh sama dengan email saat ini</string>
     <string name="speak_error">Tidak ada suara yang dikeluarkan, silahkan coba lagi</string>
     <string name="notes_required">Catatan harus di isi</string>
+    <string name="file_picker_permission_denied">Memerlukan izin penyimpanan untuk mengakses File Manager</string>
 
     <!--  Profile  -->
     <string name="title_update_profile">Ubah Profil</string>
@@ -175,10 +180,14 @@
     <string name="your_vacancy_applied">Anda melamar pada lowongan berikut:</string>
     <string name="notes_job_seeker_alert">* Isi jika pelamar diterima pada lowongan ini.</string>
     <string name="notes_from_job_provider">Catatan dari perusahaan:</string>
+    <string name="update_cv">Ganti Curriculum Vitae</string>
+    <string name="download_cv">Unduh Curriculum Vitae</string>
+    <string name="downloading">Sedang mengunduh…</string>
+    <string name="click_to_open_file">Klik untuk membuka file</string>
+    <string name="failed_download">Gagal mengunduh</string>
+    <string name="close">Tutup</string>
 
-    <!--  Notification Channel  -->
-    <string name="channel_name">Journey Notifikasi</string>
-    <string name="channel_desc">Journey Notifikasi Deskripsi</string>
+    <!--  Notification  -->
     <string name="vacancy_accepted_channel">Lamaran Diterima</string>
     <string name="vacancy_accepted_desc">Selamat! lamaran anda diterima oleh %1$s pada posisi %2$s</string>
 </resources>

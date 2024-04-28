@@ -26,6 +26,7 @@ import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegencyItem
 import com.novandi.core.data.source.remote.response.RegisterResponse
+import com.novandi.core.data.source.remote.response.UpdateCvResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
@@ -611,6 +612,24 @@ class RemoteDataSource @Inject constructor(
             } else {
                 emit(ApiResponse.Error("Connection error"))
             }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun updateJobSeekerCv(userId: String, cv: MultipartBody.Part)
+            : Flow<ApiResponse<UpdateCvResponse>> = flow {
+        try {
+            val response = apiService.updateJobSeekerCv(userId, cv)
+            emit(ApiResponse.Success(response))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {

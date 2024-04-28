@@ -1,5 +1,8 @@
 package com.novandi.journey.presentation.screen
 
+import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -9,14 +12,19 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -28,10 +36,13 @@ import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.AssistWalker
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.Password
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,7 +71,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.work.WorkInfo
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mr0xf00.easycrop.CropError
@@ -69,9 +84,12 @@ import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.novandi.core.data.response.Resource
+import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.ProfileJobSeeker
+import com.novandi.journey.BuildConfig
 import com.novandi.journey.R
 import com.novandi.journey.presentation.service.NotificationService
+import com.novandi.journey.presentation.ui.component.dialog.FileDownloadDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialogImagePreview
 import com.novandi.journey.presentation.ui.component.skeleton.ProfileSkeleton
@@ -83,10 +101,14 @@ import com.novandi.journey.presentation.ui.theme.Green
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 import com.novandi.journey.presentation.viewmodel.JobSeekerProfileViewModel
+import com.novandi.utility.consts.NetworkUrls
+import com.novandi.utility.consts.WorkerConsts
+import com.novandi.utility.data.convertUriToPdf
 import com.novandi.utility.image.bitmapToUri
 import com.novandi.utility.image.uriToFile
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 
@@ -103,9 +125,43 @@ fun JobSeekerProfileScreen(
     val accountId by viewModel.accountId.observeAsState()
     val profile by viewModel.profile.collectAsState()
     val photoProfile by viewModel.photoProfile.collectAsState()
+    val cv by viewModel.cv.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getProfile(token.toString(), accountId.toString())
+    }
+
+    val downloadedCv by viewModel.downloadedCv.collectAsState()
+    if (downloadedCv != null) {
+        val workInfo = downloadedCv!!.observeAsState().value
+        if (workInfo != null) {
+            when (workInfo.state) {
+                WorkInfo.State.SUCCEEDED -> {
+                    val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
+                    viewModel.setOnUpdateFile(
+                        isDownloading = false,
+                        downloadedUri = uri
+                    )
+                }
+                WorkInfo.State.FAILED -> {
+                    viewModel.setOnUpdateFile(
+                        isDownloading = false,
+                        downloadedUri = ""
+                    )
+                }
+                WorkInfo.State.RUNNING -> {
+                    viewModel.setOnUpdateFile(
+                        isDownloading = true
+                    )
+                }
+                else -> {
+                    viewModel.setOnUpdateFile(
+                        isDownloading = false,
+                        downloadedUri = ""
+                    )
+                }
+            }
+        }
     }
 
     LaunchedEffect(profile is Resource.Loading) {
@@ -113,10 +169,21 @@ fun JobSeekerProfileScreen(
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 viewModel.setOnProfileData(profile?.data)
+                if (profile?.data?.cv != null) {
+                    viewModel.setOnCvFile(
+                        File(
+                            id = profile?.data!!.id,
+                            name = profile?.data?.cv!!,
+                            type = "PDF",
+                            url = "${NetworkUrls.JOURNEY}users/cv/${viewModel.profileData!!.cv!!}",
+                            downloadedUri = null
+                        )
+                    )
+                }
                 viewModel.setOnLoading(false)
             }
             is Resource.Error -> viewModel.setOnLoading(false)
-            else -> viewModel.setOnLoading(false)
+            else -> {}
         }
     }
 
@@ -128,15 +195,37 @@ fun JobSeekerProfileScreen(
                 Toast.makeText(context, photoProfile?.data?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnOpenDialogImagePreview(false)
                 viewModel.setOnUploadLoading(false)
+                viewModel.resetPhotoProfileState()
             }
             is Resource.Error -> {
                 Toast.makeText(context, photoProfile?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnOpenDialogImagePreview(false)
                 viewModel.setOnUploadLoading(false)
+                viewModel.resetPhotoProfileState()
             }
             else -> {
                 viewModel.setOnOpenDialogImagePreview(false)
                 viewModel.setOnUploadLoading(false)
+            }
+        }
+    }
+
+    LaunchedEffect(cv is Resource.Loading) {
+        when (cv) {
+            is Resource.Loading -> viewModel.setOnUploadCvLoading(true)
+            is Resource.Success -> {
+                viewModel.updateCvOnProfileData(cv?.data?.cv)
+                Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
+                viewModel.setOnUploadCvLoading(false)
+                viewModel.resetCvState()
+            }
+            is Resource.Error -> {
+                Toast.makeText(context, cv?.message, Toast.LENGTH_SHORT).show()
+                viewModel.setOnUploadCvLoading(false)
+                viewModel.resetCvState()
+            }
+            else -> {
+                viewModel.setOnUploadCvLoading(false)
             }
         }
     }
@@ -154,6 +243,7 @@ fun JobSeekerProfileScreen(
             }
         } else {
             JobSeekerProfileContent(
+                viewModel = viewModel,
                 data = viewModel.profileData!!,
                 logout = {
                     viewModel.logout()
@@ -161,21 +251,9 @@ fun JobSeekerProfileScreen(
                         navigateToStarted()
                     }, 500)
                 },
-                uploadLoading = viewModel.uploadLoading,
                 navigateToEmail = navigateToEmail,
                 navigateToPassword = navigateToPassword,
-                openDialogImagePreview = viewModel.openDialogImagePreview,
-                setOnOpenDialogImagePreview = viewModel::setOnOpenDialogImagePreview,
-                uploadPhoto = { photo ->
-                    val imageFile = uriToFile(photo, context)
-                    val requestImageFile = imageFile.asRequestBody("image/png".toMediaType())
-                    val multipartBody = MultipartBody.Part.createFormData(
-                        "profile_photo_url",
-                        imageFile.name,
-                        requestImageFile
-                    )
-                    viewModel.updatePhotoProfile(accountId.toString(), multipartBody)
-                }
+                accountId = accountId.toString()
             )
 
             IconButton(
@@ -192,28 +270,77 @@ fun JobSeekerProfileScreen(
                     tint = Light
                 )
             }
+
+            if (viewModel.cvFile != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    AnimatedVisibility(
+                        visible = viewModel.cvDownloadShowing,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        FileDownloadDialog(
+                            file = viewModel.cvFile!!,
+                            close = {
+                                viewModel.setOnCvDownloadShowing(false)
+                                viewModel.resetDownloadedCvState()
+                            },
+                            openFile = { file ->
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                val uriData = FileProvider.getUriForFile(
+                                    context,
+                                    BuildConfig.APPLICATION_ID + ".provider",
+                                    file.downloadedUri!!.toUri().toFile()
+                                )
+                                intent.setDataAndType(
+                                    uriData,
+                                    "application/pdf"
+                                )
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                viewModel.resetDownloadedCvState()
+                                viewModel.setOnCvDownloadShowing(false)
+                                try {
+                                    val activity = context as Activity
+                                    activity.startActivity(intent)
+                                } catch (e: ActivityNotFoundException) {
+                                    Toast.makeText(
+                                        context,
+                                        "Can't open Pdf",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 fun JobSeekerProfileContent(
+    viewModel: JobSeekerProfileViewModel,
     data: ProfileJobSeeker,
     logout: () -> Unit,
     navigateToEmail: (String) -> Unit,
     navigateToPassword: () -> Unit,
-    openDialogImagePreview: Boolean,
-    setOnOpenDialogImagePreview: (Boolean) -> Unit,
-    uploadPhoto: (Uri) -> Unit,
-    uploadLoading: Boolean
+    accountId: String
 ) {
     val context = LocalContext.current
     val imageCropper = rememberImageCropper()
     val cropState = imageCropper.cropState
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
+    val openCvDialog = remember { mutableStateOf(false) }
 
     var photo: Bitmap? by remember { mutableStateOf(null) }
+    val selectedPdfUri = remember { mutableStateOf<Uri?>(null) }
+
     val imageLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -224,10 +351,55 @@ fun JobSeekerProfileContent(
                     is CropError -> { }
                     is CropResult.Success -> {
                         photo = result.bitmap.asAndroidBitmap()
-                        setOnOpenDialogImagePreview(true)
+                        viewModel.setOnOpenDialogImagePreview(true)
                     }
                 }
             }
+        }
+    }
+
+    val pdfLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            selectedPdfUri.value = uri
+            openCvDialog.value = true
+        }
+    }
+
+    val pdfPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            pdfLauncher.launch(arrayOf("application/pdf"))
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.file_picker_permission_denied),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    val pdfDownloadPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
+        var isGranted = false
+        it.forEach { _, b ->
+            isGranted = b
+        }
+
+        if (isGranted) {
+            viewModel.setOnCvDownloadShowing(true)
+            viewModel.downloadCv(
+                viewModel.cvFile!!
+            )
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.file_picker_permission_denied),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -249,16 +421,49 @@ fun JobSeekerProfileContent(
                 icon = Icons.AutoMirrored.Filled.Logout
             )
         }
-        openDialogImagePreview -> {
+        viewModel.openDialogImagePreview -> {
             JDialogImagePreview(
                 image = photo,
                 onDismissRequest = {
-                    setOnOpenDialogImagePreview(false)
+                    viewModel.setOnOpenDialogImagePreview(false)
                 },
                 onConfirmation = {
-                    uploadPhoto(bitmapToUri(photo!!))
+                    val imageFile = uriToFile(bitmapToUri(photo!!), context)
+                    val requestImageFile = imageFile.asRequestBody("image/png".toMediaType())
+                    val multipartBody = MultipartBody.Part.createFormData(
+                        "profile_photo_url",
+                        imageFile.name,
+                        requestImageFile
+                    )
+                    viewModel.updatePhotoProfile(accountId, multipartBody)
                 },
-                uploadLoading = uploadLoading
+                uploadLoading = viewModel.uploadLoading
+            )
+        }
+        openCvDialog.value -> {
+            JDialog(
+                onDismissRequest = {
+                    selectedPdfUri.value = null
+                    openCvDialog.value = false
+                },
+                onConfirmation = {
+                    val cvFile = convertUriToPdf(context, selectedPdfUri.value!!)
+                    val requestCvFile =
+                        cvFile?.asRequestBody("application/pdf".toMediaTypeOrNull())
+                    if (requestCvFile != null) {
+                        val multipartBody = MultipartBody.Part.createFormData(
+                            "cv",
+                            cvFile.name,
+                            requestCvFile
+                        )
+                        viewModel.updateCv(accountId, multipartBody)
+                    }
+                    openCvDialog.value = false
+                },
+                dialogTitle = stringResource(id = R.string.cv),
+                dialogText = stringResource(id = R.string.cv_desc),
+                confirmText = stringResource(id = R.string.cv_confirm),
+                icon = Icons.Rounded.Description
             )
         }
     }
@@ -486,6 +691,94 @@ fun JobSeekerProfileContent(
             }
 
             HorizontalDivider(
+                color = Dark.copy(alpha = .1f)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp, start = 24.dp, end = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = if (data.cv != null) Modifier.weight(.75f) else Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .align(alignment = Alignment.CenterVertically),
+                        imageVector = Icons.Rounded.Description,
+                        contentDescription = stringResource(id = R.string.cv),
+                        tint = DarkGray80
+                    )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.cv),
+                            fontSize = 12.sp,
+                            color = DarkGray80
+                        )
+                        Text(
+                            text = if (data.cv != null) data.cv!! else
+                                stringResource(id = R.string.cv_empty),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = DarkGray80,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Row(
+                    modifier = if (data.cv != null) Modifier.weight(.25f) else Modifier,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (viewModel.uploadCvLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .padding(end = 12.dp, top = 4.dp),
+                            color = DarkGray80
+                        )
+                    } else {
+                        if (data.cv != null) {
+                            IconButton(
+                                onClick = {
+                                    pdfDownloadPermissionLauncher.launch(arrayOf(
+                                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                    ))
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Download,
+                                    contentDescription = stringResource(id = R.string.download_cv),
+                                    tint = DarkGray80
+                                )
+                            }
+                        }
+                        IconButton(
+                            onClick = {
+                                pdfPermissionLauncher.launch(
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                )
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = stringResource(id = R.string.update_cv),
+                                tint = DarkGray80
+                            )
+                        }
+                    }
+                }
+            }
+
+            HorizontalDivider(
                 color = Dark.copy(alpha = .4f)
             )
 
@@ -578,6 +871,11 @@ fun JobSeekerProfileContent(
                     )
                 }
             }
+            Spacer(
+                modifier = Modifier.height(
+                    if (viewModel.cvDownloadShowing) 100.dp else 0.dp
+                )
+            )
         }
     }
 }
