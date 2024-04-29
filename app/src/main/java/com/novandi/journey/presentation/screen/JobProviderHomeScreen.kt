@@ -43,16 +43,15 @@ fun JobProviderHomeScreen(
     val accountId by viewModel.accountId.observeAsState()
     val vacancies by viewModel.vacancies.observeAsState(Resource.Loading())
 
-    LaunchedEffect(Unit) {
-        viewModel.vacancies(token.toString(), accountId.toString())
+    LaunchedEffect(token != null, accountId != null) {
+        if (token != null && accountId != null) {
+            viewModel.vacancies(token.toString(), accountId.toString())
+        }
     }
 
     LaunchedEffect(vacancies is Resource.Loading) {
         when (vacancies) {
-            is Resource.Loading -> {
-                viewModel.setOnLoading(true)
-                viewModel.setOnData(listOf())
-            }
+            is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 viewModel.setOnData(vacancies.data)
                 viewModel.setOnLoading(false)
@@ -102,11 +101,7 @@ fun JobProviderHomeScreen(
                 ) {
                     JCardSkeleton()
                 }
-            } else if (viewModel.data == null) {
-                NetworkError {
-                    viewModel.vacancies(token.toString(), accountId.toString())
-                }
-            } else {
+            } else if (viewModel.data != null) {
                 PullToRefreshLazyColumn(
                     items = viewModel.data!!,
                     content = { vacancy ->
@@ -120,6 +115,10 @@ fun JobProviderHomeScreen(
                         viewModel.vacancies(token.toString(), accountId.toString())
                     }
                 )
+            } else {
+                NetworkError {
+                    viewModel.vacancies(token.toString(), accountId.toString())
+                }
             }
         }
     }

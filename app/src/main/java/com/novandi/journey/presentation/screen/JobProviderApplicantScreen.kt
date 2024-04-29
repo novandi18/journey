@@ -37,7 +37,7 @@ fun JobProviderApplicantScreen(
     val accountId by viewModel.accountId.observeAsState()
     val vacancies by viewModel.vacancies.observeAsState(Resource.Loading())
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(token != null, accountId != null) {
         viewModel.vacancies(token.toString(), accountId.toString())
     }
 

@@ -89,7 +89,9 @@ fun VacancyScreen(
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 viewModel.setOnVacancyData(vacancy?.data)
-                viewModel.getVacancyStatus(token.toString(), accountId.toString())
+                if (roleId == 1) {
+                    viewModel.getVacancyStatus(token.toString(), accountId.toString())
+                }
                 viewModel.resetVacancyState()
                 viewModel.setOnLoading(false)
             }

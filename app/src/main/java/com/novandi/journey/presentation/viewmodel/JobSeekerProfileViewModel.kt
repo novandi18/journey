@@ -44,7 +44,7 @@ class JobSeekerProfileViewModel @Inject constructor(
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
 
-    var loading by mutableStateOf(false)
+    var loading by mutableStateOf(true)
         private set
 
     var profileData by mutableStateOf<ProfileJobSeeker?>(null)

@@ -49,7 +49,7 @@ fun JobSeekerApplyScreen(
     val accountId by viewModel.accountId.observeAsState()
     val vacancies by viewModel.vacancies.collectAsState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(token != null, accountId != null) {
         viewModel.getVacancies(token.toString(), accountId.toString())
     }
 

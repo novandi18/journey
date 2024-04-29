@@ -38,7 +38,7 @@ class JobProviderProfileViewModel @Inject constructor(
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
 
-    var loading by mutableStateOf(false)
+    var loading by mutableStateOf(true)
         private set
 
     var uploadLoading by mutableStateOf(false)
