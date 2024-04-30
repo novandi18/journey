@@ -3,21 +3,28 @@ package com.novandi.journey.presentation.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.store.DataStoreManager
+import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.JobApplyStatus
+import com.novandi.core.domain.model.ProfileJobSeeker
+import com.novandi.core.domain.model.UpdateCvResult
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.domain.usecase.JobSeekerUseCase
 import com.novandi.core.domain.usecase.VacancyUseCase
+import com.novandi.journey.presentation.main.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,6 +41,15 @@ class VacancyViewModel @Inject constructor(
 
     private val _applyResult = MutableStateFlow<Resource<GeneralResult>?>(null)
     val applyResult: StateFlow<Resource<GeneralResult>?> get() = _applyResult
+
+    private val _profile = MutableStateFlow<Resource<ProfileJobSeeker>?>(null)
+    val profile: StateFlow<Resource<ProfileJobSeeker>?> get() = _profile
+
+    private val _cv = MutableStateFlow<Resource<UpdateCvResult>?>(null)
+    val cv: StateFlow<Resource<UpdateCvResult>?> get() = _cv
+
+    private val _downloadedCv = MutableStateFlow<LiveData<WorkInfo>?>(null)
+    val downloadedCv: StateFlow<LiveData<WorkInfo>?> get() = _downloadedCv
 
     val roleId = dataStoreManager.roleId.asLiveData()
     val token = dataStoreManager.token.asLiveData()
@@ -52,6 +68,21 @@ class VacancyViewModel @Inject constructor(
         private set
 
     var vacancyStatusData by mutableStateOf<List<JobApplyStatus>?>(null)
+        private set
+
+    var profileData by mutableStateOf<ProfileJobSeeker?>(null)
+        private set
+
+    var profileLoading by mutableStateOf(true)
+        private set
+
+    var uploadCvLoading by mutableStateOf(false)
+        private set
+
+    var cvDownloadShowing by mutableStateOf(false)
+        private set
+
+    var cvFile by mutableStateOf<File?>(null)
         private set
 
     fun setOnLoading(isLoading: Boolean) {
@@ -84,6 +115,49 @@ class VacancyViewModel @Inject constructor(
 
     fun resetAppliesState() {
         _applies.value = null
+    }
+
+    fun setOnProfileData(value: ProfileJobSeeker?) {
+        profileData = value
+    }
+
+    fun setOnUploadCvLoading(isLoading: Boolean) {
+        uploadCvLoading = isLoading
+    }
+
+    fun updateCvOnProfileData(cv: String?) {
+        profileData = profileData?.copy(cv = cv)
+    }
+
+    fun resetCvState() {
+        _cv.value = null
+    }
+
+    fun resetProfileState() {
+        _profile.value = null
+    }
+
+    fun setOnProfileLoading(value: Boolean) {
+        profileLoading = value
+    }
+
+    fun setOnCvDownloadShowing(value: Boolean) {
+        cvDownloadShowing = value
+    }
+
+    fun setOnCvFile(value: File) {
+        cvFile = value
+    }
+
+    fun resetDownloadedCvState() {
+        _downloadedCv.value = null
+    }
+
+    fun setOnUpdateFile(downloadedUri: String? = null, isDownloading: Boolean) {
+        cvFile = cvFile?.copy(
+            isDownloading = isDownloading,
+            downloadedUri = downloadedUri
+        )
     }
 
     fun getVacancy(id: String) {
@@ -120,5 +194,41 @@ class VacancyViewModel @Inject constructor(
                     _applyResult.value = result
                 }
         }
+    }
+
+    fun getProfile(token: String, userId: String) {
+        viewModelScope.launch {
+            jobSeekerUseCase.getJobSeeker(token, userId)
+                .catch { err ->
+                    _profile.value = Resource.Error(err.message.toString())
+                }
+                .collect { result ->
+                    _profile.value = result
+                }
+        }
+    }
+
+    fun updateCv(userId: String, cv: MultipartBody.Part) {
+        viewModelScope.launch {
+            jobSeekerUseCase.updateJobSeekerCv(userId, cv)
+                .catch { err ->
+                    _cv.value = Resource.Error(err.message.toString())
+                }
+                .collect { result ->
+                    _cv.value = result
+                }
+        }
+    }
+
+    fun downloadCv(file: File) {
+        val fileCopy = file.copy(
+            id = file.id + "2"
+        )
+        MainActivity().fileDownloadStarter(
+            file = fileCopy,
+            running = { state ->
+                _downloadedCv.value = state
+            }
+        )
     }
 }

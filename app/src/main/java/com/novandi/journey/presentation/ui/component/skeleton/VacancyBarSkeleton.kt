@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -20,35 +21,67 @@ import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun VacancyBarSkeleton() {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier.shimmer(),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth().shimmer(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .height(12.dp)
+                        .fillMaxWidth(.35f)
+                        .background(DarkGray40)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(18.dp)
+                        .fillMaxWidth(.6f)
+                        .background(DarkGray40)
+                )
+            }
             Spacer(
                 modifier = Modifier
-                    .height(12.dp)
-                    .fillMaxWidth(.3f)
-                    .background(DarkGray40)
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(20.dp)
-                    .fillMaxWidth(.4f)
-                    .background(DarkGray40)
+                    .size(42.dp)
+                    .background(DarkGray40, CircleShape)
             )
         }
-        Spacer(
-            modifier = Modifier
-                .width(120.dp)
-                .height(40.dp)
-                .shimmer()
-                .background(color = DarkGray40, shape = CircleShape)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.shimmer(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .height(12.dp)
+                        .fillMaxWidth(.3f)
+                        .background(DarkGray40)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(20.dp)
+                        .fillMaxWidth(.4f)
+                        .background(DarkGray40)
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(40.dp)
+                    .shimmer()
+                    .background(color = DarkGray40, shape = CircleShape)
+            )
+        }
     }
 }
 
