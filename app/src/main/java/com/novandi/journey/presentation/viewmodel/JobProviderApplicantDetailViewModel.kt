@@ -42,7 +42,7 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
 
-    var loading by mutableStateOf(false)
+    var loading by mutableStateOf(true)
         private set
 
     var responseLoading by mutableStateOf<List<Pair<String, Boolean>>>(emptyList())

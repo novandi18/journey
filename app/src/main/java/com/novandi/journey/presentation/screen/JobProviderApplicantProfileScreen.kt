@@ -1,5 +1,16 @@
 package com.novandi.journey.presentation.screen
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +31,8 @@ import androidx.compose.material.icons.filled.AssistWalker
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,12 +53,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.work.WorkInfo
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.novandi.core.data.response.Resource
+import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.ProfileJobSeeker
+import com.novandi.journey.BuildConfig
 import com.novandi.journey.R
+import com.novandi.journey.presentation.ui.component.dialog.FileDownloadDialog
 import com.novandi.journey.presentation.ui.component.skeleton.ProfileSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -53,6 +73,8 @@ import com.novandi.journey.presentation.ui.theme.Dark
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.JobProviderApplicantProfileViewModel
+import com.novandi.utility.consts.NetworkUrls
+import com.novandi.utility.consts.WorkerConsts
 
 @Composable
 fun JobProviderApplicantProfileScreen(
@@ -60,11 +82,12 @@ fun JobProviderApplicantProfileScreen(
     applicantId: String,
     back: () -> Unit
 ) {
+    val context = LocalContext.current
     val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
     val profile by viewModel.profile.collectAsState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(token != null, accountId != null) {
         viewModel.getApplicant(token.toString(), accountId.toString(), applicantId)
     }
 
@@ -73,6 +96,17 @@ fun JobProviderApplicantProfileScreen(
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 viewModel.setOnProfileData(profile?.data)
+                if (profile?.data?.cv != null) {
+                    viewModel.setOnCvFile(
+                        File(
+                            id = profile?.data!!.id,
+                            name = profile?.data?.cv!!,
+                            type = "PDF",
+                            url = "${NetworkUrls.JOURNEY}users/cv/${viewModel.profileData!!.cv!!}",
+                            downloadedUri = null
+                        )
+                    )
+                }
                 viewModel.setOnLoading(false)
                 viewModel.resetState()
             }
@@ -112,14 +146,121 @@ fun JobProviderApplicantProfileScreen(
                     tint = Light
                 )
             }
+
+            if (viewModel.cvFile != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    AnimatedVisibility(
+                        visible = viewModel.cvDownloadShowing,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        FileDownloadDialog(
+                            file = viewModel.cvFile!!,
+                            close = {
+                                viewModel.setOnCvDownloadShowing(false)
+                                viewModel.resetDownloadedCvState()
+                            },
+                            openFile = { file ->
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                val uriData = FileProvider.getUriForFile(
+                                    context,
+                                    BuildConfig.APPLICATION_ID + ".provider",
+                                    file.downloadedUri!!.toUri().toFile()
+                                )
+                                intent.setDataAndType(
+                                    uriData,
+                                    "application/pdf"
+                                )
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                viewModel.resetDownloadedCvState()
+                                viewModel.setOnCvDownloadShowing(false)
+                                try {
+                                    val activity = context as Activity
+                                    activity.startActivity(intent)
+                                } catch (e: ActivityNotFoundException) {
+                                    Toast.makeText(
+                                        context,
+                                        "Can't open Pdf",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
 private fun Content(
+    viewModel: JobProviderApplicantProfileViewModel = hiltViewModel(),
     data: ProfileJobSeeker
 ) {
+    val context = LocalContext.current
+
+    val pdfDownloadPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
+        var isGranted = false
+        it.forEach { _, b ->
+            isGranted = b
+        }
+
+        if (isGranted) {
+            viewModel.setOnCvDownloadShowing(true)
+            viewModel.downloadCv(
+                viewModel.cvFile!!
+            )
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.file_picker_permission_denied),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    val downloadedCv by viewModel.downloadedCv.collectAsState()
+    if (downloadedCv != null) {
+        val workInfo = downloadedCv!!.observeAsState().value
+        if (workInfo != null) {
+            when (workInfo.state) {
+                WorkInfo.State.SUCCEEDED -> {
+                    val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
+                    viewModel.setOnUpdateFile(
+                        isDownloading = false,
+                        downloadedUri = uri
+                    )
+                }
+                WorkInfo.State.FAILED -> {
+                    viewModel.setOnUpdateFile(
+                        isDownloading = false,
+                        downloadedUri = ""
+                    )
+                }
+                WorkInfo.State.RUNNING -> {
+                    viewModel.setOnUpdateFile(
+                        isDownloading = true
+                    )
+                }
+                else -> {
+                    viewModel.setOnUpdateFile(
+                        isDownloading = false,
+                        downloadedUri = ""
+                    )
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -250,6 +391,72 @@ private fun Content(
                         text = data.phoneNumber,
                         fontSize = 14.sp
                     )
+                }
+            }
+
+            HorizontalDivider(
+                color = Dark.copy(alpha = .1f)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp, start = 24.dp, end = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = if (data.cv != null) Modifier.weight(.75f) else Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .align(alignment = Alignment.CenterVertically),
+                        imageVector = Icons.Rounded.Description,
+                        contentDescription = stringResource(id = R.string.cv),
+                        tint = DarkGray80
+                    )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.cv),
+                            fontSize = 12.sp,
+                            color = DarkGray80
+                        )
+                        Text(
+                            text = if (data.cv != null) data.cv!! else
+                                stringResource(id = R.string.cv_empty),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = DarkGray80,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Row(
+                    modifier = if (data.cv != null) Modifier.weight(.2f) else Modifier,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (data.cv != null) {
+                        IconButton(
+                            onClick = {
+                                pdfDownloadPermissionLauncher.launch(arrayOf(
+                                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                ))
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Download,
+                                contentDescription = stringResource(id = R.string.download_cv),
+                                tint = DarkGray80
+                            )
+                        }
+                    }
                 }
             }
 

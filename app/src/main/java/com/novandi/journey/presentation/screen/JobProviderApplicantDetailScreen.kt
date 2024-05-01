@@ -85,7 +85,7 @@ fun JobProviderApplicantDetailScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(token != null, accountId != null) {
         viewModel.getApplicants(token.toString(), accountId.toString(), vacancyId)
         viewModel.getVacancyById(vacancyId)
     }
