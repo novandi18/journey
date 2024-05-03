@@ -1,6 +1,7 @@
 package com.novandi.journey.presentation.screen
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -322,6 +323,7 @@ fun JobSeekerProfileScreen(
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
 fun JobSeekerProfileContent(
     viewModel: JobSeekerProfileViewModel,

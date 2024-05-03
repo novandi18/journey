@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -88,10 +89,6 @@ fun JobSeekerHomeScreen(
     val searchByQuery = searches.value.filter { search ->
         search.keyword.contains(searchText)
     }
-
-    val disability = viewModel.disability.observeAsState(null)
-    val skillOne = viewModel.skillOne.observeAsState(null)
-    val skillTwo = viewModel.skillTwo.observeAsState(null)
 
     val tabs = listOf(
         stringResource(id = R.string.recommended_for_you),
@@ -261,10 +258,15 @@ fun JobSeekerHomeScreen(
             ) {
                 when (tabSelected) {
                     0 -> {
-                        LaunchedEffect(disability.value) {
-                            if (disability.value != null && skillOne.value != null && skillTwo.value != null) {
+                        val disability by viewModel.disability.observeAsState()
+                        val skillOne by viewModel.skillOne.observeAsState()
+                        val skillTwo by viewModel.skillTwo.observeAsState()
+
+                        LaunchedEffect(skillOne, skillTwo, disability) {
+                            if (disability != null && skillOne != null && skillTwo != null) {
+                                Log.d("penasaran banget", "${skillOne.toString()}, ${skillTwo.toString()}")
                                 viewModel.getRecommendations(
-                                    RecommendationRequest(disability.value!!, skillOne.value!!, skillTwo.value!!)
+                                    RecommendationRequest(disability!!, skillOne!!, skillTwo!!)
                                 )
                             }
                         }
@@ -286,13 +288,13 @@ fun JobSeekerHomeScreen(
                             }
                         }
 
-                        if (viewModel.recommendationLoading || viewModel.recommendation == null) {
+                        if (viewModel.recommendationLoading) {
                             Box(
                                 modifier = Modifier.padding(16.dp)
                             ) {
                                 JCardSkeleton(total = 3)
                             }
-                        } else {
+                        } else if (viewModel.recommendation != null) {
                             val request = RecommendationVacanciesRequest(viewModel.recommendation!!)
                             val vacancies = viewModel
                                 .recommendationVacancies(request)
