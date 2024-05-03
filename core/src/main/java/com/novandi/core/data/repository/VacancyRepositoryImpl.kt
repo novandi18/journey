@@ -5,14 +5,18 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.novandi.core.data.paging.LatestVacanciesPagingSource
 import com.novandi.core.data.paging.PopularVacanciesPagingSource
+import com.novandi.core.data.paging.RecommendationVacanciesPagingSource
 import com.novandi.core.data.paging.SearchVacanciesPagingSource
 import com.novandi.core.data.paging.VacanciesPagingSource
 import com.novandi.core.data.response.NetworkOnlyResource
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.RemoteDataSource
 import com.novandi.core.data.source.remote.network.ApiResponse
+import com.novandi.core.data.source.remote.request.RecommendationRequest
+import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.response.GeneralResponse
+import com.novandi.core.data.source.remote.response.RecommendationResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import com.novandi.core.domain.model.GeneralResult
@@ -99,4 +103,22 @@ class VacancyRepositoryImpl @Inject constructor(
             override suspend fun createCall(): Flow<ApiResponse<VacancyResponse>> =
                 remoteDataSource.getJobProviderVacancies(token, companyId)
         }.asFlow()
+
+    override fun getRecommendation(request: RecommendationRequest): Flow<Resource<List<String>>> =
+        object : NetworkOnlyResource<List<String>, RecommendationResponse>() {
+            override fun loadFromNetwork(data: RecommendationResponse): Flow<List<String>> =
+                VacancyMapper.recommendationToList(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<RecommendationResponse>> =
+                remoteDataSource.getRecommendation(request)
+        }.asFlow()
+
+    override fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
+    : Flow<PagingData<Vacancy>> =
+        Pager(
+            config = PagingConfig(pageSize = 10),
+            pagingSourceFactory = {
+                RecommendationVacanciesPagingSource(remoteDataSource, recommendations)
+            }
+        ).flow
 }

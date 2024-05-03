@@ -27,6 +27,18 @@ class DataStoreManager @Inject constructor(
         preferences[DataStoreConsts.TOKEN_KEY] ?: ""
     }
 
+    val disability: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[DataStoreConsts.DISABILITY_KEY] ?: ""
+    }
+
+    val skillOne: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[DataStoreConsts.SKILL_ONE_KEY] ?: ""
+    }
+
+    val skillTwo: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[DataStoreConsts.SKILL_TWO_KEY] ?: ""
+    }
+
     suspend fun setIsWelcome(isWelcome: Boolean) {
         dataStore.edit { preferences ->
             preferences[DataStoreConsts.WELCOME_KEY] = isWelcome
@@ -48,6 +60,24 @@ class DataStoreManager @Inject constructor(
     suspend fun setToken(tokenValue: String) {
         dataStore.edit { preferences ->
             preferences[DataStoreConsts.TOKEN_KEY] = tokenValue
+        }
+    }
+
+    suspend fun setDisability(disability: String) {
+        dataStore.edit { preferences ->
+            preferences[DataStoreConsts.DISABILITY_KEY] = disability
+        }
+    }
+
+    suspend fun setSkillOne(skillOne: String) {
+        dataStore.edit { preferences ->
+            preferences[DataStoreConsts.SKILL_ONE_KEY] = skillOne
+        }
+    }
+
+    suspend fun setSkillTwo(skillTwo: String) {
+        dataStore.edit { preferences ->
+            preferences[DataStoreConsts.SKILL_TWO_KEY] = skillTwo
         }
     }
 }

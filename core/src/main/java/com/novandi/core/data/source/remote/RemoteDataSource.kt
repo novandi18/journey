@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.novandi.core.data.response.ErrorResponse
 import com.novandi.core.data.source.remote.network.ApiResponse
 import com.novandi.core.data.source.remote.network.ApiService
+import com.novandi.core.data.source.remote.network.MLApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.AssistantRequest
@@ -13,6 +14,8 @@ import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
 import com.novandi.core.data.source.remote.request.JobSeekerRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
+import com.novandi.core.data.source.remote.request.RecommendationRequest
+import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
@@ -24,6 +27,7 @@ import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
 import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
+import com.novandi.core.data.source.remote.response.RecommendationResponse
 import com.novandi.core.data.source.remote.response.RegencyItem
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateCvResponse
@@ -44,7 +48,8 @@ import javax.inject.Singleton
 @Singleton
 class RemoteDataSource @Inject constructor(
     private val apiService: ApiService,
-    private val regencyApiService: RegencyApiService
+    private val regencyApiService: RegencyApiService,
+    private val mlApiService: MLApiService
 ) {
     suspend fun getRegency(provinceId: String): Flow<ApiResponse<List<RegencyItem>>> = flow {
         try {
@@ -642,6 +647,28 @@ class RemoteDataSource @Inject constructor(
             Log.e("RemoteDataSource", e.toString())
         }
     }.flowOn(Dispatchers.IO)
+
+    suspend fun getRecommendation(request: RecommendationRequest):
+        Flow<ApiResponse<RecommendationResponse>> = flow {
+        try {
+            val response = mlApiService.getRecommendation(request)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun getRecommendationVacancies(
+        page: Int, limit: Int, recommendations: RecommendationVacanciesRequest
+    ) = apiService.getRecommendationVacancies(page, limit, recommendations)
 
     companion object {
         const val TIMEOUT_MILLIS: Long = 10_000

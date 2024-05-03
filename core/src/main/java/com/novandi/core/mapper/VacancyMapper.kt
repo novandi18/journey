@@ -3,6 +3,7 @@ package com.novandi.core.mapper
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.data.source.remote.response.GeneralResponse
+import com.novandi.core.data.source.remote.response.RecommendationResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import com.novandi.utility.data.dateFormatter
@@ -71,5 +72,9 @@ object VacancyMapper {
 
     fun mapGeneralResponseToDomain(input: GeneralResponse): Flow<GeneralResult> = flowOf(
         GeneralResult(input.message)
+    )
+
+    fun recommendationToList(input: RecommendationResponse): Flow<List<String>> = flowOf(
+        input.predictions
     )
 }

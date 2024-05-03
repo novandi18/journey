@@ -21,7 +21,15 @@ import kotlinx.coroutines.flow.flowOf
 
 object JobSeekerMapper {
     fun mapLoginResponseToDomain(input: LoginJobSeekerResponse): Flow<LoginResult> = flowOf(
-        LoginResult(input.status, input.id, input.roleId, input.token)
+        LoginResult(
+            status = input.status,
+            id = input.id,
+            roleId = input.roleId,
+            token = input.token,
+            disability = input.disability,
+            skillOne = input.skillOne,
+            skillTwo = input.skillTwo
+        )
     )
 
     fun mapRegisterResponseToDomain(input: RegisterResponse): Flow<RegisterResult> = flowOf(

@@ -64,6 +64,9 @@ fun JobSeekerLoginScreen(
                 viewModel.setRoleId()
                 viewModel.setAccountId(auth!!.data!!.id)
                 viewModel.setToken(auth!!.data!!.token)
+                viewModel.setDisability(auth!!.data!!.disability!!)
+                viewModel.setSkillOne(auth!!.data!!.skillOne!!)
+                viewModel.setSkillTwo(auth!!.data!!.skillTwo!!)
                 viewModel.setIsLoading(false)
                 navigateToHome()
             }

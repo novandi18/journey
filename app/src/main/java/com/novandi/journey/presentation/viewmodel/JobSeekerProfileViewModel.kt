@@ -157,6 +157,9 @@ class JobSeekerProfileViewModel @Inject constructor(
             dataStoreManager.setToken("")
             dataStoreManager.setAccountId("")
             dataStoreManager.setRoleId(0)
+            dataStoreManager.setDisability("")
+            dataStoreManager.setSkillOne("")
+            dataStoreManager.setSkillTwo("")
         }
     }
 

@@ -7,6 +7,7 @@ import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
 import com.novandi.core.data.source.remote.request.JobSeekerRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
+import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
@@ -244,4 +245,11 @@ interface ApiService {
         @Path("id") userId: String,
         @Part cv: MultipartBody.Part
     ): UpdateCvResponse
+
+    @POST("vacancies/recommendation")
+    suspend fun getRecommendationVacancies(
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 10,
+        @Body recommendations: RecommendationVacanciesRequest
+    ): VacancyResponse
 }

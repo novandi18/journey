@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -48,10 +49,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.RecommendationRequest
+import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.journey.R
 import com.novandi.journey.presentation.notification.NotificationWorker
 import com.novandi.journey.presentation.ui.component.card.JCard
+import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.LazyColumnPaging
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshPaging
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -77,11 +82,16 @@ fun JobSeekerHomeScreen(
     var tabSelected by remember { mutableIntStateOf(0) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val jobApplyExtra = IntentExtra.getExtra(context, NotificationWorker.JOB_APPLY)
+    val recommendation by viewModel.recommendations.collectAsState()
 
     val searches = viewModel.searches.observeAsState(listOf())
     val searchByQuery = searches.value.filter { search ->
         search.keyword.contains(searchText)
     }
+
+    val disability = viewModel.disability.observeAsState(null)
+    val skillOne = viewModel.skillOne.observeAsState(null)
+    val skillTwo = viewModel.skillTwo.observeAsState(null)
 
     val tabs = listOf(
         stringResource(id = R.string.recommended_for_you),
@@ -251,13 +261,50 @@ fun JobSeekerHomeScreen(
             ) {
                 when (tabSelected) {
                     0 -> {
-                        val vacancies = viewModel.vacancies(token.toString()).collectAsLazyPagingItems()
-                        JobSeekerHomeContent(
-                            vacancies = vacancies,
-                            navigateToVacancy = { id ->
-                                navigateToVacancy(id)
+                        LaunchedEffect(disability.value) {
+                            if (disability.value != null && skillOne.value != null && skillTwo.value != null) {
+                                viewModel.getRecommendations(
+                                    RecommendationRequest(disability.value!!, skillOne.value!!, skillTwo.value!!)
+                                )
                             }
-                        )
+                        }
+
+                        LaunchedEffect(recommendation is Resource.Loading) {
+                            when (recommendation) {
+                                is Resource.Loading -> viewModel.setOnRecommendationLoading(true)
+                                is Resource.Success -> {
+                                    if (recommendation?.data != null)
+                                        viewModel.setOnRecommendations(recommendation?.data!!)
+                                    viewModel.setOnRecommendationLoading(false)
+                                    viewModel.resetRecommendationState()
+                                }
+                                is Resource.Error -> {
+                                    viewModel.setOnRecommendationLoading(false)
+                                    viewModel.resetRecommendationState()
+                                }
+                                else -> viewModel.setOnRecommendationLoading(false)
+                            }
+                        }
+
+                        if (viewModel.recommendationLoading || viewModel.recommendation == null) {
+                            Box(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                JCardSkeleton(total = 3)
+                            }
+                        } else {
+                            val request = RecommendationVacanciesRequest(viewModel.recommendation!!)
+                            val vacancies = viewModel
+                                .recommendationVacancies(request)
+                                .collectAsLazyPagingItems()
+
+                            JobSeekerHomeContent(
+                                vacancies = vacancies,
+                                navigateToVacancy = { id ->
+                                    navigateToVacancy(id)
+                                }
+                            )
+                        }
                     }
                     1 -> {
                         val vacancies = viewModel.latestVacancies().collectAsLazyPagingItems()

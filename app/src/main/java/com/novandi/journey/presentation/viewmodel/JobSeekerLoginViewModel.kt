@@ -64,6 +64,24 @@ class JobSeekerLoginViewModel @Inject constructor(
         }
     }
 
+    fun setDisability(disability: String) {
+        viewModelScope.launch {
+            dataStoreManager.setDisability(disability)
+        }
+    }
+
+    fun setSkillOne(skillOne: String) {
+        viewModelScope.launch {
+            dataStoreManager.setSkillOne(skillOne)
+        }
+    }
+
+    fun setSkillTwo(skillTwo: String) {
+        viewModelScope.launch {
+            dataStoreManager.setSkillTwo(skillTwo)
+        }
+    }
+
     fun login() {
         viewModelScope.launch {
             jobSeekerUseCase.loginJobSeeker(LoginRequest(email, password))

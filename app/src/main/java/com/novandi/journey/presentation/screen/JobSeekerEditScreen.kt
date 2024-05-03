@@ -87,6 +87,9 @@ fun JobSeekerEditScreen(
             is Resource.Success -> {
                 Toast.makeText(context, response?.data?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnLoading(false)
+                viewModel.setDisabilityDataStore(viewModel.disabilities[viewModel.disability].en)
+                viewModel.setSkillOneDataStore(viewModel.skills[viewModel.skillOne].skill)
+                viewModel.setSkillTwoDataStore(viewModel.skills[viewModel.skillTwo].skill)
                 back()
             }
             is Resource.Error -> {

@@ -13,5 +13,14 @@ data class LoginJobSeekerResponse(
     val roleId: Int,
 
     @SerializedName("token")
-    val token: String
+    val token: String,
+
+    @SerializedName("disability")
+    val disability: String,
+
+    @SerializedName("skill_one")
+    val skillOne: String,
+
+    @SerializedName("skill_two")
+    val skillTwo: String
 )

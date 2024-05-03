@@ -1,6 +1,7 @@
 package com.novandi.core.di
 
 import com.novandi.core.data.source.remote.network.ApiService
+import com.novandi.core.data.source.remote.network.MLApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
 import com.novandi.utility.consts.NetworkUrls
 import dagger.Module
@@ -56,5 +57,16 @@ class NetworkModule {
             .client(client)
             .build()
         return retrofit.create(RegencyApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideMLApi(client: OkHttpClient): MLApiService {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(NetworkUrls.ML)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+        return retrofit.create(MLApiService::class.java)
     }
 }

@@ -2,6 +2,8 @@ package com.novandi.core.domain.interactor
 
 import androidx.paging.PagingData
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.RecommendationRequest
+import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.Vacancy
@@ -39,4 +41,10 @@ class VacancyInteractor @Inject constructor(
         token: String,
         companyId: String
     ): Flow<Resource<List<Vacancy>>> = vacancyRepository.getJobProviderVacancies(token, companyId)
+
+    override fun getRecommendation(request: RecommendationRequest): Flow<Resource<List<String>>> =
+        vacancyRepository.getRecommendation(request)
+
+    override fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
+    : Flow<PagingData<Vacancy>> = vacancyRepository.getRecommendationVacancies(recommendations)
 }

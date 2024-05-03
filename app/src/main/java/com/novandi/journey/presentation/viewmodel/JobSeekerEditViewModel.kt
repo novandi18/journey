@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class JobSeekerEditViewModel @Inject constructor(
     private val jobSeekerUseCase: JobSeekerUseCase,
-    dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager
 ): ViewModel() {
     private val _response = MutableStateFlow<Resource<GeneralResult>?>(null)
     val response: StateFlow<Resource<GeneralResult>?> get() = _response
@@ -96,6 +96,24 @@ class JobSeekerEditViewModel @Inject constructor(
 
     fun setOnSkillTwo(index: Int) {
         skillTwo = index
+    }
+
+    fun setDisabilityDataStore(disability: String) {
+        viewModelScope.launch {
+            dataStoreManager.setDisability(disability)
+        }
+    }
+
+    fun setSkillOneDataStore(skillOne: String) {
+        viewModelScope.launch {
+            dataStoreManager.setSkillOne(skillOne)
+        }
+    }
+
+    fun setSkillTwoDataStore(skillTwo: String) {
+        viewModelScope.launch {
+            dataStoreManager.setSkillTwo(skillTwo)
+        }
     }
 
     fun update(token: String, id: String, request: JobSeekerEditRequest) {
