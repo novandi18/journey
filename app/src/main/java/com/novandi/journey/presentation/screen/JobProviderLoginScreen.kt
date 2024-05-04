@@ -70,7 +70,11 @@ fun JobProviderLoginScreen(
             }
             is Resource.Error -> {
                 viewModel.setIsLoading(false)
-                Toast.makeText(context, auth?.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.login_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
                 viewModel.clearErrorMessage()
             }
             else -> viewModel.setIsLoading(false)

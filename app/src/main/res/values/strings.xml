@@ -147,6 +147,8 @@
     <string name="speak_error">Tidak ada suara yang dikeluarkan, silahkan coba lagi</string>
     <string name="notes_required">Catatan harus di isi</string>
     <string name="file_picker_permission_denied">Memerlukan izin penyimpanan untuk mengakses File Manager</string>
+    <string name="login_failed">Terjadi kesalahan saat login, silahkan coba lagi</string>
+    <string name="register_failed">Terjadi kesalahan saat registrasi, silahkan coba lagi</string>
 
     <!--  Profile  -->
     <string name="title_update_profile">Ubah Profil</string>

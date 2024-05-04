@@ -86,7 +86,11 @@ fun JobProviderRegisterScreen(
             }
             is Resource.Error -> {
                 viewModel.setOnIsLoading(false)
-                Toast.makeText(context, register?.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.register_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             else -> viewModel.setOnIsLoading(false)
         }
