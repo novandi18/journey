@@ -10,7 +10,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +33,7 @@ import androidx.work.WorkManager
 import com.novandi.core.domain.model.File
 import com.novandi.journey.presentation.notification.FileDownloadWorker
 import com.novandi.journey.presentation.service.NotificationService
+import com.novandi.journey.presentation.ui.component.state.NetworkState
 import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.viewmodel.MainViewModel
 import com.novandi.utility.consts.WorkerConsts
@@ -86,7 +87,8 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        Box(modifier = Modifier.safeDrawingPadding()) {
+                        Column(modifier = Modifier.safeDrawingPadding()) {
+                            NetworkState()
                             JourneyApp(
                                 startedDestination = viewModel.startedDestination.collectAsState().value
                             )
@@ -100,9 +102,6 @@ class MainActivity : ComponentActivity() {
     fun fileDownloadStarter(
         file: File,
         running: (LiveData<WorkInfo>) -> Unit
-//        success: (String) -> Unit,
-//        failed: (String) -> Unit,
-//        running: () -> Unit
     ) {
         val workManager = WorkManager.getInstance(this)
         val data = Data.Builder()

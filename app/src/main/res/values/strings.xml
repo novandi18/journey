@@ -186,6 +186,8 @@
     <string name="click_to_open_file">Klik untuk membuka file</string>
     <string name="failed_download">Gagal mengunduh</string>
     <string name="close">Tutup</string>
+    <string name="connected">Online</string>
+    <string name="disconnected">Tidak ada koneksi</string>
 
     <!--  Notification  -->
     <string name="vacancy_accepted_channel">Lamaran Diterima</string>

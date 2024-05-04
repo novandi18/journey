@@ -1,6 +1,5 @@
 package com.novandi.journey.presentation.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -264,7 +263,6 @@ fun JobSeekerHomeScreen(
 
                         LaunchedEffect(skillOne, skillTwo, disability) {
                             if (disability != null && skillOne != null && skillTwo != null) {
-                                Log.d("penasaran banget", "${skillOne.toString()}, ${skillTwo.toString()}")
                                 viewModel.getRecommendations(
                                     RecommendationRequest(disability!!, skillOne!!, skillTwo!!)
                                 )
