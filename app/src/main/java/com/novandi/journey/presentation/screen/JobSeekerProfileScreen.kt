@@ -167,7 +167,7 @@ fun JobSeekerProfileScreen(
 
     LaunchedEffect(profile is Resource.Loading) {
         when (profile) {
-            is Resource.Loading -> viewModel.setOnLoading(true)
+            is Resource.Loading -> {}
             is Resource.Success -> {
                 viewModel.setOnProfileData(profile?.data)
                 if (profile?.data?.cv != null) {
@@ -192,6 +192,7 @@ fun JobSeekerProfileScreen(
         when (photoProfile) {
             is Resource.Loading -> viewModel.setOnUploadLoading(true)
             is Resource.Success -> {
+                viewModel.setOnLoading(true)
                 viewModel.getProfile(token.toString(), accountId.toString())
                 Toast.makeText(context, photoProfile?.data?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnOpenDialogImagePreview(false)
@@ -240,6 +241,7 @@ fun JobSeekerProfileScreen(
             ProfileSkeleton()
         } else if (viewModel.profileData == null) {
             NetworkError {
+                viewModel.setOnLoading(true)
                 viewModel.getProfile(token.toString(), accountId.toString())
             }
         } else {
