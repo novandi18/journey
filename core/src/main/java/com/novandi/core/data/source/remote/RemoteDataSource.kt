@@ -7,6 +7,7 @@ import com.novandi.core.data.source.remote.network.ApiResponse
 import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.MLApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
+import com.novandi.core.data.source.remote.network.WhatsappApiService
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.AssistantRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
@@ -19,6 +20,7 @@ import com.novandi.core.data.source.remote.request.RecommendationVacanciesReques
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
+import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.source.remote.response.ApplicantItem
 import com.novandi.core.data.source.remote.response.AssistantResponse
 import com.novandi.core.data.source.remote.response.GeneralResponse
@@ -35,6 +37,7 @@ import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
 import com.novandi.core.data.source.remote.response.VacancyDetailResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
+import com.novandi.core.data.source.remote.response.WhatsappResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -49,7 +52,8 @@ import javax.inject.Singleton
 class RemoteDataSource @Inject constructor(
     private val apiService: ApiService,
     private val regencyApiService: RegencyApiService,
-    private val mlApiService: MLApiService
+    private val mlApiService: MLApiService,
+    private val whatsappApiService: WhatsappApiService
 ) {
     suspend fun getRegency(provinceId: String): Flow<ApiResponse<List<RegencyItem>>> = flow {
         try {
@@ -669,6 +673,24 @@ class RemoteDataSource @Inject constructor(
     suspend fun getRecommendationVacancies(
         page: Int, limit: Int, recommendations: RecommendationVacanciesRequest
     ) = apiService.getRecommendationVacancies(page, limit, recommendations)
+
+    suspend fun sendWhatsappMessage(request: WhatsappRequest): Flow<ApiResponse<WhatsappResponse>> =
+        flow {
+            try {
+                val response = whatsappApiService.sendMessage(request)
+                emit(ApiResponse.Success(response))
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorMessage = try {
+                    Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+                } catch (e: Exception) { null }
+                emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+                Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+            } catch (e: Exception) {
+                emit(ApiResponse.Error(e.toString()))
+                Log.e("RemoteDataSource", e.toString())
+            }
+        }.flowOn(Dispatchers.IO)
 
     companion object {
         const val TIMEOUT_MILLIS: Long = 10_000

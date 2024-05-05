@@ -3,6 +3,7 @@ package com.novandi.core.di
 import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.MLApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
+import com.novandi.core.data.source.remote.network.WhatsappApiService
 import com.novandi.utility.consts.NetworkUrls
 import dagger.Module
 import dagger.Provides
@@ -68,5 +69,16 @@ class NetworkModule {
             .client(client)
             .build()
         return retrofit.create(MLApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideWhatsappApi(client: OkHttpClient): WhatsappApiService {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(NetworkUrls.WHATSAPP)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+        return retrofit.create(WhatsappApiService::class.java)
     }
 }

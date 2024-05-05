@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.consts.JobTypes
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
+import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardApplicant
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
@@ -64,6 +65,7 @@ import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 import com.novandi.journey.presentation.viewmodel.JobProviderApplicantDetailViewModel
+import com.novandi.utility.data.toWhatsappNumber
 import com.novandi.utility.field.ApplicantStatus
 import com.valentinilk.shimmer.shimmer
 
@@ -81,6 +83,7 @@ fun JobProviderApplicantDetailScreen(
     val applicants by viewModel.applicants.observeAsState(Resource.Loading())
     val vacancy by viewModel.vacancy.observeAsState(Resource.Loading())
     val response by viewModel.response.collectAsState()
+    val whatsappResponse by viewModel.whatsappResponse.collectAsState()
     var vacancyToggle by remember {
         mutableStateOf(false)
     }
@@ -106,6 +109,21 @@ fun JobProviderApplicantDetailScreen(
             is Resource.Loading -> {}
             is Resource.Success -> {
                 Toast.makeText(context, response!!.data?.message, Toast.LENGTH_SHORT).show()
+                viewModel.sendWhatsappMessage(
+                    request = WhatsappRequest(
+                        to = viewModel.applicantWhatsappNumber!!.first,
+                        messages = context.getString(
+                            if (viewModel.applicantWhatsappNumber!!.second) R.string.accepted_wa
+                            else R.string.rejected_wa,
+                            vacancy.data!!.companyName,
+                            vacancy.data!!.placementAddress,
+                            vacancy.data!!.disabilityName,
+                            vacancy.data!!.skillOne,
+                            vacancy.data!!.skillTwo,
+                            JobTypes.types()[viewModel.vacancyData!!.jobType - 1]
+                        )
+                    )
+                )
             }
             is Resource.Error -> {
                 Toast.makeText(context, response!!.message, Toast.LENGTH_SHORT).show()
@@ -123,6 +141,17 @@ fun JobProviderApplicantDetailScreen(
             is Resource.Error -> {
                 Toast.makeText(context, vacancy.message, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    LaunchedEffect(whatsappResponse is Resource.Loading) {
+        when (whatsappResponse) {
+            is Resource.Loading -> {}
+            is Resource.Success -> {
+                viewModel.setOnRemoveApplicantWhatsappNumber()
+            }
+            is Resource.Error -> viewModel.setOnRemoveApplicantWhatsappNumber()
+            else -> {}
         }
     }
 
@@ -220,6 +249,10 @@ fun JobProviderApplicantDetailScreen(
                                         vacancyId, applicant.id
                                     )
                                 }
+                                viewModel.setOnApplicantWhatsappNumber(
+                                    value = applicant.phoneNumber.toWhatsappNumber(),
+                                    isAccept = isAccept
+                                )
                                 viewModel.setOnResponseLoading(applicant.id, isAccept)
                             },
                             loading = viewModel.responseLoading,
@@ -360,12 +393,15 @@ fun JobProviderApplicantDetailScreen(
                         }
                     } else {
                         Column(
-                            modifier = Modifier.padding(16.dp).shimmer(),
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .shimmer(),
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Spacer(
                                 modifier = Modifier
-                                    .fillMaxWidth(.5f).height(16.dp)
+                                    .fillMaxWidth(.5f)
+                                    .height(16.dp)
                                     .background(DarkGray40)
                             )
                             Spacer(

@@ -11,7 +11,9 @@ import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
+import com.novandi.core.data.source.remote.response.WhatsappResponse
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
+import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.utility.data.dateFormatter
 import com.novandi.utility.image.imageProfileUrl
 import kotlinx.coroutines.flow.Flow
@@ -70,4 +72,11 @@ object JobProviderMapper {
         : Flow<UpdateProfilePhotoResult> = flowOf(
             UpdateProfilePhotoResult(input.message, input.imageUrl)
         )
+
+    fun mapWhatsappResponseToDomain(input: WhatsappResponse): Flow<WhatsappResult> = flowOf(
+        WhatsappResult(
+            status = input.data.status,
+            message = input.data.message
+        )
+    )
 }

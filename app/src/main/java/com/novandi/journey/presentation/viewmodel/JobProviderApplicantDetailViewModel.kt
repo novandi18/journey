@@ -10,11 +10,13 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
+import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.ApplicantItemStatus
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.Vacancy
+import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.core.domain.usecase.JobProviderUseCase
 import com.novandi.core.domain.usecase.VacancyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +38,9 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
     private val _response = MutableStateFlow<Resource<GeneralResult>?>(null)
     val response: StateFlow<Resource<GeneralResult>?> get() = _response
 
+    private val _whatsappResponse = MutableStateFlow<Resource<WhatsappResult>?>(null)
+    val whatsappResponse: StateFlow<Resource<WhatsappResult>?> get() = _whatsappResponse
+
     private val _vacancy = MutableLiveData<Resource<Vacancy>>(Resource.Loading())
     val vacancy: LiveData<Resource<Vacancy>> get() = _vacancy
 
@@ -55,6 +60,9 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
         private set
 
     var vacancyData by mutableStateOf<Vacancy?>(null)
+        private set
+
+    var applicantWhatsappNumber by mutableStateOf<Pair<String, Boolean>?>(null)
         private set
 
     fun setOnLoading(isLoading: Boolean) {
@@ -79,6 +87,14 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
 
     fun setOnVacancyData(value: Vacancy?) {
         vacancyData = value
+    }
+
+    fun setOnApplicantWhatsappNumber(value: String, isAccept: Boolean) {
+        applicantWhatsappNumber = Pair(value, isAccept)
+    }
+
+    fun setOnRemoveApplicantWhatsappNumber() {
+        applicantWhatsappNumber = null
     }
 
     private fun setUpdateNotesOnData(applicant: Applicant, note: String) {
@@ -146,6 +162,18 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
                 }
                 .collect { result ->
                     _vacancy.value = result
+                }
+        }
+    }
+
+    fun sendWhatsappMessage(request: WhatsappRequest) {
+        viewModelScope.launch {
+            jobProviderUseCase.sendWhatsappMessage(request)
+                .catch { err ->
+                    _whatsappResponse.value = Resource.Error(err.message.toString())
+                }
+                .collect { result ->
+                    _whatsappResponse.value = result
                 }
         }
     }
