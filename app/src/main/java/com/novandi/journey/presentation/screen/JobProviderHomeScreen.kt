@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -37,7 +39,8 @@ import com.novandi.journey.presentation.viewmodel.JobProviderHomeViewModel
 fun JobProviderHomeScreen(
     viewModel: JobProviderHomeViewModel = hiltViewModel(),
     navigateToVacancy: (String) -> Unit,
-    navigateToAdd: () -> Unit
+    navigateToAdd: () -> Unit,
+    navigateToSearch: (companyId: String) -> Unit
 ) {
     val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
@@ -73,7 +76,20 @@ fun JobProviderHomeScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Blue40,
                     titleContentColor = Light
-                )
+                ),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            navigateToSearch(accountId.toString())
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Search,
+                            contentDescription = null,
+                            tint = Light
+                        )
+                    }
+                }
             )
         },
         floatingActionButton = {

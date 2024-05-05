@@ -88,6 +88,7 @@
     <string name="no_notes">Tidak ada catatan.</string>
     <string name="cv" translatable="false">Curriculum Vitae</string>
     <string name="cv_empty">Tidak ada CV</string>
+    <string name="search_vacancy_placeholder">Cari lowongan pekerjaan</string>
 
     <!--  Title  -->
     <string name="vacancy">Lowongan</string>
