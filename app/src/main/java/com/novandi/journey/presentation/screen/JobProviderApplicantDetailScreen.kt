@@ -19,10 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.WorkOff
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,9 +54,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.consts.JobTypes
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
+import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardApplicant
+import com.novandi.journey.presentation.ui.component.dialog.JDialog
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshLazyColumn
@@ -65,6 +69,7 @@ import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 import com.novandi.journey.presentation.viewmodel.JobProviderApplicantDetailViewModel
+import com.novandi.utility.data.ConvertUtil
 import com.novandi.utility.data.toWhatsappNumber
 import com.novandi.utility.field.ApplicantStatus
 import com.valentinilk.shimmer.shimmer
@@ -83,6 +88,7 @@ fun JobProviderApplicantDetailScreen(
     val applicants by viewModel.applicants.observeAsState(Resource.Loading())
     val vacancy by viewModel.vacancy.observeAsState(Resource.Loading())
     val response by viewModel.response.collectAsState()
+    val closeVacancy by viewModel.close.collectAsState()
     val whatsappResponse by viewModel.whatsappResponse.collectAsState()
     var vacancyToggle by remember {
         mutableStateOf(false)
@@ -134,9 +140,14 @@ fun JobProviderApplicantDetailScreen(
 
     LaunchedEffect(vacancy is Resource.Loading) {
         when (vacancy) {
-            is Resource.Loading -> {}
+            is Resource.Loading -> viewModel.setOnCloseVacancyStatus(1)
             is Resource.Success -> {
                 viewModel.setOnVacancyData(vacancy.data)
+                if (ConvertUtil.isDeadlinePassed(vacancy.data!!.deadlineTime)) {
+                    viewModel.setOnCloseVacancyStatus(2)
+                } else {
+                    viewModel.setOnCloseVacancyStatus(0)
+                }
             }
             is Resource.Error -> {
                 Toast.makeText(context, vacancy.message, Toast.LENGTH_SHORT).show()
@@ -155,6 +166,47 @@ fun JobProviderApplicantDetailScreen(
         }
     }
 
+    LaunchedEffect(closeVacancy) {
+        when (closeVacancy) {
+            is Resource.Loading -> viewModel.setOnCloseVacancyStatus(1)
+            is Resource.Success -> {
+                Toast.makeText(context, closeVacancy?.data?.message, Toast.LENGTH_SHORT).show()
+                viewModel.resetCloseState()
+                viewModel.setOnCloseVacancyStatus(2)
+            }
+            is Resource.Error -> {
+                Toast.makeText(context, closeVacancy?.message, Toast.LENGTH_SHORT).show()
+                viewModel.resetCloseState()
+                viewModel.setOnCloseVacancyStatus(0)
+            }
+            else -> {}
+        }
+    }
+
+    val openDialog = remember { mutableStateOf(false) }
+
+    when {
+        openDialog.value -> {
+            JDialog(
+                onDismissRequest = { openDialog.value = false },
+                onConfirmation = {
+                    viewModel.closeVacancy(
+                        token = token.toString(),
+                        request = CloseVacancyRequest(
+                            vacancyId = vacancyId,
+                            companyId = accountId.toString()
+                        )
+                    )
+                    openDialog.value = false
+                },
+                dialogTitle = stringResource(id = R.string.delete_vacancy_title),
+                dialogText = stringResource(id = R.string.delete_vacancy_desc),
+                confirmText = stringResource(id = R.string.delete_vacancy_confirm),
+                icon = Icons.Default.WorkOff
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -170,14 +222,33 @@ fun JobProviderApplicantDetailScreen(
                 ),
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            back()
-                        }
+                        onClick = back
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.back),
                             tint = Light
+                        )
+                    }
+                },
+                actions = {
+                    if (viewModel.closeVacancyStatus == 0) {
+                        IconButton(
+                            onClick = {
+                                openDialog.value = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.WorkOff,
+                                contentDescription = null,
+                                tint = Light
+                            )
+                        }
+                    } else if (viewModel.closeVacancyStatus == 1) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp).padding(top = 8.dp, end = 16.dp),
+                            color = Light,
+                            strokeWidth = 3.dp
                         )
                     }
                 }
@@ -191,7 +262,11 @@ fun JobProviderApplicantDetailScreen(
                 .background(Light)
         ) {
             if (viewModel.loading) {
-                JCardSkeleton()
+                Box(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    JCardSkeleton()
+                }
             } else if (viewModel.data == null) {
                 NetworkError {
                     viewModel.getApplicants(token.toString(), accountId.toString(), vacancyId)

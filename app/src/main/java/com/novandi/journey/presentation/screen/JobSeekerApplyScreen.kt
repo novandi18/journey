@@ -50,12 +50,14 @@ fun JobSeekerApplyScreen(
     val vacancies by viewModel.vacancies.collectAsState()
 
     LaunchedEffect(token != null, accountId != null) {
-        viewModel.getVacancies(token.toString(), accountId.toString())
+        if (token != null && accountId != null) {
+            viewModel.getVacancies(token.toString(), accountId.toString())
+        }
     }
 
     LaunchedEffect(vacancies is Resource.Loading) {
         when (vacancies) {
-            is Resource.Loading -> viewModel.setOnLoading(true)
+            is Resource.Loading -> {}
             is Resource.Success -> {
                 viewModel.setOnVacanciesData(vacancies?.data)
                 viewModel.setOnLoading(false)
@@ -95,6 +97,7 @@ fun JobSeekerApplyScreen(
                 }
             } else if (viewModel.vacanciesData == null) {
                 NetworkError {
+                    viewModel.setOnLoading(true)
                     viewModel.getVacancies(token.toString(), accountId.toString())
                 }
             } else if (viewModel.vacanciesData!!.isEmpty()) {

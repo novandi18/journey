@@ -100,12 +100,14 @@ fun JobProviderProfileScreen(
     val logoResponse by viewModel.logoResponse.collectAsState()
 
     LaunchedEffect(token != null, accountId != null) {
-        viewModel.getProfile(token.toString(), accountId.toString())
+        if (token != null && accountId != null) {
+            viewModel.getProfile(token.toString(), accountId.toString())
+        }
     }
 
     LaunchedEffect(profile is Resource.Loading) {
         when (profile) {
-            is Resource.Loading -> viewModel.setOnLoading(true)
+            is Resource.Loading -> {}
             is Resource.Success -> {
                 viewModel.setOnProfileData(profile?.data!!)
                 viewModel.setOnLoading(false)
@@ -119,6 +121,8 @@ fun JobProviderProfileScreen(
         when (logoResponse) {
             is Resource.Loading -> viewModel.setOnUploadLoading(true)
             is Resource.Success -> {
+                viewModel.setOnLoading(true)
+                viewModel.setOnLoading(true)
                 viewModel.getProfile(token.toString(), accountId.toString())
                 Toast.makeText(context, logoResponse?.data?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnOpenDialogImagePreview(false)
@@ -145,6 +149,7 @@ fun JobProviderProfileScreen(
             ProfileSkeleton()
         } else if (profileData == null) {
             NetworkError {
+                viewModel.setOnLoading(true)
                 viewModel.getProfile(token.toString(), accountId.toString())
             }
         } else {

@@ -129,7 +129,9 @@ fun JobSeekerProfileScreen(
     val cv by viewModel.cv.collectAsState()
 
     LaunchedEffect(token != null, accountId != null) {
-        viewModel.getProfile(token.toString(), accountId.toString())
+        if (token != null && accountId != null) {
+            viewModel.getProfile(token.toString(), accountId.toString())
+        }
     }
 
     val downloadedCv by viewModel.downloadedCv.collectAsState()

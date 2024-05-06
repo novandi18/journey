@@ -1,6 +1,7 @@
 package com.novandi.journey.presentation.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
@@ -10,6 +11,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
+import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Applicant
@@ -44,6 +46,9 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
     private val _vacancy = MutableLiveData<Resource<Vacancy>>(Resource.Loading())
     val vacancy: LiveData<Resource<Vacancy>> get() = _vacancy
 
+    private val _close = MutableStateFlow<Resource<GeneralResult>?>(null)
+    val close: StateFlow<Resource<GeneralResult>?> get() = _close
+
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
 
@@ -63,6 +68,9 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
         private set
 
     var applicantWhatsappNumber by mutableStateOf<Pair<String, Boolean>?>(null)
+        private set
+
+    var closeVacancyStatus by mutableIntStateOf(2) // 0 = default, 1 = loading, 2 = success
         private set
 
     fun setOnLoading(isLoading: Boolean) {
@@ -100,6 +108,14 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
     private fun setUpdateNotesOnData(applicant: Applicant, note: String) {
         val applicantIndex = data?.indexOf(applicant)
         if (applicantIndex != null) data?.get(applicantIndex)?.notes = note
+    }
+
+    fun resetCloseState() {
+        _close.value = null
+    }
+
+    fun setOnCloseVacancyStatus(status: Int) {
+        closeVacancyStatus = status
     }
 
     fun getApplicants(token: String, companyId: String, vacancyId: String) {
@@ -174,6 +190,18 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
                 }
                 .collect { result ->
                     _whatsappResponse.value = result
+                }
+        }
+    }
+
+    fun closeVacancy(token: String, request: CloseVacancyRequest) {
+        viewModelScope.launch {
+            vacancyUseCase.closeVacancy(token, request)
+                .catch { err ->
+                    _close.value = Resource.Error(err.message.toString())
+                }
+                .collect { result ->
+                    _close.value = result
                 }
         }
     }

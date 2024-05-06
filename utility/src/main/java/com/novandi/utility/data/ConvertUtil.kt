@@ -2,6 +2,7 @@ package com.novandi.utility.data
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 object ConvertUtil {
@@ -45,5 +46,13 @@ object ConvertUtil {
             SimpleDateFormat("d MMMM yyyy", Locale("id")) // "id" for Indonesian locale
         val date = inputFormatter.parse(value)
         return outputFormatter.format(date)
+    }
+
+    fun isDeadlinePassed(value: String): Boolean {
+        val formatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
+        val targetDate = formatter.parse(value)
+        val today = Date()
+
+        return targetDate!!.before(today)
     }
 }

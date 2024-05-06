@@ -10,6 +10,7 @@ import com.novandi.core.data.source.remote.network.RegencyApiService
 import com.novandi.core.data.source.remote.network.WhatsappApiService
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.AssistantRequest
+import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
@@ -691,6 +692,24 @@ class RemoteDataSource @Inject constructor(
                 Log.e("RemoteDataSource", e.toString())
             }
         }.flowOn(Dispatchers.IO)
+
+    suspend fun closeVacancy(token: String, request: CloseVacancyRequest)
+    : Flow<ApiResponse<GeneralResponse>> = flow {
+        try {
+            val response = apiService.closeVacancy(token, request)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
 
     companion object {
         const val TIMEOUT_MILLIS: Long = 10_000

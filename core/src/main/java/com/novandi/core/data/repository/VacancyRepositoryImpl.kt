@@ -12,6 +12,7 @@ import com.novandi.core.data.response.NetworkOnlyResource
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.RemoteDataSource
 import com.novandi.core.data.source.remote.network.ApiResponse
+import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
@@ -121,4 +122,13 @@ class VacancyRepositoryImpl @Inject constructor(
                 RecommendationVacanciesPagingSource(remoteDataSource, recommendations)
             }
         ).flow
+
+    override fun closeVacancy(token: String, request: CloseVacancyRequest): Flow<Resource<GeneralResult>> =
+        object : NetworkOnlyResource<GeneralResult, GeneralResponse>() {
+            override fun loadFromNetwork(data: GeneralResponse): Flow<GeneralResult> =
+                VacancyMapper.mapGeneralResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<GeneralResponse>> =
+                remoteDataSource.closeVacancy(token, request)
+        }.asFlow()
 }

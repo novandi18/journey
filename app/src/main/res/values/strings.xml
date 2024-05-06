@@ -139,6 +139,9 @@
     <string name="update_password_desc">Ingin memperbarui password pada akun ini? akun anda akan keluar setelah ini</string>
     <string name="cv_desc">Ingin memilih file ini untuk upload sebagai Curriculum Vitae?</string>
     <string name="cv_confirm">Ya, upload</string>
+    <string name="delete_vacancy_title">Tutup Lowongan</string>
+    <string name="delete_vacancy_confirm">Tutup sekarang</string>
+    <string name="delete_vacancy_desc">Ingin menutup lowongan pekerjaan ini?</string>
 
     <!--  Error  -->
     <string name="network_error">Koneksi Bermasalah</string>

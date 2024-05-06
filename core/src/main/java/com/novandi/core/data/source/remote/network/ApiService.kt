@@ -2,6 +2,7 @@ package com.novandi.core.data.source.remote.network
 
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.AssistantRequest
+import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.JobProviderEditRequest
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
@@ -252,4 +253,10 @@ interface ApiService {
         @Query("limit") limit: Int = 10,
         @Body recommendations: RecommendationVacanciesRequest
     ): VacancyResponse
+
+    @PUT("vacancies/closed")
+    suspend fun closeVacancy(
+        @Header("Authorization") token: String,
+        @Body request: CloseVacancyRequest
+    ): GeneralResponse
 }

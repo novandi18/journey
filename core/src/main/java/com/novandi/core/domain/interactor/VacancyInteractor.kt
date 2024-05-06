@@ -2,6 +2,7 @@ package com.novandi.core.domain.interactor
 
 import androidx.paging.PagingData
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
@@ -47,4 +48,7 @@ class VacancyInteractor @Inject constructor(
 
     override fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
     : Flow<PagingData<Vacancy>> = vacancyRepository.getRecommendationVacancies(recommendations)
+
+    override fun closeVacancy(token: String, request: CloseVacancyRequest): Flow<Resource<GeneralResult>> =
+        vacancyRepository.closeVacancy(token, request)
 }
