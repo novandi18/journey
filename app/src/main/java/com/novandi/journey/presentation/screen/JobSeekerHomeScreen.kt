@@ -1,5 +1,12 @@
 package com.novandi.journey.presentation.screen
 
+import android.app.Activity
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -101,6 +109,24 @@ fun JobSeekerHomeScreen(
         IntentExtra.deleteExtra(context, NotificationWorker.JOB_APPLY)
     }
 
+    val voiceLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            val result = it.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            if (result != null && result[0].isNotEmpty()) {
+                viewModel.onSearchTextChange(result[0])
+                val isSearchQueryExist = searchByQuery.filter { search ->
+                    search.keyword == searchText
+                }
+
+                if (isSearchQueryExist.isEmpty()) viewModel.saveSearch()
+                keyboardController?.hide()
+                viewModel.onToggleDoSearch(true)
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             SearchBar(
@@ -168,19 +194,53 @@ fun JobSeekerHomeScreen(
                     }
                 },
                 trailingIcon = {
-                    if (searchText.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                viewModel.onSearchTextChange("")
-                                viewModel.onToggleDoSearch(false)
-                                keyboardController?.show()
+                    Row {
+                        if (searchText.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.onSearchTextChange("")
+                                    viewModel.onToggleDoSearch(false)
+                                    keyboardController?.show()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Close,
+                                    contentDescription = stringResource(id = R.string.reset_search),
+                                    tint = Dark
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Close,
-                                contentDescription = stringResource(id = R.string.reset_search),
-                                tint = Dark
-                            )
+                        }
+                        if (isSearching) {
+                            IconButton(
+                                onClick = {
+                                    if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.voice_search_not_available),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+
+                                        intent.putExtra(
+                                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                            RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
+                                        )
+                                        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "id")
+                                        intent.putExtra(
+                                            RecognizerIntent.EXTRA_PROMPT,
+                                            context.getString(R.string.speak_something)
+                                        )
+                                        voiceLauncher.launch(intent)
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Mic,
+                                    contentDescription = stringResource(id = R.string.reset_search),
+                                    tint = Dark
+                                )
+                            }
                         }
                     }
                 }

@@ -142,6 +142,7 @@
     <string name="delete_vacancy_title">Tutup Lowongan</string>
     <string name="delete_vacancy_confirm">Tutup sekarang</string>
     <string name="delete_vacancy_desc">Ingin menutup lowongan pekerjaan ini?</string>
+    <string name="speak_something">Katakan sesuatu</string>
 
     <!--  Error  -->
     <string name="network_error">Koneksi Bermasalah</string>
@@ -153,6 +154,7 @@
     <string name="file_picker_permission_denied">Memerlukan izin penyimpanan untuk mengakses File Manager</string>
     <string name="login_failed">Terjadi kesalahan saat login, silahkan coba lagi</string>
     <string name="register_failed">Terjadi kesalahan saat registrasi, silahkan coba lagi</string>
+    <string name="voice_search_not_available">Pencarian Suara tidak tersedia</string>
 
     <!--  Profile  -->
     <string name="title_update_profile">Ubah Profil</string>
@@ -194,6 +196,7 @@
     <string name="close">Tutup</string>
     <string name="connected">Online</string>
     <string name="disconnected">Tidak ada koneksi</string>
+    <string name="voice_search">Pencarian Suara</string>
 
     <!--  Notification  -->
     <string name="vacancy_accepted_channel">Lamaran Diterima</string>
