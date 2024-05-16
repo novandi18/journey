@@ -17,6 +17,12 @@ data class AssistantEntity(
     @ColumnInfo(name = "is_from_me")
     val isFromMe: Boolean,
 
+    @ColumnInfo(name = "user_chat")
+    val userChat: String,
+
+    @ColumnInfo(name = "is_error")
+    val isError: Boolean = false,
+
     @ColumnInfo(name = "created_at")
     val createdAt: Long
 )

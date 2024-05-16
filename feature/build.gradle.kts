@@ -38,8 +38,14 @@ android {
 dependencies {
     // Hilt
     implementation(libs.dagger.hilt.android)
+    implementation(libs.play.services.basement)
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
+
+    // Text To Speech
+    implementation(libs.text.to.speech)
+    implementation(libs.oauth2.http)
+    implementation(libs.grpc.okhttp)
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)

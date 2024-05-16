@@ -17,4 +17,7 @@ interface AssistantDao {
 
     @Query("DELETE FROM assistant")
     fun deleteAll()
+
+    @Query("DELETE FROM assistant WHERE id = :id")
+    fun delete(id: Int)
 }

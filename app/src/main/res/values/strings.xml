@@ -155,6 +155,7 @@
     <string name="login_failed">Terjadi kesalahan saat login, silahkan coba lagi</string>
     <string name="register_failed">Terjadi kesalahan saat registrasi, silahkan coba lagi</string>
     <string name="voice_search_not_available">Pencarian Suara tidak tersedia</string>
+    <string name="connection_error">Koneksi bermasalah, silahkan coba lagi</string>
 
     <!--  Profile  -->
     <string name="title_update_profile">Ubah Profil</string>
@@ -197,6 +198,7 @@
     <string name="connected">Online</string>
     <string name="disconnected">Tidak ada koneksi</string>
     <string name="voice_search">Pencarian Suara</string>
+    <string name="copied_to_clipboard">Berhasil disalin ke clipboard</string>
 
     <!--  Notification  -->
     <string name="vacancy_accepted_channel">Lamaran Diterima</string>

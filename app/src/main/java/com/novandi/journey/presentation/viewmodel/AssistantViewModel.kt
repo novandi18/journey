@@ -68,4 +68,10 @@ class AssistantViewModel @Inject constructor(
             assistantUseCase.deleteAll()
         }
     }
+
+    fun deleteChat(id: Int) {
+        viewModelScope.launch {
+            assistantUseCase.deleteChat(id)
+        }
+    }
 }

@@ -1,32 +1,36 @@
 [versions]
 agp = "8.4.0"
 kotlin = "1.9.22"
-core-ktx = "1.13.0"
+core-ktx = "1.13.1"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
-lifecycle-runtime-ktx = "2.7.0"
+lifecycle-runtime-ktx = "2.8.0"
 activity-compose = "1.9.0"
-compose-bom = "2024.04.01"
+compose-bom = "2024.05.00"
 retrofit = "2.9.0"
 okHttp = "4.11.0"
 ksp = "1.9.22-1.0.17"
 hilt = "2.49"
 composeNavigation = "2.7.7"
 androidxHiltNavigation = "1.2.0"
-androidxFoundation = "1.7.0-alpha07"
-datastore = "1.1.0"
-paging = "3.3.0-beta01"
+androidxFoundation = "1.7.0-beta01"
+datastore = "1.1.1"
+paging = "3.3.0"
 splashscreen = "1.0.1"
 secretsGradle = "2.0.1"
 appcompat = "1.6.1"
-material = "1.11.0"
+material = "1.12.0"
 coil = "2.5.0"
 compose-shimmer = "1.2.0"
 room = "2.6.1"
 easycrop = "0.1.1"
 work-manager = "2.9.0"
 hilt-work = "1.2.0"
+text-to-speech = "2.19.0"
+oauth2-http = "1.16.0"
+playServicesBasement = "18.3.0"
+grpc-okhttp = "1.55.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -73,6 +77,10 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 easycrop = { group = "io.github.mr0xf00", name = "easycrop", version.ref = "easycrop" }
 work-manager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-manager" }
 hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hilt-work" }
+text-to-speech = { group = "com.google.cloud", name = "google-cloud-texttospeech", version.ref = "text-to-speech" }
+oauth2-http = { group = "com.google.auth", name = "google-auth-library-oauth2-http", version.ref = "oauth2-http" }
+play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }
+grpc-okhttp = { group = "io.grpc", name = "grpc-okhttp", version.ref = "grpc-okhttp" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

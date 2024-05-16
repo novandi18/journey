@@ -192,7 +192,7 @@ class RemoteDataSource @Inject constructor(
             if (response != null) {
                 emit(ApiResponse.Success(response))
             } else {
-                emit(ApiResponse.Error("Connection error"))
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -216,7 +216,7 @@ class RemoteDataSource @Inject constructor(
             if (response != null) {
                 emit(ApiResponse.Success(response))
             } else {
-                emit(ApiResponse.Error("Connection error"))
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -258,7 +258,7 @@ class RemoteDataSource @Inject constructor(
             if (response != null) {
                 emit(ApiResponse.Success(response))
             } else {
-                emit(ApiResponse.Error("Connection error"))
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -268,7 +268,7 @@ class RemoteDataSource @Inject constructor(
             emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
             Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
         } catch (e: Exception) {
-            emit(ApiResponse.Error(e.toString()))
+            emit(ApiResponse.Error("Terjadi kesalahan, silahkan coba lagi"))
             Log.e("RemoteDataSource", e.toString())
         }
     }.flowOn(Dispatchers.IO)
@@ -282,7 +282,7 @@ class RemoteDataSource @Inject constructor(
             if (response != null) {
                 emit(ApiResponse.Success(response))
             } else {
-                emit(ApiResponse.Error("Connection error"))
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -306,7 +306,7 @@ class RemoteDataSource @Inject constructor(
             if (response != null) {
                 emit(ApiResponse.Success(response))
             } else {
-                emit(ApiResponse.Error("Connection error"))
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -383,7 +383,7 @@ class RemoteDataSource @Inject constructor(
             if (response != null) {
                 emit(ApiResponse.Success(response))
             } else {
-                emit(ApiResponse.Error("Connection error"))
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -620,7 +620,7 @@ class RemoteDataSource @Inject constructor(
             if (response != null) {
                 emit(ApiResponse.Success(response))
             } else {
-                emit(ApiResponse.Error("Connection error"))
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

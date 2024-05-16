@@ -19,4 +19,5 @@ class LocalDataSource @Inject constructor(
     fun getPromptAssistant() = assistantDao.getAll()
     fun savePrompt(chat: AssistantEntity) = assistantDao.saveChat(chat)
     fun deletePrompts() = assistantDao.deleteAll()
+    fun deletePrompt(id: Int) = assistantDao.delete(id)
 }

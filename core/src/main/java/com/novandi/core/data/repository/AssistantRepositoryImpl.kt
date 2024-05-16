@@ -46,4 +46,10 @@ class AssistantRepositoryImpl @Inject constructor(
             localDataSource.deletePrompts()
         }
     }
+
+    override fun deleteChat(id: Int) {
+        appExecutors.diskIO().execute {
+            localDataSource.deletePrompt(id)
+        }
+    }
 }

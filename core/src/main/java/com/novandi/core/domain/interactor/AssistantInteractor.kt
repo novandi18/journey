@@ -20,4 +20,5 @@ class AssistantInteractor @Inject constructor(
     override fun saveChat(chat: AssistantChat) = assistantRepository.saveChat(chat)
 
     override fun deleteAll() = assistantRepository.deleteAll()
+    override fun deleteChat(id: Int) = assistantRepository.deleteChat(id)
 }

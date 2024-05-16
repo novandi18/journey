@@ -204,7 +204,9 @@ fun ChatBox(
                         .weight(.15f)
                         .height(56.dp),
                     onClick = {
-                        addToChats(AssistantChat(value, true))
+                        addToChats(
+                            AssistantChat(message = value, isFromMe = true)
+                        )
                         ask(value)
                         focusManager.clearFocus()
                         setValue("")

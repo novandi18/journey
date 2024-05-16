@@ -11,4 +11,5 @@ interface AssistantRepository {
     fun getAll(): Flow<List<AssistantChat>>
     fun saveChat(chat: AssistantChat)
     fun deleteAll()
+    fun deleteChat(id: Int)
 }

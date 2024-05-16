@@ -14,14 +14,19 @@ object AssistantMapper {
 
     fun entityToDomain(input: List<AssistantEntity>) = input.map { assistantEntity ->
         AssistantChat(
+            id = assistantEntity.id,
+            userMessage = assistantEntity.userChat,
             message = assistantEntity.chat,
-            isFromMe = assistantEntity.isFromMe
+            isFromMe = assistantEntity.isFromMe,
+            isError = assistantEntity.isError
         )
     }
 
     fun domainToEntity(input: AssistantChat) = AssistantEntity(
+        userChat = input.userMessage ?: "",
         chat = input.message,
         isFromMe = input.isFromMe,
+        isError = input.isError,
         createdAt = System.currentTimeMillis()
     )
 }

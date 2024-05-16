@@ -101,14 +101,23 @@ fun AssistantScreen(
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 viewModel.addChat(
-                    AssistantChat(results!!.data!!.bot, false)
+                    AssistantChat(
+                        userMessage = results!!.data!!.user,
+                        message = results!!.data!!.bot,
+                        isFromMe = false
+                    )
                 )
                 viewModel.setOnLoading(false)
                 viewModel.resetResults()
             }
             is Resource.Error -> {
                 viewModel.addChat(
-                    AssistantChat(results!!.message.toString(), false)
+                    AssistantChat(
+                        message = results!!.message.toString(),
+                        isFromMe = false,
+                        userMessage = "",
+                        isError = true
+                    )
                 )
                 viewModel.setOnLoading(false)
                 viewModel.resetResults()
@@ -129,7 +138,10 @@ fun AssistantScreen(
     LaunchedEffect(voiceState.spokenText) {
         if (voiceState.spokenText.isNotEmpty()) {
             viewModel.addChat(
-                AssistantChat(voiceState.spokenText, true)
+                AssistantChat(
+                    message = voiceState.spokenText,
+                    isFromMe = true
+                )
             )
             viewModel.ask(voiceState.spokenText)
         }
@@ -195,8 +207,12 @@ fun AssistantScreen(
 
                         ChatItem(
                             modifier = Modifier.widthIn(0.dp, maxWidth),
-                            text = chats[index].message,
-                            isFromMe = chats[index].isFromMe
+                            chat = chats[index],
+                            reload = {
+                                viewModel.ask(chats[index].userMessage!!)
+                                viewModel.deleteChat(chats[index].id!!)
+                            },
+                            isLast = index == chats.size - 1
                         )
                     }
                 }
