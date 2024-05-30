@@ -10,6 +10,7 @@ import androidx.paging.cachedIn
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
+import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Search
 import com.novandi.core.domain.usecase.SearchUseCase
@@ -52,6 +53,15 @@ class JobSeekerHomeViewModel @Inject constructor(
     var recommendationLoading by mutableStateOf(true)
         private set
 
+    var jobTypeFilter by mutableStateOf("Semua")
+        private set
+
+    var disabilityFilter by mutableStateOf("Semua")
+        private set
+
+    var provinceFilter by mutableStateOf("Semua")
+        private set
+
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
@@ -60,6 +70,9 @@ class JobSeekerHomeViewModel @Inject constructor(
         _isSearching.value = !_isSearching.value
         if (!_isSearching.value) {
             onSearchTextChange("")
+            setOnJobTypeFilter("Semua")
+            setOnDisabilityFilter("Semua")
+            setOnProvinceFilter("Semua")
         }
     }
 
@@ -79,6 +92,18 @@ class JobSeekerHomeViewModel @Inject constructor(
         recommendationLoading = isLoading
     }
 
+    fun setOnJobTypeFilter(filter: String) {
+        jobTypeFilter = filter
+    }
+
+    fun setOnDisabilityFilter(filter: String) {
+        disabilityFilter = filter
+    }
+
+    fun setOnProvinceFilter(filter: String) {
+        provinceFilter = filter
+    }
+
     fun saveSearch() = searchUseCase.saveSearch(Search(keyword = searchText.value))
 
     fun deleteSearch(id: Int) = searchUseCase.deleteSearch(id)
@@ -89,7 +114,8 @@ class JobSeekerHomeViewModel @Inject constructor(
 
     fun popularVacancies() = vacancyUseCase.getPopularVacancies().cachedIn(viewModelScope)
 
-    fun searchVacancies(query: String) = vacancyUseCase.searchVacancy(query).cachedIn(viewModelScope)
+    fun searchVacancies(query: String, filter: VacanciesSearchRequest)
+        = vacancyUseCase.searchVacancy(query, filter).cachedIn(viewModelScope)
 
     fun recommendationVacancies(recommendations: RecommendationVacanciesRequest) =
         vacancyUseCase.getRecommendationVacancies(recommendations).cachedIn(viewModelScope)

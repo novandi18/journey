@@ -15,6 +15,7 @@ import com.novandi.core.data.source.remote.network.ApiResponse
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
+import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.RecommendationResponse
@@ -85,11 +86,12 @@ class VacancyRepositoryImpl @Inject constructor(
                 remoteDataSource.addVacancy(token, companyId, request)
         }.asFlow()
 
-    override fun searchVacancy(position: String): Flow<PagingData<Vacancy>> =
+    override fun searchVacancy(position: String, request: VacanciesSearchRequest)
+    : Flow<PagingData<Vacancy>> =
         Pager(
             config = PagingConfig(pageSize = 10),
             pagingSourceFactory = {
-                SearchVacanciesPagingSource(remoteDataSource, position)
+                SearchVacanciesPagingSource(remoteDataSource, position, request)
             }
         ).flow
 

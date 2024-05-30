@@ -20,6 +20,7 @@ import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
+import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.source.remote.response.ApplicantItem
@@ -438,8 +439,8 @@ class RemoteDataSource @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getSearchVacancy(position: String, page: Int, limit: Int) =
-        apiService.getSearchVacancy(position, page, limit)
+    suspend fun getSearchVacancy(position: String, page: Int, limit: Int, request: VacanciesSearchRequest) =
+        apiService.getSearchVacancy(position, page, limit, request)
 
     suspend fun updateJobProvider(companyId: String, request: JobProviderEditRequest)
             : Flow<ApiResponse<GeneralResponse>> = flow {
@@ -653,11 +654,17 @@ class RemoteDataSource @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getRecommendation(request: RecommendationRequest):
+    suspend fun getRecommendation(request: RecommendationRequest, timeout: Long = 60_000):
         Flow<ApiResponse<RecommendationResponse>> = flow {
         try {
-            val response = mlApiService.getRecommendation(request)
-            emit(ApiResponse.Success(response))
+            val response = withTimeoutOrNull(timeout) {
+                mlApiService.getRecommendation(request)
+            }
+            if (response != null) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
+            }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             val errorMessage = try {

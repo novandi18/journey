@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
@@ -29,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
@@ -67,15 +67,16 @@ fun ChatItem(
 
     Column(
         modifier = modifier
-            .clip(
-                RoundedCornerShape(
+            .widthIn(min = 0.dp, max = 280.dp)
+            .background(
+                color = if (chat.isFromMe) Blue40 else Light,
+                shape = RoundedCornerShape(
                     topStart = 48f,
                     topEnd = 48f,
                     bottomStart = if (chat.isFromMe) 48f else 0f,
                     bottomEnd = if (chat.isFromMe) 0f else 48f
                 )
             )
-            .background(if (chat.isFromMe) Blue40 else Light)
             .padding(if (chat.isFromMe) 16.dp else 0.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

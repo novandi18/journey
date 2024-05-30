@@ -5,6 +5,7 @@ import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
+import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.Vacancy
@@ -35,8 +36,8 @@ class VacancyInteractor @Inject constructor(
         request: VacancyRequest
     ): Flow<Resource<GeneralResult>> = vacancyRepository.addVacancy(token, companyId, request)
 
-    override fun searchVacancy(position: String): Flow<PagingData<Vacancy>> =
-        vacancyRepository.searchVacancy(position)
+    override fun searchVacancy(position: String, request: VacanciesSearchRequest): Flow<PagingData<Vacancy>> =
+        vacancyRepository.searchVacancy(position, request)
 
     override fun getJobProviderVacancies(
         token: String,

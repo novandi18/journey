@@ -11,6 +11,7 @@ import com.novandi.core.data.source.remote.request.LoginRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
+import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.response.ApplicantItem
 import com.novandi.core.data.source.remote.response.AssistantResponse
@@ -160,11 +161,12 @@ interface ApiService {
         @Path("applicantsId") applicantsId: String
     ): GeneralResponse
 
-    @GET("vacancies/name/{position}")
+    @POST("vacancies/name/{position}")
     suspend fun getSearchVacancy(
         @Path("position") position: String,
         @Query("page") page: Int = 1,
-        @Query("limit") limit: Int = 10
+        @Query("limit") limit: Int = 10,
+        @Body request: VacanciesSearchRequest
     ): VacancyResponse
 
     @PUT("companies/{id}")

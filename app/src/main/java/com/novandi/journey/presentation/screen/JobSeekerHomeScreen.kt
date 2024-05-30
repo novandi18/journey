@@ -5,6 +5,7 @@ import android.content.Intent
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -16,12 +17,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.AssistWalker
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -57,18 +63,22 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.novandi.core.consts.FilterMenu
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
+import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.journey.R
 import com.novandi.journey.presentation.notification.NotificationWorker
 import com.novandi.journey.presentation.ui.component.card.JCard
+import com.novandi.journey.presentation.ui.component.sheet.SearchFilterSheet
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.LazyColumnPaging
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshPaging
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.Dark
+import com.novandi.journey.presentation.ui.theme.DarkGray
 import com.novandi.journey.presentation.ui.theme.DarkGray40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
@@ -99,8 +109,8 @@ fun JobSeekerHomeScreen(
 
     val tabs = listOf(
         stringResource(id = R.string.recommended_for_you),
-        stringResource(id = R.string.newest),
         stringResource(id = R.string.all),
+        stringResource(id = R.string.newest),
         stringResource(id = R.string.most_popular),
     )
 
@@ -155,7 +165,7 @@ fun JobSeekerHomeScreen(
                 onActiveChange = { viewModel.onToogleSearch() },
                 colors = SearchBarDefaults.colors(
                     containerColor = Light,
-                    dividerColor = DarkGray40,
+                    dividerColor = if (isDoSearching) Color.Transparent else DarkGray40,
                     inputFieldColors = TextFieldDefaults.colors(
                         cursorColor = DarkGray80,
                         focusedContainerColor = Light,
@@ -245,55 +255,178 @@ fun JobSeekerHomeScreen(
                     }
                 }
             ) {
-                if (isDoSearching) {
-                    val vacancies = viewModel.searchVacancies(searchText).collectAsLazyPagingItems()
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (isDoSearching) {
+                        BackHandler {
+                            viewModel.onToggleDoSearch(false)
+                            viewModel.onToogleSearch()
+                        }
 
-                    LazyColumnPaging(
-                        items = vacancies,
-                        content = { vacancy ->
-                            JCard(
-                                vacancy = vacancy,
-                                setClick = navigateToVacancy
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 56.dp)
+                        ) {
+                            val vacancies =
+                                viewModel.searchVacancies(
+                                    query = searchText,
+                                    filter = VacanciesSearchRequest(
+                                        jobType = viewModel.jobTypeFilter,
+                                        disability = viewModel.disabilityFilter,
+                                        province = viewModel.provinceFilter
+                                    )
+                                ).collectAsLazyPagingItems()
+
+                            LazyColumnPaging(
+                                items = vacancies,
+                                content = { vacancy ->
+                                    JCard(
+                                        vacancy = vacancy,
+                                        setClick = navigateToVacancy
+                                    )
+                                }
                             )
                         }
-                    )
-                } else {
-                    LazyColumn {
-                        items(searchByQuery.size) { index ->
-                            TextButton(
-                                onClick = {
-                                    viewModel.onSearchTextChange(searchByQuery[index].keyword)
-                                    viewModel.onToggleDoSearch(true)
-                                    keyboardController?.hide()
-                                },
-                                shape = RectangleShape
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 8.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                    } else {
+                        LazyColumn {
+                            items(searchByQuery.size) { index ->
+                                TextButton(
+                                    onClick = {
+                                        viewModel.setOnJobTypeFilter("Semua")
+                                        viewModel.setOnDisabilityFilter("Semua")
+                                        viewModel.setOnProvinceFilter("Semua")
+                                        viewModel.onSearchTextChange(searchByQuery[index].keyword)
+                                        viewModel.onToggleDoSearch(true)
+                                        keyboardController?.hide()
+                                    },
+                                    shape = RectangleShape
                                 ) {
-                                    Text(
+                                    Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .weight(1f)
-                                            .padding(end = 8.dp),
-                                        text = searchByQuery[index].keyword,
-                                        overflow = TextOverflow.Ellipsis,
-                                        color = Dark,
-                                        maxLines = 1
-                                    )
-                                    IconButton(
-                                        onClick = {
-                                            viewModel.deleteSearch(searchByQuery[index].id)
+                                            .padding(start = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .weight(1f)
+                                                .padding(end = 8.dp),
+                                            text = searchByQuery[index].keyword,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = Dark,
+                                            maxLines = 1
+                                        )
+                                        IconButton(
+                                            onClick = {
+                                                viewModel.deleteSearch(searchByQuery[index].id)
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Close,
+                                                contentDescription = null,
+                                                tint = Dark
+                                            )
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (isDoSearching) {
+                        var filterData by remember { mutableStateOf(Pair(listOf<String>(), 0)) }
+                        var showFilterSheet by remember { mutableStateOf(false) }
+
+                        if (showFilterSheet) {
+                            SearchFilterSheet(
+                                data = filterData.first,
+                                selectedItem = when (filterData.second) {
+                                    0 -> viewModel.jobTypeFilter
+                                    1 -> viewModel.disabilityFilter
+                                    else -> viewModel.provinceFilter
+                                },
+                                onSelected = { value ->
+                                    when (filterData.second) {
+                                        0 -> viewModel.setOnJobTypeFilter(value)
+                                        1 -> viewModel.setOnDisabilityFilter(value)
+                                        else -> viewModel.setOnProvinceFilter(value)
+                                    }
+                                    showFilterSheet = false
+                                },
+                                onDismissed = {
+                                    showFilterSheet = false
+                                    filterData = Pair(listOf(), 0)
+                                }
+                            )
+                        }
+
+                        ScrollableTabRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.TopCenter),
+                            selectedTabIndex = tabSelected,
+                            edgePadding = 16.dp,
+                            containerColor = Light,
+                            contentColor = Dark,
+                            indicator = { tabPositions ->
+                                SecondaryIndicator(
+                                    modifier = Modifier
+                                        .tabIndicatorOffset(tabPositions[tabSelected])
+                                        .fillMaxWidth(),
+                                    color = Color.Transparent
+                                )
+                            }
+                        ) {
+                            FilterMenu.menu().forEachIndexed { index, tab ->
+                                TextButton(
+                                    modifier = Modifier
+                                        .padding(
+                                            bottom = 12.dp,
+                                            end = if (index < tabs.lastIndex) 4.dp else 0.dp
+                                        )
+                                        .height(48.dp),
+                                    onClick = {
+                                        filterData = Pair(tab, index)
+                                        showFilterSheet = true
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = DarkGray,
+                                        contentColor = DarkGray80
+                                    )
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 4.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Rounded.Close,
+                                            modifier = Modifier
+                                                .size(18.dp)
+                                                .padding(end = 2.dp),
+                                            imageVector = when (index) {
+                                                0 -> Icons.Rounded.Work
+                                                1 -> Icons.Rounded.AssistWalker
+                                                else -> Icons.Rounded.LocationOn
+                                            },
                                             contentDescription = null,
-                                            tint = Dark
+                                            tint = DarkGray80
+                                        )
+                                        Text(
+                                            text = when (index) {
+                                                0 -> viewModel.jobTypeFilter
+                                                1 -> viewModel.disabilityFilter
+                                                else -> viewModel.provinceFilter
+                                            },
+                                            fontSize = 14.sp
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Rounded.KeyboardArrowDown,
+                                            contentDescription = null,
+                                            tint = DarkGray80
                                         )
                                     }
                                 }
@@ -367,7 +500,7 @@ fun JobSeekerHomeScreen(
                         }
                     }
                     1 -> {
-                        val vacancies = viewModel.latestVacancies().collectAsLazyPagingItems()
+                        val vacancies = viewModel.vacancies(token.toString()).collectAsLazyPagingItems()
                         JobSeekerHomeContent(
                             vacancies = vacancies,
                             navigateToVacancy = { id ->
@@ -376,7 +509,7 @@ fun JobSeekerHomeScreen(
                         )
                     }
                     2 -> {
-                        val vacancies = viewModel.popularVacancies().collectAsLazyPagingItems()
+                        val vacancies = viewModel.latestVacancies().collectAsLazyPagingItems()
                         JobSeekerHomeContent(
                             vacancies = vacancies,
                             navigateToVacancy = { id ->
@@ -385,7 +518,7 @@ fun JobSeekerHomeScreen(
                         )
                     }
                     3 -> {
-                        val vacancies = viewModel.vacancies(token.toString()).collectAsLazyPagingItems()
+                        val vacancies = viewModel.popularVacancies().collectAsLazyPagingItems()
                         JobSeekerHomeContent(
                             vacancies = vacancies,
                             navigateToVacancy = { id ->
