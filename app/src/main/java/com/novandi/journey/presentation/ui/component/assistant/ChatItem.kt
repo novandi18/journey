@@ -15,6 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,6 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.novandi.core.domain.model.AssistantChat
@@ -55,7 +61,8 @@ fun ChatItem(
     modifier: Modifier = Modifier,
     chat: AssistantChat,
     reload: () -> Unit,
-    isLast: Boolean
+    isLast: Boolean,
+    maxChatCharacters: Int = 100
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -64,6 +71,8 @@ fun ChatItem(
     }
     var isPlaying by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
+    var textExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -93,11 +102,37 @@ fun ChatItem(
                     tint = Yellow60
                 )
             }
-            Text(
-                text = chat.message,
-                color = if (chat.isFromMe) Light else Dark,
-                fontSize = 16.sp
-            )
+            if (chat.isFromMe) {
+                Text(
+                    text = chat.message,
+                    color = Light,
+                    fontSize = 16.sp
+                )
+            } else {
+                val regex = Regex("\\*\\*(.*?)\\*\\*", RegexOption.DOT_MATCHES_ALL)
+                val annotatedString = buildAnnotatedString {
+                    var lastIndex = 0
+                    regex.findAll(chat.message.trimIndent()).forEach { matchResult ->
+                        val range = matchResult.range
+                        append(chat.message.trimIndent().substring(lastIndex, range.first))
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(matchResult.groupValues[1])
+                        }
+                        lastIndex = range.last + 1
+                    }
+                    if (lastIndex < chat.message.trimIndent().length) {
+                        append(chat.message.trimIndent().substring(lastIndex))
+                    }
+                }
+                val expandedText = if (annotatedString.length > maxChatCharacters) {
+                    if (textExpanded) annotatedString.text else annotatedString.substring(0, 97) + "..."
+                } else annotatedString.text
+                Text(
+                    text = expandedText,
+                    color = Dark,
+                    fontSize = 16.sp
+                )
+            }
         }
         if (!chat.isFromMe && !chat.isError) {
             Row(
@@ -183,6 +218,26 @@ fun ChatItem(
                             contentDescription = null,
                             tint = DarkGray80
                         )
+                    }
+                }
+
+                if (!isLast) {
+                    if (chat.message.length > maxChatCharacters) {
+                        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                            IconButton(
+                                onClick = {
+                                    textExpanded = !textExpanded
+                                }
+                            ) {
+                                Icon(
+                                    modifier = Modifier.padding(horizontal = 0.dp),
+                                    imageVector = if (textExpanded) Icons.Rounded.KeyboardArrowUp
+                                        else Icons.Rounded.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = DarkGray80
+                                )
+                            }
+                        }
                     }
                 }
             }
