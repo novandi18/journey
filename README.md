@@ -18,6 +18,7 @@
 - **Vacancies Recommendation:** Get vacancies recommendation based on your disability with Machine Learning.
 - **Job Applies Notification:** Stay in the loop with instant updates on the progress of your job application.
 - **Apply Job Vacancy:** Easily apply for job vacancies with a single click.
+- **Journey Assistant:** AI to empowering your career path.
 
 ## Tech Stack
 - [Kotlin](https://kotlinlang.org/) - Programming Language
