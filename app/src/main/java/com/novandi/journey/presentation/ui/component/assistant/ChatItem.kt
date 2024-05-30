@@ -124,7 +124,7 @@ fun ChatItem(
                         append(chat.message.trimIndent().substring(lastIndex))
                     }
                 }
-                val expandedText = if (annotatedString.length > maxChatCharacters) {
+                val expandedText = if (!isLast && annotatedString.length > maxChatCharacters) {
                     if (textExpanded) annotatedString.text else annotatedString.substring(0, 97) + "..."
                 } else annotatedString.text
                 Text(
