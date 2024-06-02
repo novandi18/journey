@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -69,6 +70,7 @@ fun VacancyBar(
     val context = LocalContext.current
     val selectedPdfUri = remember { mutableStateOf<Uri?>(null) }
     val openCvDialog = remember { mutableStateOf(false) }
+    val applyDialog = remember { mutableStateOf(false) }
 
     val pdfLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -137,6 +139,21 @@ fun VacancyBar(
                 dialogText = stringResource(id = R.string.cv_desc),
                 confirmText = stringResource(id = R.string.cv_confirm),
                 icon = Icons.Rounded.Description
+            )
+        }
+        applyDialog.value -> {
+            JDialog(
+                onDismissRequest = {
+                    applyDialog.value = false
+                },
+                onConfirmation = {
+                    doApply()
+                    applyDialog.value = false
+                },
+                dialogTitle = stringResource(id = R.string.apply_title),
+                dialogText = stringResource(id = R.string.apply_desc),
+                confirmText = stringResource(id = R.string.apply_confirm),
+                icon = Icons.Rounded.Work,
             )
         }
     }
@@ -270,7 +287,9 @@ fun VacancyBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
-                        onClick = { doApply() },
+                        onClick = {
+                            applyDialog.value = true
+                        },
                         enabled = !loading,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Blue40,

@@ -143,6 +143,9 @@
     <string name="delete_vacancy_confirm">Tutup sekarang</string>
     <string name="delete_vacancy_desc">Ingin menutup lowongan pekerjaan ini?</string>
     <string name="speak_something">Katakan sesuatu</string>
+    <string name="apply_confirm">Ya, lamar</string>
+    <string name="apply_desc">Ingin melamar pekerjaan ini?</string>
+    <string name="apply_title">Lamar Lowogan Pekerjaan</string>
 
     <!--  Error  -->
     <string name="network_error">Koneksi Bermasalah</string>

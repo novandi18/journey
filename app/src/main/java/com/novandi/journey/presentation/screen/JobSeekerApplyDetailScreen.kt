@@ -165,7 +165,7 @@ fun JobSeekerApplyDetailScreen(
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                if (viewModel.statusLoading && viewModel.loading) {
+                if (viewModel.statusLoading && viewModel.loading && viewModel.vacancyStatusData != null) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
