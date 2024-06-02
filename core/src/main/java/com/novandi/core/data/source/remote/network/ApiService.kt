@@ -63,6 +63,11 @@ interface ApiService {
         @Path("id") id: String
     ): VacancyDetailResponse
 
+    @GET("vacancies/company/{companyId}")
+    suspend fun getVacancyCompanyDetail(
+        @Path("companyId") companyId: String
+    ): ProfileJobProviderResponse
+
     @POST("users/login")
     suspend fun loginJobSeeker(
         @Body loginRequest: LoginRequest

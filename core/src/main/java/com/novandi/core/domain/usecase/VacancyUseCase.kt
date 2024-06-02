@@ -8,6 +8,7 @@ import com.novandi.core.data.source.remote.request.RecommendationVacanciesReques
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.domain.model.GeneralResult
+import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.Vacancy
 import kotlinx.coroutines.flow.Flow
 
@@ -23,4 +24,5 @@ interface VacancyUseCase {
     fun getRecommendation(request: RecommendationRequest): Flow<Resource<List<String>>>
     fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest): Flow<PagingData<Vacancy>>
     fun closeVacancy(token: String, request: CloseVacancyRequest): Flow<Resource<GeneralResult>>
+    fun getVacancyCompany(companyId: String): Flow<Resource<ProfileJobProvider>>
 }

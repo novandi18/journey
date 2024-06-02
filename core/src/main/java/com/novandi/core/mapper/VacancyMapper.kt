@@ -45,7 +45,8 @@ object VacancyMapper {
             disabilityName = input.vacancy.disabilityName,
             companyLogo = input.vacancy.companyLogo.imageProfileUrl(),
             sectorName = input.vacancy.sectorName,
-            companyName = input.vacancy.companyName
+            companyName = input.vacancy.companyName,
+            companyId = input.vacancy.companyId
         )
     )
 

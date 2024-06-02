@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.novandi.journey.presentation.common.Screen
+import com.novandi.journey.presentation.screen.VacancyCompanyDetailScreen
 import com.novandi.journey.presentation.screen.VacancyScreen
 
 fun NavGraphBuilder.vacancyGraph(navController: NavController) {
@@ -27,6 +28,23 @@ fun NavGraphBuilder.vacancyGraph(navController: NavController) {
                         value = vacancy
                     )
                     navController.navigate(Screen.JobProviderVacancy.route)
+                },
+                navigateToCompanyDetail = { companyId ->
+                    navController.navigate(
+                        Screen.VacancyCompanyDetail.createRoute(companyId)
+                    )
+                }
+            )
+        }
+        composable(
+            route = Screen.VacancyCompanyDetail.route,
+            arguments = listOf(navArgument("companyId") { type = NavType.StringType })
+        ) {
+            val companyId = it.arguments?.getString("companyId") ?: ""
+            VacancyCompanyDetailScreen(
+                companyId = companyId,
+                back = {
+                    navController.navigateUp()
                 }
             )
         }

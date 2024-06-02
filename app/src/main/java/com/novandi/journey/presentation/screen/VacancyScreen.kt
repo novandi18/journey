@@ -8,6 +8,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,7 +83,8 @@ fun VacancyScreen(
     viewModel: VacancyViewModel = hiltViewModel(),
     vacancyId: String,
     navigateBack: () -> Unit,
-    navigateToEditVacancy: (Vacancy) -> Unit
+    navigateToEditVacancy: (Vacancy) -> Unit,
+    navigateToCompanyDetail: (vacancyId: String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -247,7 +249,10 @@ fun VacancyScreen(
                 if (viewModel.loading) {
                     VacancySkeleton()
                 } else if (viewModel.vacancyData != null) {
-                    VacancyContent(viewModel.vacancyData!!)
+                    VacancyContent(
+                        vacancy = viewModel.vacancyData!!,
+                        navigateToCompanyDetail = navigateToCompanyDetail
+                    )
                 } else {
                     NetworkError {
                         viewModel.getVacancy(vacancyId)
@@ -416,7 +421,8 @@ fun VacancyScreen(
 
 @Composable
 fun VacancyContent(
-    vacancy: Vacancy
+    vacancy: Vacancy,
+    navigateToCompanyDetail: (vacancyId: String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -451,6 +457,9 @@ fun VacancyContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable {
+                    navigateToCompanyDetail(vacancy.companyId)
+                }
                 .padding(24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -556,6 +565,11 @@ fun VacancyContent(
 @Composable
 private fun Preview() {
     JourneyTheme {
-        VacancyScreen(vacancyId = "1", navigateBack = {}, navigateToEditVacancy = {})
+        VacancyScreen(
+            vacancyId = "1",
+            navigateBack = {},
+            navigateToEditVacancy = {},
+            navigateToCompanyDetail = {}
+        )
     }
 }

@@ -18,5 +18,6 @@ data class Vacancy(
     val companyLogo: String = "",
     val sectorName: String = "",
     val companyName: String = "",
-    val totalApplicants: Int? = null
+    val totalApplicants: Int? = null,
+    val companyId: String = ""
 ): Parcelable
