@@ -15,10 +15,10 @@ class AssistantInteractor @Inject constructor(
     override fun getAssistantResult(request: AssistantRequest): Flow<Resource<AssistantResult>> =
         assistantRepository.getAssistantResult(request)
 
-    override fun getAll(): Flow<List<AssistantChat>> = assistantRepository.getAll()
+    override fun getAll(userId: String): Flow<List<AssistantChat>> = assistantRepository.getAll(userId)
 
     override fun saveChat(chat: AssistantChat) = assistantRepository.saveChat(chat)
 
-    override fun deleteAll() = assistantRepository.deleteAll()
+    override fun deleteAll(userId: String) = assistantRepository.deleteAll(userId)
     override fun deleteChat(id: Int) = assistantRepository.deleteChat(id)
 }

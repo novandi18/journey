@@ -25,7 +25,8 @@ import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateCvResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
-import com.novandi.core.data.source.remote.response.VacancyDetailResponse
+import com.novandi.core.data.source.remote.response.VacancyDetailCompanyResponse
+import com.novandi.core.data.source.remote.response.VacancyDetailUserResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
@@ -58,10 +59,10 @@ interface ApiService {
         @Query("limit") limit: Int = 10
     ): VacancyResponse
 
-    @GET("vacancies/{id}")
-    suspend fun getVacancy(
-        @Path("id") id: String
-    ): VacancyDetailResponse
+    @GET("vacancies/company/{companyId}")
+    suspend fun getVacancyCompanyDetail(
+        @Path("companyId") companyId: String
+    ): ProfileJobProviderResponse
 
     @POST("users/login")
     suspend fun loginJobSeeker(
@@ -261,4 +262,15 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body request: CloseVacancyRequest
     ): GeneralResponse
+
+    @GET("vacancies/detail/company/{vacancyId}")
+    suspend fun getVacancyInCompany(
+        @Path("vacancyId") id: String
+    ): VacancyDetailCompanyResponse
+
+    @GET("vacancies/detail/{vacancyId}/user/{userId}")
+    suspend fun getVacancyInUser(
+        @Path("vacancyId") vacancyId: String,
+        @Path("userId") userId: String,
+    ): VacancyDetailUserResponse
 }

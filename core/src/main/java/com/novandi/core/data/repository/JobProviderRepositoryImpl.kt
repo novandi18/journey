@@ -11,7 +11,6 @@ import com.novandi.core.data.source.remote.request.LoginRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.source.remote.response.ApplicantItem
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
@@ -20,7 +19,6 @@ import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
-import com.novandi.core.data.source.remote.response.WhatsappResponse
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
@@ -29,7 +27,6 @@ import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
-import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.core.domain.repository.JobProviderRepository
 import com.novandi.core.mapper.JobProviderMapper
 import com.novandi.core.mapper.JobSeekerMapper
@@ -199,15 +196,5 @@ class JobProviderRepositoryImpl @Inject constructor(
 
             override suspend fun createCall(): Flow<ApiResponse<ProfileJobSeekerResponse>> =
                 remoteDataSource.getApplicantById(token, companyId, applicantId)
-        }.asFlow()
-
-    override fun sendWhatsappMessage(request: WhatsappRequest): Flow<Resource<WhatsappResult>> =
-        object : NetworkOnlyResource<WhatsappResult, WhatsappResponse>() {
-            override fun loadFromNetwork(data: WhatsappResponse): Flow<WhatsappResult> =
-                JobProviderMapper.mapWhatsappResponseToDomain(data)
-
-            override suspend fun createCall(): Flow<ApiResponse<WhatsappResponse>> =
-                remoteDataSource.sendWhatsappMessage(request)
-
         }.asFlow()
 }

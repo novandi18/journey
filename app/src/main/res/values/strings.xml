@@ -143,6 +143,9 @@
     <string name="delete_vacancy_confirm">Tutup sekarang</string>
     <string name="delete_vacancy_desc">Ingin menutup lowongan pekerjaan ini?</string>
     <string name="speak_something">Katakan sesuatu</string>
+    <string name="apply_confirm">Ya, lamar</string>
+    <string name="apply_desc">Ingin melamar pekerjaan ini?</string>
+    <string name="apply_title">Lamar Lowogan Pekerjaan</string>
 
     <!--  Error  -->
     <string name="network_error">Koneksi Bermasalah</string>
@@ -207,4 +210,5 @@
     <!--  Whatsapp Message  -->
     <string name="accepted_wa">Selamat! anda diterima di perusahaan *%1$s* dengan detail lowongan kerja berikut:\n\nPosisi: *%2$s*\nDisabilitas: *%3$s*\nSyarat kemampuan:\n- *%4$s*\n- *%5$s*\nTipe Pekerjaan: *%6$s*\n\nSegera melakukan pengecekan informasi pada catatan yang diberikan oleh perusahaan di aplikasi Journey.</string>
     <string name="rejected_wa">Maaf, anda belum diterima di perusahaan *%1$s* dengan detail lowongan kerja berikut:\n\nPosisi: *%2$s*\nDisabilitas: *%3$s*\nSyarat kemampuan:\n- *%4$s*\n- *%5$s*\nTipe Pekerjaan: *%6$s*\n\nJangan menyerah dan terus berusaha ya!</string>
+    <string name="job_seeker_apply">Lamaran baru telah diterima untuk posisi *%1$s*. Silakan cek daftar pelamar pada lowongan anda di aplikasi Journey.</string>
 </resources>

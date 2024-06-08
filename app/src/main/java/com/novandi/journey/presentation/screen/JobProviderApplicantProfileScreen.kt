@@ -5,9 +5,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -60,6 +59,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.WorkInfo
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.novandi.core.data.response.Resource
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.ProfileJobSeeker
@@ -73,8 +74,9 @@ import com.novandi.journey.presentation.ui.theme.Dark
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.JobProviderApplicantProfileViewModel
-import com.novandi.utility.consts.NetworkUrls
 import com.novandi.utility.consts.WorkerConsts
+import com.novandi.utility.data.getFilenameFromUrl
+import kotlin.random.Random
 
 @Composable
 fun JobProviderApplicantProfileScreen(
@@ -96,13 +98,13 @@ fun JobProviderApplicantProfileScreen(
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
                 viewModel.setOnProfileData(profile?.data)
-                if (profile?.data?.cv != null) {
+                if (profile?.data != null) {
                     viewModel.setOnCvFile(
                         File(
-                            id = profile?.data!!.id,
-                            name = profile?.data?.cv!!,
+                            id = Random.nextInt().toString(),
+                            name = getFilenameFromUrl(profile?.data?.cv!!),
                             type = "PDF",
-                            url = "${NetworkUrls.JOURNEY}users/cv/${viewModel.profileData!!.cv!!}",
+                            url = profile?.data?.cv!!,
                             downloadedUri = null
                         )
                     )
@@ -198,6 +200,7 @@ fun JobProviderApplicantProfileScreen(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("NewApi")
 @Composable
 private fun Content(
@@ -206,13 +209,17 @@ private fun Content(
 ) {
     val context = LocalContext.current
 
-    val pdfDownloadPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        var isGranted = false
-        it.forEach { _, b ->
-            isGranted = b
+    val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
+        permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            listOf(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            listOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
         }
+    ) { permission ->
+        val isGranted = permission.values.all { it }
 
         if (isGranted) {
             viewModel.setOnCvDownloadShowing(true)
@@ -426,7 +433,7 @@ private fun Content(
                             color = DarkGray80
                         )
                         Text(
-                            text = if (data.cv != null) data.cv!! else
+                            text = if (data.cv != null) getFilenameFromUrl(data.cv!!) else
                                 stringResource(id = R.string.cv_empty),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -444,10 +451,7 @@ private fun Content(
                     if (data.cv != null) {
                         IconButton(
                             onClick = {
-                                pdfDownloadPermissionLauncher.launch(arrayOf(
-                                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                ))
+                                pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
                             }
                         ) {
                             Icon(

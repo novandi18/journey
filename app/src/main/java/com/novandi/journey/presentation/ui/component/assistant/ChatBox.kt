@@ -59,7 +59,8 @@ fun ChatBox(
     addToChats: (AssistantChat) -> Unit,
     ask: (String) -> Unit,
     voiceState: VoiceToTextParserState,
-    voiceParser: VoiceToTextParser
+    voiceParser: VoiceToTextParser,
+    accountId: String?
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -204,12 +205,18 @@ fun ChatBox(
                         .weight(.15f)
                         .height(56.dp),
                     onClick = {
-                        addToChats(
-                            AssistantChat(message = value, isFromMe = true)
-                        )
-                        ask(value)
-                        focusManager.clearFocus()
-                        setValue("")
+                        if (accountId != null) {
+                            addToChats(
+                                AssistantChat(
+                                    message = value,
+                                    isFromMe = true,
+                                    userId = accountId
+                                )
+                            )
+                            ask(value)
+                            focusManager.clearFocus()
+                            setValue("")
+                        }
                     },
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = Blue40

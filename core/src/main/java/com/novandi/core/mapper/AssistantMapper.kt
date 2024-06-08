@@ -18,7 +18,8 @@ object AssistantMapper {
             userMessage = assistantEntity.userChat,
             message = assistantEntity.chat,
             isFromMe = assistantEntity.isFromMe,
-            isError = assistantEntity.isError
+            isError = assistantEntity.isError,
+            userId = assistantEntity.userId
         )
     }
 
@@ -27,6 +28,7 @@ object AssistantMapper {
         chat = input.message,
         isFromMe = input.isFromMe,
         isError = input.isError,
-        createdAt = System.currentTimeMillis()
+        createdAt = System.currentTimeMillis(),
+        userId = input.userId
     )
 }

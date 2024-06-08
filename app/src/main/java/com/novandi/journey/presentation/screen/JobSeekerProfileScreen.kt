@@ -7,8 +7,10 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -79,6 +81,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.WorkInfo
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.crop
@@ -102,9 +106,9 @@ import com.novandi.journey.presentation.ui.theme.Green
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 import com.novandi.journey.presentation.viewmodel.JobSeekerProfileViewModel
-import com.novandi.utility.consts.NetworkUrls
 import com.novandi.utility.consts.WorkerConsts
 import com.novandi.utility.data.convertUriToPdf
+import com.novandi.utility.data.getFilenameFromUrl
 import com.novandi.utility.image.bitmapToUri
 import com.novandi.utility.image.uriToFile
 import kotlinx.coroutines.launch
@@ -176,9 +180,9 @@ fun JobSeekerProfileScreen(
                     viewModel.setOnCvFile(
                         File(
                             id = profile?.data!!.id,
-                            name = profile?.data?.cv!!,
+                            name = getFilenameFromUrl(profile?.data?.cv!!),
                             type = "PDF",
-                            url = "${NetworkUrls.JOURNEY}users/cv/${viewModel.profileData!!.cv!!}",
+                            url = profile?.data?.cv!!,
                             downloadedUri = null
                         )
                     )
@@ -219,6 +223,14 @@ fun JobSeekerProfileScreen(
             is Resource.Loading -> viewModel.setOnUploadCvLoading(true)
             is Resource.Success -> {
                 viewModel.updateCvOnProfileData(cv?.data?.cv)
+                viewModel.setOnCvFile(
+                    File(
+                        id = accountId!!,
+                        name = getFilenameFromUrl(cv?.data?.cv!!),
+                        type = "PDF",
+                        url = cv?.data?.cv!!,
+                    )
+                )
                 Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnUploadCvLoading(false)
                 viewModel.resetCvState()
@@ -295,6 +307,7 @@ fun JobSeekerProfileScreen(
                                 viewModel.resetDownloadedCvState()
                             },
                             openFile = { file ->
+                                Log.d("please penasaran", file.downloadedUri.toString())
                                 val intent = Intent(Intent.ACTION_VIEW)
                                 val uriData = FileProvider.getUriForFile(
                                     context,
@@ -327,6 +340,7 @@ fun JobSeekerProfileScreen(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("NewApi")
 @Composable
 fun JobSeekerProfileContent(
@@ -373,10 +387,17 @@ fun JobSeekerProfileContent(
         }
     }
 
-    val pdfPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
+    val pdfPermissionLauncher = rememberMultiplePermissionsState(
+        permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            listOf(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            listOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        }
+    ) { permissions ->
+        if (permissions.all { it.value }) {
             pdfLauncher.launch(arrayOf("application/pdf"))
         } else {
             Toast.makeText(
@@ -387,13 +408,17 @@ fun JobSeekerProfileContent(
         }
     }
 
-    val pdfDownloadPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        var isGranted = false
-        it.forEach { _, b ->
-            isGranted = b
+    val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
+        permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            listOf(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            listOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
         }
+    ) { permission ->
+        val isGranted = permission.values.all { it }
 
         if (isGranted) {
             viewModel.setOnCvDownloadShowing(true)
@@ -728,7 +753,7 @@ fun JobSeekerProfileContent(
                             color = DarkGray80
                         )
                         Text(
-                            text = if (data.cv != null) data.cv!! else
+                            text = if (data.cv != null) getFilenameFromUrl(data.cv!!) else
                                 stringResource(id = R.string.cv_empty),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -754,10 +779,7 @@ fun JobSeekerProfileContent(
                         if (data.cv != null) {
                             IconButton(
                                 onClick = {
-                                    pdfDownloadPermissionLauncher.launch(arrayOf(
-                                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                    ))
+                                    pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
                                 }
                             ) {
                                 Icon(
@@ -769,9 +791,7 @@ fun JobSeekerProfileContent(
                         }
                         IconButton(
                             onClick = {
-                                pdfPermissionLauncher.launch(
-                                    Manifest.permission.READ_EXTERNAL_STORAGE
-                                )
+                                pdfPermissionLauncher.launchMultiplePermissionRequest()
                             }
                         ) {
                             Icon(

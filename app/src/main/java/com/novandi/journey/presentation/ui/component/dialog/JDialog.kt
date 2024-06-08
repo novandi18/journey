@@ -28,7 +28,10 @@ fun JDialog(
             Icon(icon, contentDescription = dialogTitle)
         },
         title = {
-            Text(text = dialogTitle)
+            Text(
+                text = dialogTitle,
+                textAlign = TextAlign.Center
+            )
         },
         text = {
             Text(

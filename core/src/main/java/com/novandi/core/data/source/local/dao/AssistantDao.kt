@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AssistantDao {
-    @Query("SELECT * FROM assistant")
-    fun getAll(): Flow<List<AssistantEntity>>
+    @Query("SELECT * FROM assistant WHERE user_id = :userId")
+    fun getAll(userId: String): Flow<List<AssistantEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveChat(chat: AssistantEntity)
 
-    @Query("DELETE FROM assistant")
-    fun deleteAll()
+    @Query("DELETE FROM assistant WHERE user_id = :userId")
+    fun deleteAll(userId: String)
 
     @Query("DELETE FROM assistant WHERE id = :id")
     fun delete(id: Int)

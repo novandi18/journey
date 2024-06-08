@@ -8,7 +8,6 @@ import com.novandi.core.data.source.remote.request.LoginRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
@@ -17,7 +16,6 @@ import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
-import com.novandi.core.domain.model.WhatsappResult
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 
@@ -45,5 +43,4 @@ interface JobProviderRepository {
     fun getVacanciesApplicants(token: String, companyId: String): Flow<Resource<List<Vacancy>>>
     fun getApplicantById(token: String, companyId: String, applicantId: String)
         : Flow<Resource<ProfileJobSeeker>>
-    fun sendWhatsappMessage(request: WhatsappRequest): Flow<Resource<WhatsappResult>>
 }
