@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AssistantUseCase {
     fun getAssistantResult(request: AssistantRequest): Flow<Resource<AssistantResult>>
-    fun getAll(): Flow<List<AssistantChat>>
+    fun getAll(userId: String): Flow<List<AssistantChat>>
     fun saveChat(chat: AssistantChat)
-    fun deleteAll()
+    fun deleteAll(userId: String)
     fun deleteChat(id: Int)
 }

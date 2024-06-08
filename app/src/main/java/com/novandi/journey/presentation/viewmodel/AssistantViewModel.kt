@@ -3,11 +3,14 @@ package com.novandi.journey.presentation.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AssistantRequest
+import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.AssistantChat
 import com.novandi.core.domain.model.AssistantResult
 import com.novandi.core.domain.usecase.AssistantUseCase
@@ -20,12 +23,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AssistantViewModel @Inject constructor(
-    private val assistantUseCase: AssistantUseCase
+    private val assistantUseCase: AssistantUseCase,
+    dataStoreManager: DataStoreManager
 ): ViewModel() {
     private val _results = MutableStateFlow<Resource<AssistantResult>?>(null)
     val results: StateFlow<Resource<AssistantResult>?> get() = _results
 
-    val chats = assistantUseCase.getAll().asLiveData()
+    private val _chats = MutableLiveData(listOf<AssistantChat>())
+    val chats: LiveData<List<AssistantChat>> get() = _chats
+
+    val accountId = dataStoreManager.accountId.asLiveData()
+
+    fun getChats(userId: String) {
+        viewModelScope.launch {
+            assistantUseCase.getAll(userId).collect {
+                _chats.value = it
+            }
+        }
+    }
 
     var loading by mutableStateOf(false)
         private set
@@ -63,9 +78,9 @@ class AssistantViewModel @Inject constructor(
         }
     }
 
-    fun deleteAll() {
+    fun deleteAll(userId: String) {
         viewModelScope.launch {
-            assistantUseCase.deleteAll()
+            assistantUseCase.deleteAll(userId)
         }
     }
 

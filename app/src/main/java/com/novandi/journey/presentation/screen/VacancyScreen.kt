@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.AssistWalker
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,11 +53,9 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.WorkInfo
 import coil.compose.AsyncImage
-import com.novandi.core.consts.JobTypes
 import com.novandi.core.data.response.Resource
 import com.novandi.core.domain.model.File
-import com.novandi.core.domain.model.JobApplyStatus
-import com.novandi.core.domain.model.Vacancy
+import com.novandi.core.domain.model.VacancyDetailUser
 import com.novandi.journey.BuildConfig
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.bar.VacancyBar
@@ -72,10 +69,10 @@ import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.VacancyViewModel
-import com.novandi.utility.consts.NetworkUrls
 import com.novandi.utility.consts.WorkerConsts
-import com.novandi.utility.data.currentDateTime
+import com.novandi.utility.data.getFilenameFromUrl
 import com.novandi.utility.field.ApplicantStatus
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,56 +80,43 @@ fun VacancyScreen(
     viewModel: VacancyViewModel = hiltViewModel(),
     vacancyId: String,
     navigateBack: () -> Unit,
-    navigateToEditVacancy: (Vacancy) -> Unit,
     navigateToCompanyDetail: (vacancyId: String) -> Unit
 ) {
     val context = LocalContext.current
-
     val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
-    val roleId by viewModel.roleId.observeAsState()
-
     val vacancy by viewModel.vacancy.collectAsState()
     val applyStatus by viewModel.applyResult.collectAsState()
-    val applies by viewModel.applies.collectAsState()
-    val profile by viewModel.profile.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.getVacancy(vacancyId)
+    LaunchedEffect(accountId) {
+        if (accountId != null) viewModel.getVacancy(vacancyId, accountId.toString())
     }
 
     LaunchedEffect(vacancy is Resource.Loading) {
         when (vacancy) {
-            is Resource.Loading -> viewModel.setOnLoading(true)
+            is Resource.Loading -> {}
             is Resource.Success -> {
                 viewModel.setOnVacancyData(vacancy?.data)
-                if (roleId == 1) {
-                    viewModel.getVacancyStatus(token.toString(), accountId.toString())
+                if (vacancy?.data != null) {
+                    viewModel.setOnCvFile(
+                        File(
+                            id = Random.nextInt().toString(),
+                            name = getFilenameFromUrl(vacancy?.data?.userCv!!),
+                            type = "PDF",
+                            url = vacancy?.data?.userCv!!,
+                            downloadedUri = null
+                        )
+                    )
                 }
                 viewModel.resetVacancyState()
                 viewModel.setOnLoading(false)
             }
             is Resource.Error -> {
+                Toast.makeText(context, vacancy?.message, Toast.LENGTH_SHORT).show()
                 viewModel.resetVacancyState()
                 viewModel.setOnLoading(false)
             }
-            else -> viewModel.setOnLoading(false)
-        }
-    }
-
-    LaunchedEffect(applies is Resource.Loading) {
-        when (applies) {
-            is Resource.Loading -> {}
-            is Resource.Success -> {
-                viewModel.setOnVacancyStatusData(applies?.data)
-                viewModel.setOnAppliesLoading(false)
-                viewModel.resetAppliesState()
-            }
-            is Resource.Error -> {
-                viewModel.setOnAppliesLoading(false)
-                viewModel.resetAppliesState()
-            }
-            else -> viewModel.setOnAppliesLoading(false)
+            else -> {}
         }
     }
 
@@ -140,14 +124,7 @@ fun VacancyScreen(
         when (applyStatus) {
             is Resource.Loading -> {}
             is Resource.Success -> {
-                val newApplies = listOf(
-                    JobApplyStatus(
-                        vacancyId = vacancyId,
-                        status = ApplicantStatus.PENDING.value,
-                        appliedAt = currentDateTime()
-                    )
-                )
-                viewModel.setOnVacancyStatusData(newApplies)
+                viewModel.setOnUpdateStatusApply(ApplicantStatus.PENDING.value)
                 viewModel.setOnApplyLoading(false)
                 viewModel.resetApplyResultState()
             }
@@ -157,33 +134,6 @@ fun VacancyScreen(
                 viewModel.resetApplyResultState()
             }
             else -> viewModel.setOnApplyLoading(false)
-        }
-    }
-
-    LaunchedEffect(profile is Resource.Loading) {
-        when (profile) {
-            is Resource.Loading -> viewModel.setOnProfileLoading(true)
-            is Resource.Success -> {
-                viewModel.setOnProfileData(profile?.data)
-                if (profile?.data?.cv != null) {
-                    viewModel.setOnCvFile(
-                        File(
-                            id = profile?.data!!.id,
-                            name = profile?.data?.cv!!,
-                            type = "PDF",
-                            url = "${NetworkUrls.JOURNEY}users/cv/${viewModel.profileData!!.cv!!}",
-                            downloadedUri = null
-                        )
-                    )
-                }
-                viewModel.setOnProfileLoading(false)
-                viewModel.resetProfileState()
-            }
-            is Resource.Error -> {
-                viewModel.setOnProfileLoading(false)
-                viewModel.resetProfileState()
-            }
-            else -> viewModel.setOnProfileLoading(false)
         }
     }
 
@@ -210,23 +160,6 @@ fun VacancyScreen(
                             tint = Light
                         )
                     }
-                },
-                actions = {
-                    if (roleId == 2) {
-                        if (viewModel.vacancyData != null) {
-                            IconButton(
-                                onClick = {
-                                    navigateToEditVacancy(viewModel.vacancyData!!)
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Edit,
-                                    contentDescription = stringResource(id = R.string.edit_vacancy),
-                                    tint = Light
-                                )
-                            }
-                        }
-                    }
                 }
             )
         }
@@ -241,9 +174,7 @@ fun VacancyScreen(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .padding(
-                        bottom = if (roleId == 1)
-                            if (viewModel.cvDownloadShowing) 256.dp else 156.dp
-                        else 0.dp
+                        bottom = if (viewModel.cvDownloadShowing) 256.dp else 156.dp
                     )
             ) {
                 if (viewModel.loading) {
@@ -255,162 +186,155 @@ fun VacancyScreen(
                     )
                 } else {
                     NetworkError {
-                        viewModel.getVacancy(vacancyId)
+                        viewModel.getVacancy(vacancyId, accountId.toString())
                     }
                 }
             }
 
-            if (roleId == 1) {
-                val downloadedCv by viewModel.downloadedCv.collectAsState()
-                val cv by viewModel.cv.collectAsState()
+            val downloadedCv by viewModel.downloadedCv.collectAsState()
+            val cv by viewModel.cv.collectAsState()
 
-                LaunchedEffect(Unit) {
-                    viewModel.getProfile(token.toString(), accountId.toString())
+            LaunchedEffect(cv is Resource.Loading) {
+                when (cv) {
+                    is Resource.Loading -> viewModel.setOnUploadCvLoading(true)
+                    is Resource.Success -> {
+                        viewModel.updateCvOnVacancyData(cv?.data?.cv)
+                        viewModel.setOnCvFile(
+                            File(
+                                id = Random.nextInt().toString(),
+                                name = getFilenameFromUrl(cv?.data?.cv!!),
+                                type = "PDF",
+                                url = cv?.data?.cv!!,
+                            )
+                        )
+                        Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
+                        viewModel.setOnUploadCvLoading(false)
+                        viewModel.resetCvState()
+                    }
+                    is Resource.Error -> {
+                        Toast.makeText(context, cv?.message, Toast.LENGTH_SHORT).show()
+                        viewModel.setOnUploadCvLoading(false)
+                        viewModel.resetCvState()
+                    }
+                    else -> {
+                        viewModel.setOnUploadCvLoading(false)
+                    }
                 }
+            }
 
-                LaunchedEffect(cv is Resource.Loading) {
-                    when (cv) {
-                        is Resource.Loading -> viewModel.setOnUploadCvLoading(true)
-                        is Resource.Success -> {
-                            viewModel.updateCvOnProfileData(cv?.data?.cv)
-                            Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
-                            viewModel.setOnUploadCvLoading(false)
-                            viewModel.resetCvState()
+            if (downloadedCv != null) {
+                val workInfo = downloadedCv!!.observeAsState().value
+
+                if (workInfo != null) {
+                    when (workInfo.state) {
+                        WorkInfo.State.SUCCEEDED -> {
+                            val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
+                            viewModel.setOnUpdateFile(
+                                isDownloading = false,
+                                downloadedUri = uri
+                            )
                         }
-                        is Resource.Error -> {
-                            Toast.makeText(context, cv?.message, Toast.LENGTH_SHORT).show()
-                            viewModel.setOnUploadCvLoading(false)
-                            viewModel.resetCvState()
+                        WorkInfo.State.FAILED -> {
+                            viewModel.setOnUpdateFile(
+                                isDownloading = false,
+                                downloadedUri = ""
+                            )
+                        }
+                        WorkInfo.State.RUNNING -> {
+                            viewModel.setOnUpdateFile(
+                                isDownloading = true
+                            )
                         }
                         else -> {
-                            viewModel.setOnUploadCvLoading(false)
+                            viewModel.setOnUpdateFile(
+                                isDownloading = false,
+                                downloadedUri = ""
+                            )
                         }
                     }
                 }
+            }
 
-                if (downloadedCv != null) {
-                    val workInfo = downloadedCv!!.observeAsState().value
-
-                    if (workInfo != null) {
-                        when (workInfo.state) {
-                            WorkInfo.State.SUCCEEDED -> {
-                                val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
-                                viewModel.setOnUpdateFile(
-                                    isDownloading = false,
-                                    downloadedUri = uri
-                                )
-                            }
-                            WorkInfo.State.FAILED -> {
-                                viewModel.setOnUpdateFile(
-                                    isDownloading = false,
-                                    downloadedUri = ""
-                                )
-                            }
-                            WorkInfo.State.RUNNING -> {
-                                viewModel.setOnUpdateFile(
-                                    isDownloading = true
-                                )
-                            }
-                            else -> {
-                                viewModel.setOnUpdateFile(
-                                    isDownloading = false,
-                                    downloadedUri = ""
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                ) {
-                    Column {
-                        if (viewModel.cvFile != null) {
-                            AnimatedVisibility(
-                                modifier = Modifier.padding(16.dp),
-                                visible = viewModel.cvDownloadShowing,
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
-                                FileDownloadDialog(
-                                    file = viewModel.cvFile!!,
-                                    close = {
-                                        viewModel.setOnCvDownloadShowing(false)
-                                        viewModel.resetDownloadedCvState()
-                                    },
-                                    openFile = { file ->
-                                        val intent = Intent(Intent.ACTION_VIEW)
-                                        val uriData = FileProvider.getUriForFile(
-                                            context,
-                                            BuildConfig.APPLICATION_ID + ".provider",
-                                            file.downloadedUri!!.toUri().toFile()
-                                        )
-                                        intent.setDataAndType(
-                                            uriData,
-                                            "application/pdf"
-                                        )
-                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                        viewModel.resetDownloadedCvState()
-                                        viewModel.setOnCvDownloadShowing(false)
-                                        try {
-                                            val activity = context as Activity
-                                            activity.startActivity(intent)
-                                        } catch (e: ActivityNotFoundException) {
-                                            Toast.makeText(
-                                                context,
-                                                "Can't open Pdf",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = DarkGray80
-                        )
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Light)
-                                .padding(16.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+            ) {
+                Column {
+                    if (viewModel.cvFile != null) {
+                        AnimatedVisibility(
+                            modifier = Modifier.padding(16.dp),
+                            visible = viewModel.cvDownloadShowing,
+                            enter = fadeIn(),
+                            exit = fadeOut()
                         ) {
-                            if (viewModel.loading && viewModel.profileLoading && viewModel.appliesLoading) {
-                                VacancyBarSkeleton()
-                            } else if (
-                                viewModel.vacancyData != null &&
-                                viewModel.vacancyStatusData != null &&
-                                viewModel.profileData != null &&
-                                viewModel.cvFile != null
-                            ) {
-                                val status = viewModel.vacancyStatusData!!.filter {
-                                    it.vacancyId == vacancyId
-                                }
-
-                                VacancyBar(
-                                    vacancy = viewModel.vacancyData!!,
-                                    vacancyStatus = if (status.isEmpty()) null else status[0],
-                                    loading = viewModel.applyLoading,
-                                    doApply = {
-                                        viewModel.setOnApplyLoading(true)
-                                        viewModel.applyVacancy(token.toString(), accountId.toString(), vacancyId)
-                                    },
-                                    userData = viewModel.profileData!!,
-                                    cvFile = viewModel.cvFile!!,
-                                    updateCv = { cv ->
-                                        viewModel.updateCv(accountId.toString(), cv)
-                                    },
-                                    uploadCvLoading = viewModel.uploadCvLoading,
-                                    downloadCv = { file ->
-                                        viewModel.setOnCvDownloadShowing(true)
-                                        viewModel.downloadCv(file)
+                            FileDownloadDialog(
+                                file = viewModel.cvFile!!,
+                                close = {
+                                    viewModel.setOnCvDownloadShowing(false)
+                                    viewModel.resetDownloadedCvState()
+                                },
+                                openFile = { file ->
+                                    val intent = Intent(Intent.ACTION_VIEW)
+                                    val uriData = FileProvider.getUriForFile(
+                                        context,
+                                        BuildConfig.APPLICATION_ID + ".provider",
+                                        file.downloadedUri!!.toUri().toFile()
+                                    )
+                                    intent.setDataAndType(
+                                        uriData,
+                                        "application/pdf"
+                                    )
+                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    viewModel.resetDownloadedCvState()
+                                    viewModel.setOnCvDownloadShowing(false)
+                                    try {
+                                        val activity = context as Activity
+                                        activity.startActivity(intent)
+                                    } catch (e: ActivityNotFoundException) {
+                                        Toast.makeText(
+                                            context,
+                                            "Can't open Pdf",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
-                                )
-                            }
+                                }
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = DarkGray80
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Light)
+                            .padding(16.dp)
+                    ) {
+                        if (viewModel.loading) {
+                            VacancyBarSkeleton()
+                        } else if (
+                            viewModel.vacancyData != null
+                        ) {
+                            VacancyBar(
+                                vacancy = viewModel.vacancyData!!,
+                                loading = viewModel.applyLoading,
+                                doApply = {
+                                    viewModel.setOnApplyLoading(true)
+                                    viewModel.applyVacancy(token.toString(), accountId.toString(), vacancyId)
+                                },
+                                cvFile = viewModel.cvFile,
+                                updateCv = { cv ->
+                                    viewModel.updateCv(accountId.toString(), cv)
+                                },
+                                uploadCvLoading = viewModel.uploadCvLoading,
+                                downloadCv = { file ->
+                                    viewModel.setOnCvDownloadShowing(true)
+                                    viewModel.downloadCv(file)
+                                }
+                            )
                         }
                     }
                 }
@@ -421,7 +345,7 @@ fun VacancyScreen(
 
 @Composable
 fun VacancyContent(
-    vacancy: Vacancy,
+    vacancy: VacancyDetailUser,
     navigateToCompanyDetail: (vacancyId: String) -> Unit
 ) {
     Column(
@@ -435,7 +359,7 @@ fun VacancyContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = vacancy.placementAddress,
+                    text = vacancy.position,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 32.sp
@@ -444,7 +368,7 @@ fun VacancyContent(
                     modifier = Modifier
                         .background(color = Dark.copy(alpha = .1f), shape = CircleShape)
                         .padding(horizontal = 16.dp, vertical = 4.dp),
-                    text = JobTypes.types()[vacancy.jobType - 1],
+                    text = vacancy.jobType,
                     fontSize = 14.sp
                 )
             }
@@ -480,7 +404,7 @@ fun VacancyContent(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = vacancy.sectorName,
+                    text = vacancy.companySector,
                     fontSize = 14.sp
                 )
             }
@@ -568,7 +492,6 @@ private fun Preview() {
         VacancyScreen(
             vacancyId = "1",
             navigateBack = {},
-            navigateToEditVacancy = {},
             navigateToCompanyDetail = {}
         )
     }

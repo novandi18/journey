@@ -23,6 +23,9 @@ data class AssistantEntity(
     @ColumnInfo(name = "is_error")
     val isError: Boolean = false,
 
+    @ColumnInfo(name = "user_id")
+    val userId: String,
+
     @ColumnInfo(name = "created_at")
     val createdAt: Long
 )

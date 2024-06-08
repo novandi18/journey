@@ -12,10 +12,8 @@ import com.novandi.core.data.response.Resource
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.GeneralResult
-import com.novandi.core.domain.model.JobApplyStatus
-import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.core.domain.model.UpdateCvResult
-import com.novandi.core.domain.model.Vacancy
+import com.novandi.core.domain.model.VacancyDetailUser
 import com.novandi.core.domain.usecase.JobSeekerUseCase
 import com.novandi.core.domain.usecase.VacancyUseCase
 import com.novandi.journey.presentation.main.MainActivity
@@ -33,17 +31,11 @@ class VacancyViewModel @Inject constructor(
     private val jobSeekerUseCase: JobSeekerUseCase,
     dataStoreManager: DataStoreManager
 ): ViewModel() {
-    private val _vacancy = MutableStateFlow<Resource<Vacancy>?>(null)
-    val vacancy: StateFlow<Resource<Vacancy>?> get() = _vacancy
-
-    private val _applies = MutableStateFlow<Resource<List<JobApplyStatus>>?>(null)
-    val applies: StateFlow<Resource<List<JobApplyStatus>>?> get() = _applies
+    private val _vacancy = MutableStateFlow<Resource<VacancyDetailUser>?>(null)
+    val vacancy: StateFlow<Resource<VacancyDetailUser>?> get() = _vacancy
 
     private val _applyResult = MutableStateFlow<Resource<GeneralResult>?>(null)
     val applyResult: StateFlow<Resource<GeneralResult>?> get() = _applyResult
-
-    private val _profile = MutableStateFlow<Resource<ProfileJobSeeker>?>(null)
-    val profile: StateFlow<Resource<ProfileJobSeeker>?> get() = _profile
 
     private val _cv = MutableStateFlow<Resource<UpdateCvResult>?>(null)
     val cv: StateFlow<Resource<UpdateCvResult>?> get() = _cv
@@ -51,29 +43,16 @@ class VacancyViewModel @Inject constructor(
     private val _downloadedCv = MutableStateFlow<LiveData<WorkInfo>?>(null)
     val downloadedCv: StateFlow<LiveData<WorkInfo>?> get() = _downloadedCv
 
-    val roleId = dataStoreManager.roleId.asLiveData()
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
 
     var loading by mutableStateOf(true)
         private set
 
-    var appliesLoading by mutableStateOf(true)
-        private set
-
     var applyLoading by mutableStateOf(false)
         private set
 
-    var vacancyData by mutableStateOf<Vacancy?>(null)
-        private set
-
-    var vacancyStatusData by mutableStateOf<List<JobApplyStatus>?>(null)
-        private set
-
-    var profileData by mutableStateOf<ProfileJobSeeker?>(null)
-        private set
-
-    var profileLoading by mutableStateOf(true)
+    var vacancyData by mutableStateOf<VacancyDetailUser?>(null)
         private set
 
     var uploadCvLoading by mutableStateOf(false)
@@ -93,16 +72,8 @@ class VacancyViewModel @Inject constructor(
         applyLoading = isLoading
     }
 
-    fun setOnVacancyData(data: Vacancy?) {
+    fun setOnVacancyData(data: VacancyDetailUser?) {
         vacancyData = data
-    }
-
-    fun setOnVacancyStatusData(data: List<JobApplyStatus>?) {
-        vacancyStatusData = data
-    }
-
-    fun setOnAppliesLoading(isLoading: Boolean) {
-        appliesLoading = isLoading
     }
 
     fun resetVacancyState() {
@@ -113,44 +84,32 @@ class VacancyViewModel @Inject constructor(
         _applyResult.value = null
     }
 
-    fun resetAppliesState() {
-        _applies.value = null
-    }
-
-    fun setOnProfileData(value: ProfileJobSeeker?) {
-        profileData = value
-    }
-
     fun setOnUploadCvLoading(isLoading: Boolean) {
         uploadCvLoading = isLoading
     }
 
-    fun updateCvOnProfileData(cv: String?) {
-        profileData = profileData?.copy(cv = cv)
+    fun updateCvOnVacancyData(cv: String?) {
+        vacancyData = vacancyData?.copy(userCv = cv)
     }
 
     fun resetCvState() {
         _cv.value = null
     }
 
-    fun resetProfileState() {
-        _profile.value = null
-    }
-
-    fun setOnProfileLoading(value: Boolean) {
-        profileLoading = value
-    }
-
     fun setOnCvDownloadShowing(value: Boolean) {
         cvDownloadShowing = value
     }
 
-    fun setOnCvFile(value: File) {
-        cvFile = value
+    fun setOnUpdateStatusApply(status: String) {
+        vacancyData = vacancyData?.copy(statusApply = status)
     }
 
     fun resetDownloadedCvState() {
         _downloadedCv.value = null
+    }
+
+    fun setOnCvFile(value: File) {
+        cvFile = value
     }
 
     fun setOnUpdateFile(downloadedUri: String? = null, isDownloading: Boolean) {
@@ -160,26 +119,14 @@ class VacancyViewModel @Inject constructor(
         )
     }
 
-    fun getVacancy(id: String) {
+    fun getVacancy(vacancyId: String, userId: String) {
         viewModelScope.launch {
-            vacancyUseCase.getVacancy(id)
+            vacancyUseCase.getVacancyInUser(vacancyId, userId)
                 .catch { err ->
                     _vacancy.value = Resource.Error(err.message.toString())
                 }
                 .collect { result ->
                     _vacancy.value = result
-                }
-        }
-    }
-
-    fun getVacancyStatus(token: String, userId: String) {
-        viewModelScope.launch {
-            jobSeekerUseCase.getApplyStatus(token, userId)
-                .catch { err ->
-                    _applies.value = Resource.Error(err.message.toString())
-                }
-                .collect { result ->
-                    _applies.value = result
                 }
         }
     }
@@ -192,18 +139,6 @@ class VacancyViewModel @Inject constructor(
                 }
                 .collect { result ->
                     _applyResult.value = result
-                }
-        }
-    }
-
-    fun getProfile(token: String, userId: String) {
-        viewModelScope.launch {
-            jobSeekerUseCase.getJobSeeker(token, userId)
-                .catch { err ->
-                    _profile.value = Resource.Error(err.message.toString())
-                }
-                .collect { result ->
-                    _profile.value = result
                 }
         }
     }

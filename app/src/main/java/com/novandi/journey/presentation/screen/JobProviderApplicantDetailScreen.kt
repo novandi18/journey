@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.novandi.core.consts.JobTypes
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
@@ -122,11 +121,11 @@ fun JobProviderApplicantDetailScreen(
                             if (viewModel.applicantWhatsappNumber!!.second) R.string.accepted_wa
                             else R.string.rejected_wa,
                             vacancy.data!!.companyName,
-                            vacancy.data!!.placementAddress,
-                            vacancy.data!!.disabilityName,
+                            vacancy.data!!.position,
+                            vacancy.data!!.disability,
                             vacancy.data!!.skillOne,
                             vacancy.data!!.skillTwo,
-                            JobTypes.types()[viewModel.vacancyData!!.jobType - 1]
+                            viewModel.vacancyData!!.jobType
                         )
                     )
                 )
@@ -375,7 +374,7 @@ fun JobProviderApplicantDetailScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = viewModel.vacancyData!!.placementAddress,
+                                    text = viewModel.vacancyData!!.position,
                                     fontSize = 12.sp,
                                     color = Dark,
                                     fontWeight = FontWeight.Bold
@@ -389,7 +388,7 @@ fun JobProviderApplicantDetailScreen(
                                 )
                             }
                             Text(
-                                text = JobTypes.types()[viewModel.vacancyData!!.jobType - 1],
+                                text = viewModel.vacancyData?.jobType.toString(),
                                 fontSize = 12.sp,
                                 color = Dark
                             )
@@ -441,7 +440,7 @@ fun JobProviderApplicantDetailScreen(
                                             color = DarkGray80
                                         )
                                         Text(
-                                            text = viewModel.vacancyData!!.disabilityName,
+                                            text = viewModel.vacancyData?.disability.toString(),
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.SemiBold
                                         )

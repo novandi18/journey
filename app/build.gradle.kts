@@ -98,6 +98,9 @@ dependencies {
     // Work Manager
     implementation(libs.work.manager)
 
+    // Accompanist
+    implementation(libs.accompanist.permissions)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

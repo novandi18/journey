@@ -62,6 +62,7 @@ fun AssistantScreen(
     viewModel: AssistantViewModel = hiltViewModel()
 ) {
     val results by viewModel.results.collectAsState()
+    val accountId by viewModel.accountId.observeAsState()
     val chats by viewModel.chats.observeAsState(emptyList())
     val listState = rememberLazyListState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -86,6 +87,10 @@ fun AssistantScreen(
         recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
 
+    LaunchedEffect(accountId) {
+        if (accountId != null) viewModel.getChats(accountId.toString())
+    }
+
     LaunchedEffect(chats) {
         if (chats.isNotEmpty()) {
             listState.animateScrollToItem(chats.size - 1)
@@ -100,7 +105,8 @@ fun AssistantScreen(
                     AssistantChat(
                         userMessage = results!!.data!!.user,
                         message = results!!.data!!.bot,
-                        isFromMe = false
+                        isFromMe = false,
+                        userId = accountId.toString()
                     )
                 )
                 viewModel.setOnLoading(false)
@@ -112,7 +118,8 @@ fun AssistantScreen(
                         message = results!!.message.toString(),
                         isFromMe = false,
                         userMessage = "",
-                        isError = true
+                        isError = true,
+                        userId = accountId.toString()
                     )
                 )
                 viewModel.setOnLoading(false)
@@ -125,7 +132,7 @@ fun AssistantScreen(
     if (showBottomSheet) {
         AssistantSheet(
             deleteChats = {
-                viewModel.deleteAll()
+                if (accountId != null) viewModel.deleteAll(accountId.toString())
             },
             showBottomSheet = { showBottomSheet = it }
         )
@@ -136,7 +143,8 @@ fun AssistantScreen(
             viewModel.addChat(
                 AssistantChat(
                     message = voiceState.spokenText,
-                    isFromMe = true
+                    isFromMe = true,
+                    userId = accountId.toString()
                 )
             )
             viewModel.ask(voiceState.spokenText)
@@ -228,7 +236,8 @@ fun AssistantScreen(
                     viewModel.ask(prompt)
                 },
                 voiceState = voiceState,
-                voiceParser = voiceToTextParser
+                voiceParser = voiceToTextParser,
+                accountId = accountId
             )
         }
     }

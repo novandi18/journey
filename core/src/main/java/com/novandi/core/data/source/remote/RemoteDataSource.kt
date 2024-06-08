@@ -37,7 +37,8 @@ import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateCvResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.UpdatedJobStatusItem
-import com.novandi.core.data.source.remote.response.VacancyDetailResponse
+import com.novandi.core.data.source.remote.response.VacancyDetailCompanyResponse
+import com.novandi.core.data.source.remote.response.VacancyDetailUserResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import com.novandi.core.data.source.remote.response.WhatsappResponse
 import kotlinx.coroutines.Dispatchers
@@ -87,9 +88,26 @@ class RemoteDataSource @Inject constructor(
     suspend fun getPopularVacancies(page: Int, limit: Int) =
         apiService.getPopularVacancies(page, limit)
 
-    suspend fun getVacancy(id: String): Flow<ApiResponse<VacancyDetailResponse>> = flow {
+    suspend fun getVacancyInCompany(vacancyId: String): Flow<ApiResponse<VacancyDetailCompanyResponse>> = flow {
         try {
-            val response = apiService.getVacancy(id)
+            val response = apiService.getVacancyInCompany(vacancyId)
+            emit(ApiResponse.Success(response))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = try {
+                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
+            } catch (e: Exception) { null }
+            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
+            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
+        } catch (e: Exception) {
+            emit(ApiResponse.Error(e.toString()))
+            Log.e("RemoteDataSource", e.toString())
+        }
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun getVacancyInUser(vacancyId: String, userId: String): Flow<ApiResponse<VacancyDetailUserResponse>> = flow {
+        try {
+            val response = apiService.getVacancyInUser(vacancyId, userId)
             emit(ApiResponse.Success(response))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

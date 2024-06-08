@@ -15,7 +15,6 @@ import com.novandi.core.data.source.remote.response.WhatsappResponse
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.utility.data.dateFormatter
-import com.novandi.utility.image.imageProfileUrl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -35,7 +34,7 @@ object JobProviderMapper {
             address = input.company.address,
             city = input.company.city,
             province = input.company.province,
-            logo = input.company.logo.imageProfileUrl(),
+            logo = input.company.logo,
             employees = input.company.employees,
             email = input.company.email,
             roleId = input.company.roleId,
@@ -50,7 +49,7 @@ object JobProviderMapper {
                 fullName = it.fullName,
                 email = it.email,
                 address = it.address,
-                profilePhotoUrl = it.profilePhotoUrl.imageProfileUrl(),
+                profilePhotoUrl = it.profilePhotoUrl,
                 gender = it.gender,
                 age = it.age,
                 phoneNumber = it.phoneNumber,

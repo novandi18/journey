@@ -42,6 +42,11 @@ class JobSeekerApplyViewModel @Inject constructor(
         vacanciesData = values
     }
 
+    fun resetState() {
+        _vacancies.value = null
+        loading = false
+    }
+
     fun getVacancies(token: String, userId: String) {
         viewModelScope.launch {
             jsSeekerUseCase.getApplyStatus(token, userId)

@@ -17,14 +17,20 @@ import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
+import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.RecommendationResponse
-import com.novandi.core.data.source.remote.response.VacancyDetailResponse
+import com.novandi.core.data.source.remote.response.VacancyDetailCompanyResponse
+import com.novandi.core.data.source.remote.response.VacancyDetailUserResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
+import com.novandi.core.data.source.remote.response.WhatsappResponse
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.Vacancy
+import com.novandi.core.domain.model.VacancyDetailCompany
+import com.novandi.core.domain.model.VacancyDetailUser
+import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.core.domain.repository.VacancyRepository
 import com.novandi.core.mapper.JobProviderMapper
 import com.novandi.core.mapper.VacancyMapper
@@ -58,13 +64,25 @@ class VacancyRepositoryImpl @Inject constructor(
             }
         ).flow
 
-    override fun getVacancy(id: String): Flow<Resource<Vacancy>> =
-        object : NetworkOnlyResource<Vacancy, VacancyDetailResponse>() {
-            override fun loadFromNetwork(data: VacancyDetailResponse): Flow<Vacancy> =
-                VacancyMapper.mapDetailResponseToDomain(data)
+    override fun getVacancyInUser(
+        companyId: String,
+        userId: String
+    ): Flow<Resource<VacancyDetailUser>> =
+        object : NetworkOnlyResource<VacancyDetailUser, VacancyDetailUserResponse>() {
+            override fun loadFromNetwork(data: VacancyDetailUserResponse): Flow<VacancyDetailUser> =
+                VacancyMapper.mapDetailUserToDomain(data)
 
-            override suspend fun createCall(): Flow<ApiResponse<VacancyDetailResponse>> =
-                remoteDataSource.getVacancy(id)
+            override suspend fun createCall(): Flow<ApiResponse<VacancyDetailUserResponse>> =
+                remoteDataSource.getVacancyInUser(companyId, userId)
+        }.asFlow()
+
+    override fun getVacancyInCompany(vacancyId: String): Flow<Resource<VacancyDetailCompany>> =
+        object : NetworkOnlyResource<VacancyDetailCompany, VacancyDetailCompanyResponse>() {
+            override fun loadFromNetwork(data: VacancyDetailCompanyResponse): Flow<VacancyDetailCompany> =
+                VacancyMapper.mapDetailCompanyToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<VacancyDetailCompanyResponse>> =
+                remoteDataSource.getVacancyInCompany(vacancyId)
         }.asFlow()
 
     override fun getVacanciesWithoutPager(): Flow<Resource<List<Vacancy>>> =
@@ -144,5 +162,15 @@ class VacancyRepositoryImpl @Inject constructor(
 
             override suspend fun createCall(): Flow<ApiResponse<ProfileJobProviderResponse>> =
                 remoteDataSource.getVacancyCompanyDetail(companyId)
+        }.asFlow()
+
+    override fun sendWhatsappMessage(request: WhatsappRequest): Flow<Resource<WhatsappResult>> =
+        object : NetworkOnlyResource<WhatsappResult, WhatsappResponse>() {
+            override fun loadFromNetwork(data: WhatsappResponse): Flow<WhatsappResult> =
+                JobProviderMapper.mapWhatsappResponseToDomain(data)
+
+            override suspend fun createCall(): Flow<ApiResponse<WhatsappResponse>> =
+                remoteDataSource.sendWhatsappMessage(request)
+
         }.asFlow()
 }

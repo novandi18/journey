@@ -1,10 +1,12 @@
 package com.novandi.journey.presentation.notification
 
-import android.annotation.SuppressLint
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -19,13 +21,13 @@ class FileDownloadWorker(
     private val context: Context,
     workerParameters: WorkerParameters
 ): CoroutineWorker(context, workerParameters) {
-    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val fileUrl = inputData.getString(WorkerConsts.KEY_FILE_URL) ?: ""
         val fileName = inputData.getString(WorkerConsts.KEY_FILE_NAME) ?: ""
         val fileType = inputData.getString(WorkerConsts.KEY_FILE_TYPE) ?: ""
 
-        if (fileName.isEmpty()
+        if (
+            fileName.isEmpty()
             || fileType.isEmpty()
             || fileUrl.isEmpty()
         ) {
@@ -49,6 +51,14 @@ class FileDownloadWorker(
             .setContentTitle(context.getString(R.string.downloading))
             .setOngoing(true)
             .setProgress(0,0,true)
+
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Result.failure()
+        }
 
         NotificationManagerCompat.from(context).notify(NotificationConsts.NOTIFICATION_ID_DOWNLOAD, builder.build())
 

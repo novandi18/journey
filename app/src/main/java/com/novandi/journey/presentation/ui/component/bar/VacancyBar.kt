@@ -2,6 +2,7 @@ package com.novandi.journey.presentation.ui.component.bar
 
 import android.Manifest
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,10 +37,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
 import com.novandi.core.domain.model.File
-import com.novandi.core.domain.model.JobApplyStatus
-import com.novandi.core.domain.model.ProfileJobSeeker
-import com.novandi.core.domain.model.Vacancy
+import com.novandi.core.domain.model.VacancyDetailUser
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -50,19 +52,19 @@ import com.novandi.journey.presentation.ui.theme.Green
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 import com.novandi.utility.data.convertUriToPdf
+import com.novandi.utility.data.getFilenameFromUrl
 import com.novandi.utility.field.ApplicantStatus
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun VacancyBar(
-    vacancy: Vacancy,
-    vacancyStatus: JobApplyStatus?,
+    vacancy: VacancyDetailUser,
     loading: Boolean,
     doApply: () -> Unit,
-    userData: ProfileJobSeeker,
-    cvFile: File,
+    cvFile: File?,
     updateCv: (MultipartBody.Part) -> Unit,
     uploadCvLoading: Boolean,
     downloadCv: (File) -> Unit
@@ -81,30 +83,36 @@ fun VacancyBar(
         }
     }
 
-    val pdfPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
+    val pdfPermissionLauncher = rememberPermissionState(
+        permission = Manifest.permission.READ_EXTERNAL_STORAGE
     ) { isGranted ->
-        if (isGranted) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             pdfLauncher.launch(arrayOf("application/pdf"))
         } else {
-            Toast.makeText(
-                context,
-                context.getString(R.string.file_picker_permission_denied),
-                Toast.LENGTH_SHORT
-            ).show()
+            if (isGranted) {
+                pdfLauncher.launch(arrayOf("application/pdf"))
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.file_picker_permission_denied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
-    val pdfDownloadPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        var isGranted = false
-        it.forEach { _, b ->
-            isGranted = b
+    val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
+        permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            listOf(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            listOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
         }
-
-        if (isGranted) {
-            downloadCv(cvFile)
+    ) { permissions ->
+        if (permissions.all { it.value }) {
+            if (cvFile != null) downloadCv(cvFile)
         } else {
             Toast.makeText(
                 context,
@@ -169,7 +177,7 @@ fun VacancyBar(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = if (userData.cv != null) Modifier.weight(.75f) else Modifier,
+                modifier = if (vacancy.userCv != null) Modifier.weight(.75f) else Modifier,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
@@ -189,7 +197,7 @@ fun VacancyBar(
                         color = DarkGray80
                     )
                     Text(
-                        text = if (userData.cv != null) userData.cv!! else
+                        text = if (vacancy.userCv != null) getFilenameFromUrl(vacancy.userCv!!) else
                             stringResource(id = R.string.cv_empty),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -200,7 +208,7 @@ fun VacancyBar(
                 }
             }
             Row(
-                modifier = if (userData.cv != null) Modifier.weight(.25f) else Modifier,
+                modifier = if (vacancy.userCv != null) Modifier.weight(.25f) else Modifier,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
@@ -212,13 +220,10 @@ fun VacancyBar(
                         color = DarkGray80
                     )
                 } else {
-                    if (userData.cv != null) {
+                    if (vacancy.userCv != null) {
                         IconButton(
                             onClick = {
-                                pdfDownloadPermissionLauncher.launch(arrayOf(
-                                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                ))
+                                pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
                             }
                         ) {
                             Icon(
@@ -230,9 +235,7 @@ fun VacancyBar(
                     }
                     IconButton(
                         onClick = {
-                            pdfPermissionLauncher.launch(
-                                Manifest.permission.READ_EXTERNAL_STORAGE
-                            )
+                            pdfPermissionLauncher.launchPermissionRequest()
                         }
                     ) {
                         Icon(
@@ -264,18 +267,18 @@ fun VacancyBar(
                     fontSize = 14.sp
                 )
             }
-            if (vacancyStatus != null) {
+            if (vacancy.statusApply != null) {
                 Text(
                     modifier = Modifier
                         .background(
-                            color = when (vacancyStatus.status) {
+                            color = when (vacancy.statusApply) {
                                 ApplicantStatus.ACCEPTED.value -> Green
                                 ApplicantStatus.REJECTED.value -> Red
                                 else -> DarkGray80
                             }, shape = CircleShape
                         )
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    text = when (vacancyStatus.status) {
+                    text = when (vacancy.statusApply) {
                         ApplicantStatus.ACCEPTED.value -> stringResource(id = R.string.accepted)
                         ApplicantStatus.REJECTED.value -> stringResource(id = R.string.not_accepted)
                         else -> stringResource(id = R.string.pending)

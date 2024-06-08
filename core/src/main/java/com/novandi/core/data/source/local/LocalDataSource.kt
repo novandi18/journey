@@ -16,8 +16,8 @@ class LocalDataSource @Inject constructor(
     fun getSearch(): Flow<List<SearchEntity>> = searchDao.getSearch()
     fun saveSearch(search: SearchEntity) = searchDao.saveSearch(search)
     fun deleteSearch(id: Int) = searchDao.deleteSearch(id)
-    fun getPromptAssistant() = assistantDao.getAll()
+    fun getPromptAssistant(userId: String) = assistantDao.getAll(userId)
     fun savePrompt(chat: AssistantEntity) = assistantDao.saveChat(chat)
-    fun deletePrompts() = assistantDao.deleteAll()
+    fun deletePrompts(userId: String) = assistantDao.deleteAll(userId)
     fun deletePrompt(id: Int) = assistantDao.delete(id)
 }

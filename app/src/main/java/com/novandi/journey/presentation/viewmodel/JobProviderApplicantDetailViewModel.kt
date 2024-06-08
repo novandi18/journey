@@ -17,7 +17,7 @@ import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.ApplicantItemStatus
 import com.novandi.core.domain.model.GeneralResult
-import com.novandi.core.domain.model.Vacancy
+import com.novandi.core.domain.model.VacancyDetailCompany
 import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.core.domain.usecase.JobProviderUseCase
 import com.novandi.core.domain.usecase.VacancyUseCase
@@ -43,8 +43,8 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
     private val _whatsappResponse = MutableStateFlow<Resource<WhatsappResult>?>(null)
     val whatsappResponse: StateFlow<Resource<WhatsappResult>?> get() = _whatsappResponse
 
-    private val _vacancy = MutableLiveData<Resource<Vacancy>>(Resource.Loading())
-    val vacancy: LiveData<Resource<Vacancy>> get() = _vacancy
+    private val _vacancy = MutableLiveData<Resource<VacancyDetailCompany>>(Resource.Loading())
+    val vacancy: LiveData<Resource<VacancyDetailCompany>> get() = _vacancy
 
     private val _close = MutableStateFlow<Resource<GeneralResult>?>(null)
     val close: StateFlow<Resource<GeneralResult>?> get() = _close
@@ -64,7 +64,7 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
     var done by mutableStateOf<List<ApplicantItemStatus>>(emptyList())
         private set
 
-    var vacancyData by mutableStateOf<Vacancy?>(null)
+    var vacancyData by mutableStateOf<VacancyDetailCompany?>(null)
         private set
 
     var applicantWhatsappNumber by mutableStateOf<Pair<String, Boolean>?>(null)
@@ -93,7 +93,7 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
         done = done + listOf(applicantItemStatus)
     }
 
-    fun setOnVacancyData(value: Vacancy?) {
+    fun setOnVacancyData(value: VacancyDetailCompany?) {
         vacancyData = value
     }
 
@@ -172,7 +172,7 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
 
     fun getVacancyById(vacancyId: String) {
         viewModelScope.launch {
-            vacancyUseCase.getVacancy(vacancyId)
+            vacancyUseCase.getVacancyInCompany(vacancyId)
                 .catch { err ->
                     _vacancy.value = Resource.Error(err.message.toString())
                 }
@@ -184,7 +184,7 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
 
     fun sendWhatsappMessage(request: WhatsappRequest) {
         viewModelScope.launch {
-            jobProviderUseCase.sendWhatsappMessage(request)
+            vacancyUseCase.sendWhatsappMessage(request)
                 .catch { err ->
                     _whatsappResponse.value = Resource.Error(err.message.toString())
                 }

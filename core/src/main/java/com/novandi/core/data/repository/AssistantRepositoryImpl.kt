@@ -30,9 +30,10 @@ class AssistantRepositoryImpl @Inject constructor(
                 remoteDataSource.getAssistantResult(request)
         }.asFlow()
 
-    override fun getAll(): Flow<List<AssistantChat>> = localDataSource.getPromptAssistant().map {
-        AssistantMapper.entityToDomain(it)
-    }
+    override fun getAll(userId: String): Flow<List<AssistantChat>> =
+        localDataSource.getPromptAssistant(userId).map {
+            AssistantMapper.entityToDomain(it)
+        }
 
     override fun saveChat(chat: AssistantChat) {
         val entity = AssistantMapper.domainToEntity(chat)
@@ -41,9 +42,9 @@ class AssistantRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun deleteAll() {
+    override fun deleteAll(userId: String) {
         appExecutors.diskIO().execute {
-            localDataSource.deletePrompts()
+            localDataSource.deletePrompts(userId)
         }
     }
 

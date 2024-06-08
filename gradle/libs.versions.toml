@@ -31,6 +31,7 @@ text-to-speech = "2.19.0"
 oauth2-http = "1.16.0"
 playServicesBasement = "18.4.0"
 grpc-okhttp = "1.55.1"
+accompanist-permissions = "0.35.1-alpha"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -81,6 +82,7 @@ text-to-speech = { group = "com.google.cloud", name = "google-cloud-texttospeech
 oauth2-http = { group = "com.google.auth", name = "google-auth-library-oauth2-http", version.ref = "oauth2-http" }
 play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }
 grpc-okhttp = { group = "io.grpc", name = "grpc-okhttp", version.ref = "grpc-okhttp" }
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist-permissions" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

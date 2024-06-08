@@ -3,6 +3,7 @@ package com.novandi.journey.presentation.screen
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,12 +47,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.novandi.core.consts.JobTypes
 import com.novandi.core.data.response.Resource
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.skeleton.VacancySkeleton
@@ -63,7 +62,6 @@ import com.novandi.journey.presentation.ui.theme.DarkGray40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Green
 import com.novandi.journey.presentation.ui.theme.Green80
-import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 import com.novandi.journey.presentation.ui.theme.Red80
@@ -76,52 +74,31 @@ import com.valentinilk.shimmer.shimmer
 fun JobSeekerApplyDetailScreen(
     viewModel: JobSeekerApplyDetailViewModel = hiltViewModel(),
     vacancyId: String,
-    back: () -> Unit
+    back: () -> Unit,
+    navigateToCompanyDetail: (companyId: String) -> Unit
 ) {
     val context = LocalContext.current
-
-    val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
-
     val vacancy by viewModel.vacancy.collectAsState()
-    val applies by viewModel.applies.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.getVacancy(vacancyId)
-        viewModel.getVacancyStatus(token.toString(), accountId.toString())
+    LaunchedEffect(accountId) {
+        if (accountId != null) viewModel.getVacancy(vacancyId, accountId.toString())
     }
 
     LaunchedEffect(vacancy is Resource.Loading) {
         when (vacancy) {
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
-                viewModel.setOnVacancyData(vacancy?.data)
+                viewModel.setOnData(vacancy?.data!!)
                 viewModel.setOnLoading(false)
-                viewModel.resetVacancyState()
             }
             is Resource.Error -> {
                 viewModel.setOnLoading(false)
                 Toast.makeText(context, vacancy?.message, Toast.LENGTH_SHORT).show()
                 viewModel.resetVacancyState()
             }
-            else -> viewModel.setOnLoading(false)
-        }
-    }
 
-    LaunchedEffect(applies is Resource.Loading) {
-        when (applies) {
-            is Resource.Loading -> viewModel.setOnStatusLoading(true)
-            is Resource.Success -> {
-                viewModel.setOnVacancyStatusData(applies?.data)
-                viewModel.setOnStatusLoading(false)
-                viewModel.resetVacancyStatusState()
-            }
-            is Resource.Error -> {
-                viewModel.setOnStatusLoading(false)
-                Toast.makeText(context, applies?.message, Toast.LENGTH_SHORT).show()
-                viewModel.resetVacancyStatusState()
-            }
-            else -> {}
+            else -> viewModel.setOnLoading(false)
         }
     }
 
@@ -165,7 +142,7 @@ fun JobSeekerApplyDetailScreen(
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                if (viewModel.statusLoading && viewModel.loading && viewModel.vacancyStatusData != null) {
+                if (viewModel.loading) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -217,17 +194,11 @@ fun JobSeekerApplyDetailScreen(
                     VacancySkeleton(
                         paddingValues = PaddingValues(0.dp)
                     )
-                } else if (viewModel.vacancyStatusData != null && viewModel.vacancyData != null) {
-                    val statusData = viewModel.vacancyStatusData!!.filter {
-                        it.vacancyId == vacancyId
-                    }[0]
-                    val status = statusData.status.lowercase()
-                    val notes = statusData.notes
-
+                } else if (viewModel.data != null) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = when (status) {
+                            containerColor = when (viewModel.data?.statusApply) {
                                 ApplicantStatus.ACCEPTED.value -> Green.copy(.2f)
                                 ApplicantStatus.REJECTED.value -> Red.copy(.2f)
                                 else -> DarkGray
@@ -235,7 +206,7 @@ fun JobSeekerApplyDetailScreen(
                         ),
                         border = BorderStroke(
                             width = 1.dp,
-                            color = when (status) {
+                            color = when (viewModel.data?.statusApply) {
                                 ApplicantStatus.ACCEPTED.value -> Green
                                 ApplicantStatus.REJECTED.value -> Red
                                 else -> DarkGray80
@@ -254,7 +225,7 @@ fun JobSeekerApplyDetailScreen(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = Icons.Rounded.Info,
                                 contentDescription = null,
-                                tint = when (status) {
+                                tint = when (viewModel.data?.statusApply) {
                                     ApplicantStatus.ACCEPTED.value -> Green80
                                     ApplicantStatus.REJECTED.value -> Red80
                                     else -> DarkGray80
@@ -263,7 +234,7 @@ fun JobSeekerApplyDetailScreen(
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = stringResource(
-                                    id = when (status) {
+                                    id = when (viewModel.data?.statusApply) {
                                         ApplicantStatus.ACCEPTED.value -> R.string.job_accepted_desc
                                         ApplicantStatus.REJECTED.value -> R.string.job_rejected_desc
                                         else -> R.string.job_pending_desc
@@ -271,7 +242,7 @@ fun JobSeekerApplyDetailScreen(
                                 ),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = when (status) {
+                                color = when (viewModel.data?.statusApply) {
                                     ApplicantStatus.ACCEPTED.value -> Green80
                                     ApplicantStatus.REJECTED.value -> Red80
                                     else -> DarkGray80
@@ -290,7 +261,8 @@ fun JobSeekerApplyDetailScreen(
                         )
                         SelectionContainer {
                             Text(
-                                text = notes ?: stringResource(id = R.string.no_notes),
+                                text = viewModel.data?.notesApply
+                                    ?: stringResource(id = R.string.no_notes),
                                 fontSize = 14.sp,
                                 color = Dark
                             )
@@ -314,7 +286,7 @@ fun JobSeekerApplyDetailScreen(
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Text(
-                                    text = viewModel.vacancyData!!.placementAddress,
+                                    text = viewModel.data?.position.toString(),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     lineHeight = 32.sp
@@ -326,13 +298,13 @@ fun JobSeekerApplyDetailScreen(
                                             shape = CircleShape
                                         )
                                         .padding(horizontal = 16.dp, vertical = 4.dp),
-                                    text = JobTypes.types()[viewModel.vacancyData!!.jobType - 1],
+                                    text = viewModel.data?.jobType.toString(),
                                     fontSize = 14.sp
                                 )
                             }
                             Text(
                                 modifier = Modifier.padding(vertical = 8.dp),
-                                text = viewModel.vacancyData!!.description,
+                                text = viewModel.data?.description.toString(),
                                 fontSize = 14.sp
                             )
                         }
@@ -340,6 +312,11 @@ fun JobSeekerApplyDetailScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .clickable {
+                                    navigateToCompanyDetail(
+                                        viewModel.data?.companyId.toString()
+                                    )
+                                }
                                 .padding(horizontal = 20.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -348,19 +325,19 @@ fun JobSeekerApplyDetailScreen(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape),
-                                model = viewModel.vacancyData!!.companyLogo,
+                                model = viewModel.data?.companyLogo.toString(),
                                 contentDescription = null
                             )
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 Text(
-                                    text = viewModel.vacancyData!!.companyName,
+                                    text = viewModel.data?.companyName.toString(),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = viewModel.vacancyData!!.sectorName,
+                                    text = viewModel.data?.companySector.toString(),
                                     fontSize = 14.sp
                                 )
                             }
@@ -388,7 +365,7 @@ fun JobSeekerApplyDetailScreen(
                                     color = Dark.copy(.8f)
                                 )
                                 Text(
-                                    text = viewModel.vacancyData!!.disabilityName,
+                                    text = viewModel.data?.disabilityName.toString(),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -420,7 +397,7 @@ fun JobSeekerApplyDetailScreen(
                                     modifier = Modifier
                                         .background(color = Dark.copy(.1f), shape = CircleShape)
                                         .padding(horizontal = 16.dp, vertical = 4.dp),
-                                    text = viewModel.vacancyData!!.skillOne,
+                                    text = viewModel.data!!.skillOne,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     fontSize = 14.sp,
@@ -430,7 +407,7 @@ fun JobSeekerApplyDetailScreen(
                                     modifier = Modifier
                                         .background(color = Dark.copy(.1f), shape = CircleShape)
                                         .padding(horizontal = 16.dp, vertical = 4.dp),
-                                    text = viewModel.vacancyData!!.skillTwo,
+                                    text = viewModel.data!!.skillTwo,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     fontSize = 14.sp,
@@ -441,23 +418,10 @@ fun JobSeekerApplyDetailScreen(
                     }
                 } else {
                     NetworkError {
-                        if (viewModel.vacancyData == null) viewModel.getVacancy(vacancyId)
-                        if (viewModel.vacancyStatusData == null)
-                            viewModel.getVacancyStatus(token.toString(), accountId.toString())
+                        if (accountId != null) viewModel.getVacancy(vacancyId, accountId.toString())
                     }
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun JobSeekerApplyDetailScreenPreview() {
-    JourneyTheme {
-        JobSeekerApplyDetailScreen(
-            vacancyId = "",
-            back = {}
-        )
     }
 }
