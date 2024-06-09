@@ -1,6 +1,10 @@
 package com.novandi.core.mapper
 
 import com.novandi.core.consts.JobTypes
+import com.novandi.core.data.source.local.entity.AllVacancyEntity
+import com.novandi.core.data.source.local.entity.LatestVacancyEntity
+import com.novandi.core.data.source.local.entity.PopularVacancyEntity
+import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.data.source.remote.response.GeneralResponse
@@ -98,4 +102,164 @@ object VacancyMapper {
     fun recommendationToList(input: RecommendationResponse): Flow<List<String>> = flowOf(
         input.predictions
     )
+
+    fun mapResponseToPopularVacancyEntity(input: VacancyResponse): List<PopularVacancyEntity> =
+        input.vacancies.map {
+            PopularVacancyEntity(
+                vacancyId = it.id,
+                placementAddress = it.placementAddress,
+                description = it.description,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                deadlineTime = dateFormatter(it.deadlineTime),
+                jobType = it.jobType,
+                skillOne = it.skillOne,
+                skillTwo = it.skillTwo,
+                disabilityName = it.disabilityName,
+                companyLogo = it.companyLogo,
+                sectorName = it.sectorName,
+                companyName = it.companyName,
+                totalApplicants = it.totalApplicants,
+                companyId = it.companyId
+            )
+        }
+
+    fun mapPopularVacancyEntityToDomain(input: PopularVacancyEntity): Vacancy =
+        Vacancy(
+            id = input.vacancyId,
+            placementAddress = input.placementAddress,
+            description = input.description,
+            createdAt = input.createdAt,
+            updatedAt = input.updatedAt,
+            deadlineTime = input.deadlineTime,
+            jobType = input.jobType,
+            skillOne = input.skillOne,
+            skillTwo = input.skillTwo,
+            disabilityName = input.disabilityName,
+            companyLogo = input.companyLogo,
+            sectorName = input.sectorName,
+            companyName = input.companyName,
+            totalApplicants = input.totalApplicants,
+            companyId = input.companyId ?: ""
+        )
+
+    fun mapResponseToLatestVacancyEntity(input: VacancyResponse): List<LatestVacancyEntity> =
+        input.vacancies.map {
+            LatestVacancyEntity(
+                vacancyId = it.id,
+                placementAddress = it.placementAddress,
+                description = it.description,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                deadlineTime = dateFormatter(it.deadlineTime),
+                jobType = it.jobType,
+                skillOne = it.skillOne,
+                skillTwo = it.skillTwo,
+                disabilityName = it.disabilityName,
+                companyLogo = it.companyLogo,
+                sectorName = it.sectorName,
+                companyName = it.companyName,
+                totalApplicants = it.totalApplicants,
+                companyId = it.companyId
+            )
+        }
+
+    fun mapLatestVacancyEntityToDomain(input: LatestVacancyEntity): Vacancy =
+        Vacancy(
+            id = input.vacancyId,
+            placementAddress = input.placementAddress,
+            description = input.description,
+            createdAt = input.createdAt,
+            updatedAt = input.updatedAt,
+            deadlineTime = input.deadlineTime,
+            jobType = input.jobType,
+            skillOne = input.skillOne,
+            skillTwo = input.skillTwo,
+            disabilityName = input.disabilityName,
+            companyLogo = input.companyLogo,
+            sectorName = input.sectorName,
+            companyName = input.companyName,
+            totalApplicants = input.totalApplicants,
+            companyId = input.companyId ?: ""
+        )
+
+    fun mapResponseToAllVacancyEntity(input: VacancyResponse): List<AllVacancyEntity> =
+        input.vacancies.map {
+            AllVacancyEntity(
+                vacancyId = it.id,
+                placementAddress = it.placementAddress,
+                description = it.description,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                deadlineTime = dateFormatter(it.deadlineTime),
+                jobType = it.jobType,
+                skillOne = it.skillOne,
+                skillTwo = it.skillTwo,
+                disabilityName = it.disabilityName,
+                companyLogo = it.companyLogo,
+                sectorName = it.sectorName,
+                companyName = it.companyName,
+                totalApplicants = it.totalApplicants,
+                companyId = it.companyId
+            )
+        }
+
+    fun mapAllVacancyEntityToDomain(input: AllVacancyEntity): Vacancy =
+        Vacancy(
+            id = input.vacancyId,
+            placementAddress = input.placementAddress,
+            description = input.description,
+            createdAt = input.createdAt,
+            updatedAt = input.updatedAt,
+            deadlineTime = input.deadlineTime,
+            jobType = input.jobType,
+            skillOne = input.skillOne,
+            skillTwo = input.skillTwo,
+            disabilityName = input.disabilityName,
+            companyLogo = input.companyLogo,
+            sectorName = input.sectorName,
+            companyName = input.companyName,
+            totalApplicants = input.totalApplicants,
+            companyId = input.companyId ?: ""
+        )
+
+    fun mapResponseToRecommendationVacancyEntity(input: VacancyResponse): List<RecommendationVacancyEntity> =
+        input.vacancies.map {
+            RecommendationVacancyEntity(
+                vacancyId = it.id,
+                placementAddress = it.placementAddress,
+                description = it.description,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                deadlineTime = dateFormatter(it.deadlineTime),
+                jobType = it.jobType,
+                skillOne = it.skillOne,
+                skillTwo = it.skillTwo,
+                disabilityName = it.disabilityName,
+                companyLogo = it.companyLogo,
+                sectorName = it.sectorName,
+                companyName = it.companyName,
+                totalApplicants = it.totalApplicants,
+                companyId = it.companyId
+            )
+        }
+
+    fun mapRecommendationVacancyEntityToDomain(input: RecommendationVacancyEntity): Vacancy =
+        Vacancy(
+            id = input.vacancyId,
+            placementAddress = input.placementAddress,
+            description = input.description,
+            createdAt = input.createdAt,
+            updatedAt = input.updatedAt,
+            deadlineTime = input.deadlineTime,
+            jobType = input.jobType,
+            skillOne = input.skillOne,
+            skillTwo = input.skillTwo,
+            disabilityName = input.disabilityName,
+            companyLogo = input.companyLogo,
+            sectorName = input.sectorName,
+            companyName = input.companyName,
+            totalApplicants = input.totalApplicants,
+            companyId = input.companyId ?: ""
+        )
 }

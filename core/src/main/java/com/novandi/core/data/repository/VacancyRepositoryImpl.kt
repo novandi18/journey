@@ -1,15 +1,21 @@
 package com.novandi.core.data.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.novandi.core.data.paging.LatestVacanciesPagingSource
-import com.novandi.core.data.paging.PopularVacanciesPagingSource
-import com.novandi.core.data.paging.RecommendationVacanciesPagingSource
+import com.novandi.core.data.mediator.AllVacanciesRemoteMediator
+import com.novandi.core.data.mediator.LatestVacanciesRemoteMediator
+import com.novandi.core.data.mediator.PopularVacanciesRemoteMediator
+import com.novandi.core.data.mediator.RecommendationVacanciesRemoteMediator
 import com.novandi.core.data.paging.SearchVacanciesPagingSource
-import com.novandi.core.data.paging.VacanciesPagingSource
 import com.novandi.core.data.response.NetworkOnlyResource
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.local.LocalDataSource
+import com.novandi.core.data.source.local.entity.AllVacancyEntity
+import com.novandi.core.data.source.local.entity.LatestVacancyEntity
+import com.novandi.core.data.source.local.entity.PopularVacancyEntity
+import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.data.source.remote.RemoteDataSource
 import com.novandi.core.data.source.remote.network.ApiResponse
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
@@ -34,33 +40,54 @@ import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.core.domain.repository.VacancyRepository
 import com.novandi.core.mapper.JobProviderMapper
 import com.novandi.core.mapper.VacancyMapper
+import com.novandi.utility.data.AppExecutors
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class VacancyRepositoryImpl @Inject constructor(
-    private val remoteDataSource: RemoteDataSource
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+    private val appExecutors: AppExecutors
 ): VacancyRepository {
-    override fun getVacancies(key: String): Flow<PagingData<Vacancy>> =
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getVacancies(key: String): Flow<PagingData<AllVacancyEntity>> =
         Pager(
             config = PagingConfig(pageSize = 10),
+            remoteMediator = AllVacanciesRemoteMediator(
+                remoteDataSource = remoteDataSource,
+                localDataSource = localDataSource,
+                appExecutors = appExecutors
+            ),
             pagingSourceFactory = {
-                VacanciesPagingSource(remoteDataSource, key)
+                localDataSource.getAllVacancies()
             }
         ).flow
 
-    override fun getLatestVacancies(): Flow<PagingData<Vacancy>> =
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getLatestVacancies(): Flow<PagingData<LatestVacancyEntity>> =
         Pager(
             config = PagingConfig(pageSize = 10),
+            remoteMediator = LatestVacanciesRemoteMediator(
+                remoteDataSource = remoteDataSource,
+                localDataSource = localDataSource,
+                appExecutors = appExecutors
+            ),
             pagingSourceFactory = {
-                LatestVacanciesPagingSource(remoteDataSource)
+                localDataSource.getLatestVacancies()
             }
         ).flow
 
-    override fun getPopularVacancies(): Flow<PagingData<Vacancy>> =
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getPopularVacancies(): Flow<PagingData<PopularVacancyEntity>> =
         Pager(
             config = PagingConfig(pageSize = 10),
+            remoteMediator = PopularVacanciesRemoteMediator(
+                remoteDataSource = remoteDataSource,
+                localDataSource = localDataSource,
+                appExecutors = appExecutors
+            ),
             pagingSourceFactory = {
-                PopularVacanciesPagingSource(remoteDataSource)
+                localDataSource.getPopularVacancies()
             }
         ).flow
 
@@ -137,12 +164,19 @@ class VacancyRepositoryImpl @Inject constructor(
                 remoteDataSource.getRecommendation(request)
         }.asFlow()
 
+    @OptIn(ExperimentalPagingApi::class)
     override fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
-    : Flow<PagingData<Vacancy>> =
+    : Flow<PagingData<RecommendationVacancyEntity>> =
         Pager(
             config = PagingConfig(pageSize = 10),
+            remoteMediator = RecommendationVacanciesRemoteMediator(
+                remoteDataSource = remoteDataSource,
+                localDataSource = localDataSource,
+                appExecutors = appExecutors,
+                recommendations = recommendations
+            ),
             pagingSourceFactory = {
-                RecommendationVacanciesPagingSource(remoteDataSource, recommendations)
+                localDataSource.getRecommendationVacancies()
             }
         ).flow
 

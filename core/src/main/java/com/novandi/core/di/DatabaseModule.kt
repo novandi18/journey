@@ -3,8 +3,12 @@ package com.novandi.core.di
 import android.content.Context
 import androidx.room.Room
 import com.novandi.core.consts.Rooms
+import com.novandi.core.data.source.local.dao.AllVacancyDao
 import com.novandi.core.data.source.local.dao.AssistantDao
+import com.novandi.core.data.source.local.dao.LatestVacancyDao
 import com.novandi.core.data.source.local.dao.SearchDao
+import com.novandi.core.data.source.local.dao.PopularVacancyDao
+import com.novandi.core.data.source.local.dao.RecommendationVacancyDao
 import com.novandi.core.data.source.local.room.JourneyDatabase
 import dagger.Module
 import dagger.Provides
@@ -28,4 +32,19 @@ class DatabaseModule {
 
     @Provides
     fun provideAssistantDao(database: JourneyDatabase): AssistantDao = database.assistantDao()
+
+    @Provides
+    fun provideRecommendationVacancyDao(database: JourneyDatabase): RecommendationVacancyDao =
+        database.recommendationVacancyDao()
+
+    @Provides
+    fun providePopularVacancyDao(database: JourneyDatabase): PopularVacancyDao =
+        database.popularVacancyDao()
+
+    @Provides
+    fun provideLatestVacancyDao(database: JourneyDatabase): LatestVacancyDao =
+        database.latestVacancyDao()
+
+    @Provides
+    fun provideAllVacancyDao(database: JourneyDatabase): AllVacancyDao = database.allVacancyDao()
 }

@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.pager)
     implementation(libs.androidx.paging)
     implementation(libs.androidx.paging.compose)
+    implementation(libs.room.paging)
 
     // DataStore
     implementation(libs.datastore.preferences)

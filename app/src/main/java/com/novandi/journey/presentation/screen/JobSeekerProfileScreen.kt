@@ -97,6 +97,7 @@ import com.novandi.journey.presentation.service.NotificationService
 import com.novandi.journey.presentation.ui.component.dialog.FileDownloadDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialogImagePreview
+import com.novandi.journey.presentation.ui.component.dialog.LoadingDialog
 import com.novandi.journey.presentation.ui.component.skeleton.ProfileSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -110,6 +111,7 @@ import com.novandi.utility.consts.WorkerConsts
 import com.novandi.utility.data.convertUriToPdf
 import com.novandi.utility.data.getFilenameFromUrl
 import com.novandi.utility.image.bitmapToUri
+import com.novandi.utility.image.compressImage
 import com.novandi.utility.image.uriToFile
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
@@ -357,6 +359,7 @@ fun JobSeekerProfileContent(
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
     val openCvDialog = remember { mutableStateOf(false) }
+    val loadingDialog = remember { mutableStateOf(false) }
 
     var photo: Bitmap? by remember { mutableStateOf(null) }
     val selectedPdfUri = remember { mutableStateOf<Uri?>(null) }
@@ -365,12 +368,24 @@ fun JobSeekerProfileContent(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
+            loadingDialog.value = true
             scope.launch {
                 when (val result = imageCropper.crop(uri, context)) {
-                    is CropResult.Cancelled -> { }
-                    is CropError -> { }
+                    is CropResult.Cancelled -> {
+                        loadingDialog.value = true
+                    }
+                    is CropError -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.crop_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                     is CropResult.Success -> {
-                        photo = result.bitmap.asAndroidBitmap()
+                        val imageResult = result.bitmap.asAndroidBitmap()
+                        val imageCompressed = imageResult.compressImage(context)
+                        photo = imageCompressed
+                        loadingDialog.value = false
                         viewModel.setOnOpenDialogImagePreview(true)
                     }
                 }
@@ -434,7 +449,9 @@ fun JobSeekerProfileContent(
         }
     }
 
-    if(cropState != null) ImageCropperDialog(state = cropState)
+    if(cropState != null) {
+        ImageCropperDialog(state = cropState)
+    }
 
     when {
         openDialog.value -> {
@@ -497,6 +514,7 @@ fun JobSeekerProfileContent(
                 icon = Icons.Rounded.Description
             )
         }
+        loadingDialog.value -> LoadingDialog()
     }
 
     Column(

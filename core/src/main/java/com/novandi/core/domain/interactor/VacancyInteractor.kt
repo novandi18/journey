@@ -2,6 +2,10 @@ package com.novandi.core.domain.interactor
 
 import androidx.paging.PagingData
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.local.entity.AllVacancyEntity
+import com.novandi.core.data.source.local.entity.LatestVacancyEntity
+import com.novandi.core.data.source.local.entity.PopularVacancyEntity
+import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
@@ -22,13 +26,15 @@ import javax.inject.Inject
 class VacancyInteractor @Inject constructor(
     private val vacancyRepository: VacancyRepository
 ): VacancyUseCase {
-    override fun getVacancies(key: String): Flow<PagingData<Vacancy>> =
+    override fun getVacancies(key: String): Flow<PagingData<AllVacancyEntity>> =
         vacancyRepository.getVacancies(key)
 
-    override fun getLatestVacancies(): Flow<PagingData<Vacancy>> =
+    override fun getLatestVacancies(): Flow<PagingData<LatestVacancyEntity>> =
         vacancyRepository.getLatestVacancies()
 
-    override fun getPopularVacancies(): Flow<PagingData<Vacancy>> = vacancyRepository.getPopularVacancies()
+    override fun getPopularVacancies(): Flow<PagingData<PopularVacancyEntity>>
+        = vacancyRepository.getPopularVacancies()
+
     override fun getVacancyInUser(
         vacancyId: String,
         userId: String
@@ -58,7 +64,8 @@ class VacancyInteractor @Inject constructor(
         vacancyRepository.getRecommendation(request)
 
     override fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
-    : Flow<PagingData<Vacancy>> = vacancyRepository.getRecommendationVacancies(recommendations)
+    : Flow<PagingData<RecommendationVacancyEntity>> =
+        vacancyRepository.getRecommendationVacancies(recommendations)
 
     override fun closeVacancy(token: String, request: CloseVacancyRequest): Flow<Resource<GeneralResult>> =
         vacancyRepository.closeVacancy(token, request)
