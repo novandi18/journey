@@ -30,6 +30,7 @@
 - [Retrofit](https://square.github.io/retrofit/) - Network
 - [OkHttp](https://square.github.io/okhttp/) - HTTP client
 - [Room Database](https://developer.android.com/reference/kotlin/androidx/room/RoomDatabase) - Local Database
+- [Paging 3 with Remote Mediator](https://developer.android.com/topic/libraries/architecture/paging/v3-overview) - Display Data from Room or over a Network
 - [Worker Manager](https://developer.android.com/topic/libraries/architecture/workmanager) - Notification with Periodic Time
 - [Services](https://developer.android.com/develop/background-work/services) - Run Notification in the background
 
