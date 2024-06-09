@@ -1,5 +1,8 @@
 <div align="center">
-  <img src="https://github.com/novandi18/movie-verse/assets/48386354/07799a8c-1e01-4299-972f-12c71ec09ef3" width="150px"/>
+  <div style="display: inline-block;">
+    <img src="https://github.com/novandi18/journey/assets/48386354/9eb8141d-16e0-42d3-a41f-c8d5a558b477" width="150px"/>
+    <img src="https://github.com/novandi18/journey/assets/48386354/c13948fd-8aaf-4823-bd43-697772c23047" width="150px"/>
+  </div>
   <h1 align="center">Journey</h1>
   <h3>Job and Empowerment for Disability</h3>
 
