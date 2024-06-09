@@ -8,7 +8,7 @@
 
   <p align="center">
     <a href="https://skillicons.dev">
-      <img src="https://skillicons.dev/icons?i=kotlin,androidstudio" />
+      <img src="https://skillicons.dev/icons?i=kotlin,tensorflow,androidstudio,gcp,figma" />
     </a>
   </p>
 
