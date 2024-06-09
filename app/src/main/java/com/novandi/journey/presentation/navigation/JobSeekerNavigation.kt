@@ -17,6 +17,7 @@ import com.novandi.journey.presentation.screen.JobSeekerEmailScreen
 import com.novandi.journey.presentation.screen.JobSeekerHomeScreen
 import com.novandi.journey.presentation.screen.JobSeekerPasswordScreen
 import com.novandi.journey.presentation.screen.JobSeekerProfileScreen
+import com.novandi.journey.presentation.screen.JobSeekerSearch
 
 fun NavGraphBuilder.jobSeekerGraph(navController: NavController) {
     navigation(
@@ -34,6 +35,9 @@ fun NavGraphBuilder.jobSeekerGraph(navController: NavController) {
                     navController.navigate(
                         Screen.JobSeekerApplyDetail.createRoute(vacancyId)
                     )
+                },
+                navigateToSearch = {
+                    navController.navigate(Screen.JobSeekerSearch.route)
                 }
             )
         }
@@ -131,6 +135,20 @@ fun NavGraphBuilder.jobSeekerGraph(navController: NavController) {
                 navigateToCompanyDetail = { companyId ->
                     navController.navigate(
                         Screen.VacancyCompanyDetail.createRoute(companyId)
+                    )
+                }
+            )
+        }
+        composable(
+            route = Screen.JobSeekerSearch.route
+        ) {
+            JobSeekerSearch(
+                back = {
+                    navController.navigateUp()
+                },
+                navigateToVacancy = { id ->
+                    navController.navigate(
+                        Screen.Vacancy.createRoute(vacancyId = id)
                     )
                 }
             )

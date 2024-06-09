@@ -2,6 +2,10 @@ package com.novandi.core.domain.repository
 
 import androidx.paging.PagingData
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.local.entity.AllVacancyEntity
+import com.novandi.core.data.source.local.entity.LatestVacancyEntity
+import com.novandi.core.data.source.local.entity.PopularVacancyEntity
+import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
@@ -17,9 +21,9 @@ import com.novandi.core.domain.model.WhatsappResult
 import kotlinx.coroutines.flow.Flow
 
 interface VacancyRepository {
-    fun getVacancies(key: String): Flow<PagingData<Vacancy>>
-    fun getLatestVacancies(): Flow<PagingData<Vacancy>>
-    fun getPopularVacancies(): Flow<PagingData<Vacancy>>
+    fun getVacancies(key: String): Flow<PagingData<AllVacancyEntity>>
+    fun getLatestVacancies(): Flow<PagingData<LatestVacancyEntity>>
+    fun getPopularVacancies(): Flow<PagingData<PopularVacancyEntity>>
     fun getVacancyInUser(companyId: String, userId: String): Flow<Resource<VacancyDetailUser>>
     fun getVacancyInCompany(vacancyId: String): Flow<Resource<VacancyDetailCompany>>
     fun getVacanciesWithoutPager(): Flow<Resource<List<Vacancy>>>
@@ -27,7 +31,8 @@ interface VacancyRepository {
     fun searchVacancy(position: String, request: VacanciesSearchRequest): Flow<PagingData<Vacancy>>
     fun getJobProviderVacancies(token: String, companyId: String): Flow<Resource<List<Vacancy>>>
     fun getRecommendation(request: RecommendationRequest): Flow<Resource<List<String>>>
-    fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest): Flow<PagingData<Vacancy>>
+    fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
+        : Flow<PagingData<RecommendationVacancyEntity>>
     fun closeVacancy(token: String, request: CloseVacancyRequest): Flow<Resource<GeneralResult>>
     fun getVacancyCompany(companyId: String): Flow<Resource<ProfileJobProvider>>
     fun sendWhatsappMessage(request: WhatsappRequest): Flow<Resource<WhatsappResult>>

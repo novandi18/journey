@@ -2,6 +2,7 @@ package com.novandi.journey.presentation.ui.component.dialog
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.theme.Dark
+import com.novandi.journey.presentation.ui.theme.DarkGray
 import com.novandi.journey.presentation.ui.theme.DarkGray40
 import com.novandi.journey.presentation.ui.theme.Light
 
@@ -87,6 +89,22 @@ fun JDialogImagePreview(
                             colorFilter = if (uploadLoading)
                                 ColorFilter.colorMatrix(ColorMatrix(colorMatrix)) else null
                         )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(200.dp)
+                                .background(
+                                    color = DarkGray, shape = CircleShape
+                                )
+                                .border(
+                                    width = 2.dp, color = Dark, shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = Dark
+                            )
+                        }
                     }
                     if (uploadLoading) {
                         CircularProgressIndicator(

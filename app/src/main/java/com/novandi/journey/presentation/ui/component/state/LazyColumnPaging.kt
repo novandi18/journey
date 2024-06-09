@@ -8,9 +8,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 
 @Composable
@@ -40,9 +42,8 @@ fun <T: Any> LazyColumnPaging(
                 }
 
                 loadState.refresh is LoadState.Error -> {
-                    val error = items.loadState.refresh as LoadState.Error
                     item {
-                        LoadStateError(errorMessage = error.error.localizedMessage!!) {
+                        LoadStateError(errorMessage = stringResource(id = R.string.network_error)) {
                             retry()
                         }
                     }
@@ -55,9 +56,8 @@ fun <T: Any> LazyColumnPaging(
                 }
 
                 loadState.append is LoadState.Error -> {
-                    val error = items.loadState.refresh as LoadState.Error
                     item {
-                        LoadStateError(errorMessage = error.error.localizedMessage!!) {
+                        LoadStateError(errorMessage = stringResource(id = R.string.network_error)) {
                             retry()
                         }
                     }
