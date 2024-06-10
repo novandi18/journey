@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,7 +49,6 @@ import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.mapper.VacancyMapper
 import com.novandi.journey.R
-import com.novandi.journey.presentation.notification.NotificationWorker
 import com.novandi.journey.presentation.ui.component.card.JCard
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshPaging
@@ -58,20 +56,16 @@ import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray40
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.JobSeekerHomeViewModel
-import com.novandi.utility.data.IntentExtra
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobSeekerHomeScreen(
     viewModel: JobSeekerHomeViewModel = hiltViewModel(),
     navigateToVacancy: (String) -> Unit,
-    navigateToJobApplyDetail: (vacancyId: String) -> Unit,
     navigateToSearch: () -> Unit
 ) {
-    val context = LocalContext.current
     val token by viewModel.token.observeAsState()
     var tabSelected by remember { mutableIntStateOf(0) }
-    val jobApplyExtra = IntentExtra.getExtra(context, NotificationWorker.JOB_APPLY)
     val recommendation by viewModel.recommendations.collectAsState()
 
     val tabs = listOf(
@@ -80,11 +74,6 @@ fun JobSeekerHomeScreen(
         stringResource(id = R.string.newest),
         stringResource(id = R.string.most_popular),
     )
-
-    if (jobApplyExtra != null) {
-        navigateToJobApplyDetail(jobApplyExtra)
-        IntentExtra.deleteExtra(context, NotificationWorker.JOB_APPLY)
-    }
 
     Scaffold(
         topBar = {
