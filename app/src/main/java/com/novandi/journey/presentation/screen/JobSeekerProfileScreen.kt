@@ -371,9 +371,7 @@ fun JobSeekerProfileContent(
             loadingDialog.value = true
             scope.launch {
                 when (val result = imageCropper.crop(uri, context)) {
-                    is CropResult.Cancelled -> {
-                        loadingDialog.value = true
-                    }
+                    is CropResult.Cancelled -> {}
                     is CropError -> {
                         Toast.makeText(
                             context,

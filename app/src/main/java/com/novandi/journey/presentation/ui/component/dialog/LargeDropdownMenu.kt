@@ -168,7 +168,7 @@ fun <T> LargeDropdownMenu(
                             val selectedItem = index == selectedIndex
 
                             drawItem(item, selectedItem, true) {
-                                onItemSelected(index, item)
+                                onItemSelected(items.indexOf(item), item)
                                 expanded = false
                             }
 
