@@ -93,7 +93,6 @@ import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.ProfileJobSeeker
 import com.novandi.journey.BuildConfig
 import com.novandi.journey.R
-import com.novandi.journey.presentation.service.NotificationService
 import com.novandi.journey.presentation.ui.component.dialog.FileDownloadDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialogImagePreview
@@ -457,8 +456,6 @@ fun JobSeekerProfileContent(
                 onDismissRequest = { openDialog.value = false },
                 onConfirmation = {
                     openDialog.value = false
-                    val service = Intent(context, NotificationService::class.java)
-                    context.stopService(service)
                     logout()
                 },
                 dialogTitle = stringResource(id = R.string.logout),
