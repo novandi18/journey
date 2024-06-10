@@ -70,7 +70,7 @@ fun JobProviderVacancyScreen(
             viewModel.setOnDisability(viewModel.disabilities.filter { it.disability == vacancy.disabilityName }[0].id - 1)
             viewModel.setOnSkillOne(viewModel.skills.filter { it.skill == vacancy.skillOne }[0].id - 1)
             viewModel.setOnSkillTwo(viewModel.skills.filter { it.skill == vacancy.skillTwo }[0].id - 1)
-            viewModel.setOnJobType(vacancy.jobType - 1)
+            viewModel.setOnJobType(vacancy.jobType)
             viewModel.setOnPosition(vacancy.placementAddress)
             viewModel.setOnDescription(vacancy.description)
             viewModel.setOnDeadline(ConvertUtil.convertDateValueToActualFormat(vacancy.deadlineTime))

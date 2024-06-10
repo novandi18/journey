@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 object ConvertUtil {
     fun convertMillisToDate(milliseconds: Long): String {
@@ -54,5 +55,11 @@ object ConvertUtil {
         val today = Date()
 
         return targetDate!!.before(today)
+    }
+
+    fun getCurrentTimestamp(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        return dateFormat.format(Date())
     }
 }

@@ -30,7 +30,7 @@ fun NavGraphBuilder.jobProviderGraph(navController: NavController) {
             JobProviderHomeScreen(
                 navigateToVacancy = { id ->
                     navController.navigate(
-                        Screen.Vacancy.createRoute(vacancyId = id)
+                        Screen.VacancyDetailCompany.createRoute(vacancyId = id)
                     )
                 },
                 navigateToAdd = {

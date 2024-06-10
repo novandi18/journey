@@ -68,6 +68,7 @@ import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialogImagePreview
+import com.novandi.journey.presentation.ui.component.dialog.LoadingDialog
 import com.novandi.journey.presentation.ui.component.skeleton.ProfileSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
 import com.novandi.journey.presentation.ui.theme.Blue40
@@ -78,6 +79,7 @@ import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.ui.theme.Red
 import com.novandi.journey.presentation.viewmodel.JobProviderProfileViewModel
 import com.novandi.utility.image.bitmapToUri
+import com.novandi.utility.image.compressImage
 import com.novandi.utility.image.uriToFile
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
@@ -212,18 +214,23 @@ fun JobProviderProfileContent(
     val cropState = imageCropper.cropState
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
+    val loadingDialog = remember { mutableStateOf(false) }
 
     var logo: Bitmap? by remember { mutableStateOf(null) }
     val imageLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
+            loadingDialog.value = true
             scope.launch {
                 when (val result = imageCropper.crop(uri, context)) {
                     is CropResult.Cancelled -> { }
                     is CropError -> { }
                     is CropResult.Success -> {
-                        logo = result.bitmap.asAndroidBitmap()
+                        val imageResult = result.bitmap.asAndroidBitmap()
+                        val imageCompressed = imageResult.compressImage(context)
+                        logo = imageCompressed
+                        loadingDialog.value = false
                         setOnOpenDialogImagePreview(true)
                     }
                 }
@@ -259,6 +266,7 @@ fun JobProviderProfileContent(
                 uploadLoading = uploadLoading
             )
         }
+        loadingDialog.value -> LoadingDialog()
     }
 
     Column(
