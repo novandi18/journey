@@ -27,7 +27,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -100,9 +100,6 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.permissions)
-
-    // Bouquet
-    implementation(libs.bouquet)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
