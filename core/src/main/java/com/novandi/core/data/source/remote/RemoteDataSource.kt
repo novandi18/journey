@@ -31,7 +31,6 @@ import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
 import com.novandi.core.data.source.remote.response.LoginJobSeekerResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
-import com.novandi.core.data.source.remote.response.RecommendationResponse
 import com.novandi.core.data.source.remote.response.RegencyItem
 import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateCvResponse
@@ -672,29 +671,8 @@ class RemoteDataSource @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getRecommendation(request: RecommendationRequest, timeout: Long = 60_000):
-        Flow<ApiResponse<RecommendationResponse>> = flow {
-        try {
-            val response = withTimeoutOrNull(timeout) {
-                mlApiService.getRecommendation(request)
-            }
-            if (response != null) {
-                emit(ApiResponse.Success(response))
-            } else {
-                emit(ApiResponse.Error("Koneksi bermasalah, silahkan coba lagi"))
-            }
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val errorMessage = try {
-                Gson().fromJson(errorBody, ErrorResponse::class.java)?.message
-            } catch (e: Exception) { null }
-            emit(ApiResponse.Error(errorMessage ?: "Unknown error"))
-            Log.e("RemoteDataSource", errorMessage ?: "Unknown error")
-        } catch (e: Exception) {
-            emit(ApiResponse.Error(e.toString()))
-            Log.e("RemoteDataSource", e.toString())
-        }
-    }.flowOn(Dispatchers.IO)
+    suspend fun getRecommendation(request: RecommendationRequest, page: Int, limit: Int) =
+        mlApiService.getRecommendation(request, page, limit)
 
     suspend fun getRecommendationVacancies(
         page: Int, limit: Int, recommendations: RecommendationVacanciesRequest

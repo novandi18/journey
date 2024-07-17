@@ -1,3 +1,5 @@
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidLibrary)
@@ -17,6 +19,20 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        val keystoreFile = project.rootProject.file("baseurl.properties")
+        val properties = Properties()
+        properties.load(keystoreFile.inputStream())
+
+        val journeyUrl = properties.getProperty("JOURNEY_URL") ?: ""
+        val mlUrl = properties.getProperty("ML_URL") ?: ""
+        val whatsappUrl = properties.getProperty("WHATSAPP_URL") ?: ""
+        val regencyUrl = properties.getProperty("REGENCY_URL") ?: ""
+
+        buildConfigField("String", "JOURNEY_URL", journeyUrl)
+        buildConfigField("String", "ML_URL", mlUrl)
+        buildConfigField("String", "WHATSAPP_URL", whatsappUrl)
+        buildConfigField("String", "REGENCY_URL", regencyUrl)
     }
 
     buildTypes {
@@ -34,6 +50,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 

@@ -43,8 +43,8 @@ class LocalDataSource @Inject constructor(
     fun getAllVacancies() = allVacancyDao.getAll()
     fun insertAllVacancies(vacancies: List<AllVacancyEntity>) = allVacancyDao.insertAll(vacancies)
     fun deleteAllVacancies() = allVacancyDao.deleteAll()
-    fun getRecommendationVacancies() = recommendationVacancyDao.getAll()
-    fun insertRecommendationVacancies(vacancies: List<RecommendationVacancyEntity>) =
+    fun getRecommendation() = recommendationVacancyDao.getAll()
+    fun insertRecommendation(vacancies: List<RecommendationVacancyEntity>) =
         recommendationVacancyDao.insertAll(vacancies)
-    fun deleteRecommendationVacancies() = recommendationVacancyDao.deleteAll()
+    fun deleteRecommendation() = recommendationVacancyDao.deleteAll()
 }

@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +40,7 @@ import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray80
 import com.novandi.journey.presentation.ui.theme.Light
 import com.novandi.journey.presentation.viewmodel.JobSeekerApplyViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +48,7 @@ fun JobSeekerApplyScreen(
     viewModel: JobSeekerApplyViewModel = hiltViewModel(),
     navigateToDetail: (vacancyId: String) -> Unit
 ) {
+    val context = LocalContext.current
     val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
     val vacancies by viewModel.vacancies.collectAsState()
@@ -55,17 +59,21 @@ fun JobSeekerApplyScreen(
         }
     }
 
-    LaunchedEffect(vacancies is Resource.Loading) {
+    LaunchedEffect(vacancies) {
         when (vacancies) {
             is Resource.Loading -> viewModel.setOnLoading(true)
             is Resource.Success -> {
-                viewModel.setOnVacanciesData(vacancies?.data)
+                if (vacancies?.data != null) viewModel.setOnVacanciesData(vacancies?.data)
+                viewModel.setOnLoading(false)
                 viewModel.resetState()
             }
             is Resource.Error -> {
+                Toast.makeText(context, vacancies?.message, Toast.LENGTH_SHORT).show()
+                viewModel.setOnLoading(false)
                 viewModel.resetState()
             }
             else -> {
+                viewModel.setOnLoading(false)
                 viewModel.resetState()
             }
         }
@@ -101,7 +109,6 @@ fun JobSeekerApplyScreen(
                 }
             } else if (viewModel.vacanciesData == null) {
                 NetworkError {
-                    viewModel.setOnLoading(true)
                     viewModel.getVacancies(token.toString(), accountId.toString())
                 }
             } else if (viewModel.vacanciesData!!.isEmpty()) {

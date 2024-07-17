@@ -8,7 +8,6 @@ import com.novandi.core.data.source.local.entity.PopularVacancyEntity
 import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
-import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.request.WhatsappRequest
@@ -60,12 +59,8 @@ class VacancyInteractor @Inject constructor(
         companyId: String
     ): Flow<Resource<List<Vacancy>>> = vacancyRepository.getJobProviderVacancies(token, companyId)
 
-    override fun getRecommendation(request: RecommendationRequest): Flow<Resource<List<String>>> =
+    override fun getRecommendation(request: RecommendationRequest): Flow<PagingData<RecommendationVacancyEntity>> =
         vacancyRepository.getRecommendation(request)
-
-    override fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
-    : Flow<PagingData<RecommendationVacancyEntity>> =
-        vacancyRepository.getRecommendationVacancies(recommendations)
 
     override fun closeVacancy(token: String, request: CloseVacancyRequest): Flow<Resource<GeneralResult>> =
         vacancyRepository.closeVacancy(token, request)

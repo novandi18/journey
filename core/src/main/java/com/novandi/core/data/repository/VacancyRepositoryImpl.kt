@@ -20,13 +20,11 @@ import com.novandi.core.data.source.remote.RemoteDataSource
 import com.novandi.core.data.source.remote.network.ApiResponse
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
-import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
 import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
-import com.novandi.core.data.source.remote.response.RecommendationResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailCompanyResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailUserResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
@@ -92,7 +90,7 @@ class VacancyRepositoryImpl @Inject constructor(
         ).flow
 
     override fun getVacancyInUser(
-        companyId: String,
+        vacancyId: String,
         userId: String
     ): Flow<Resource<VacancyDetailUser>> =
         object : NetworkOnlyResource<VacancyDetailUser, VacancyDetailUserResponse>() {
@@ -100,7 +98,7 @@ class VacancyRepositoryImpl @Inject constructor(
                 VacancyMapper.mapDetailUserToDomain(data)
 
             override suspend fun createCall(): Flow<ApiResponse<VacancyDetailUserResponse>> =
-                remoteDataSource.getVacancyInUser(companyId, userId)
+                remoteDataSource.getVacancyInUser(vacancyId, userId)
         }.asFlow()
 
     override fun getVacancyInCompany(vacancyId: String): Flow<Resource<VacancyDetailCompany>> =
@@ -155,28 +153,19 @@ class VacancyRepositoryImpl @Inject constructor(
                 remoteDataSource.getJobProviderVacancies(token, companyId)
         }.asFlow()
 
-    override fun getRecommendation(request: RecommendationRequest): Flow<Resource<List<String>>> =
-        object : NetworkOnlyResource<List<String>, RecommendationResponse>() {
-            override fun loadFromNetwork(data: RecommendationResponse): Flow<List<String>> =
-                VacancyMapper.recommendationToList(data)
-
-            override suspend fun createCall(): Flow<ApiResponse<RecommendationResponse>> =
-                remoteDataSource.getRecommendation(request)
-        }.asFlow()
-
     @OptIn(ExperimentalPagingApi::class)
-    override fun getRecommendationVacancies(recommendations: RecommendationVacanciesRequest)
-    : Flow<PagingData<RecommendationVacancyEntity>> =
+    override fun getRecommendation(request: RecommendationRequest)
+        : Flow<PagingData<RecommendationVacancyEntity>> =
         Pager(
             config = PagingConfig(pageSize = 10),
             remoteMediator = RecommendationVacanciesRemoteMediator(
                 remoteDataSource = remoteDataSource,
                 localDataSource = localDataSource,
                 appExecutors = appExecutors,
-                recommendations = recommendations
+                recommendations = request
             ),
             pagingSourceFactory = {
-                localDataSource.getRecommendationVacancies()
+                localDataSource.getRecommendation()
             }
         ).flow
 

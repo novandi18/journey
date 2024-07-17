@@ -7,7 +7,7 @@ import androidx.paging.RemoteMediator
 import com.novandi.core.data.source.local.LocalDataSource
 import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.data.source.remote.RemoteDataSource
-import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
+import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.mapper.VacancyMapper
 import com.novandi.utility.data.AppExecutors
 import retrofit2.HttpException
@@ -18,7 +18,7 @@ class RecommendationVacanciesRemoteMediator(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
     private val appExecutors: AppExecutors,
-    private val recommendations: RecommendationVacanciesRequest
+    private val recommendations: RecommendationRequest
 ): RemoteMediator<Int, RecommendationVacancyEntity>() {
     override suspend fun load(
         loadType: LoadType,
@@ -40,19 +40,19 @@ class RecommendationVacanciesRemoteMediator(
                 }
             }
 
-            val vacancyFeed = remoteDataSource.getRecommendationVacancies(
+            val vacancyFeed = remoteDataSource.getRecommendation(
+                request = recommendations,
                 page = loadKey,
-                limit = state.config.pageSize,
-                recommendations = recommendations
+                limit = state.config.pageSize
             )
 
             appExecutors.diskIO().execute {
                 if (loadType == LoadType.REFRESH) {
-                    localDataSource.deleteRecommendationVacancies()
+                    localDataSource.deleteRecommendation()
                 }
 
                 val vacancyEntities = VacancyMapper.mapResponseToRecommendationVacancyEntity(vacancyFeed)
-                localDataSource.insertRecommendationVacancies(vacancyEntities)
+                localDataSource.insertRecommendation(vacancyEntities)
             }
 
             MediatorResult.Success(

@@ -54,11 +54,6 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
-        
-        <service
-            android:name=".presentation.service.NotificationService"
-            android:enabled="true"
-            android:exported="false" />
 
         <!-- Trigger Google Play services to install the backported photo picker module. -->
         <!--suppress AndroidDomInspection -->

@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -59,10 +60,10 @@ class JobSeekerProfileViewModel @Inject constructor(
     var openDialogImagePreview by mutableStateOf(false)
         private set
 
-    var cvDownloadShowing by mutableStateOf(false)
+    var cvFile by mutableStateOf<File?>(null)
         private set
 
-    var cvFile by mutableStateOf<File?>(null)
+    var cvDownloadShowing by mutableStateOf(false)
         private set
 
     fun setOnLoading(isLoading: Boolean) {
@@ -97,12 +98,12 @@ class JobSeekerProfileViewModel @Inject constructor(
         _cv.value = null
     }
 
-    fun setOnCvDownloadShowing(value: Boolean) {
-        cvDownloadShowing = value
-    }
-
     fun setOnCvFile(value: File) {
         cvFile = value
+    }
+
+    fun setOnCvDownloadShowing(value: Boolean) {
+        cvDownloadShowing = value
     }
 
     fun resetDownloadedCvState() {
@@ -163,12 +164,17 @@ class JobSeekerProfileViewModel @Inject constructor(
         }
     }
 
-    fun downloadCv(file: File) {
-        MainActivity().fileDownloadStarter(
-            file = file,
-            running = { state ->
-                _downloadedCv.value = state
+    fun downloadCv(context: Context) {
+        viewModelScope.launch {
+            if (cvFile != null) {
+                MainActivity().fileDownloadStarter(
+                    context = context,
+                    file = cvFile!!,
+                    running = { state ->
+                        _downloadedCv.value = state
+                    }
+                )
             }
-        )
+        }
     }
 }

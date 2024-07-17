@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -155,15 +156,17 @@ class VacancyViewModel @Inject constructor(
         }
     }
 
-    fun downloadCv(file: File) {
-        val fileCopy = file.copy(
-            id = file.id + "2"
-        )
-        MainActivity().fileDownloadStarter(
-            file = fileCopy,
-            running = { state ->
-                _downloadedCv.value = state
+    fun downloadCv(context: Context) {
+        viewModelScope.launch {
+            if (cvFile != null) {
+                MainActivity().fileDownloadStarter(
+                    context = context,
+                    file = cvFile!!,
+                    running = { state ->
+                        _downloadedCv.value = state
+                    }
+                )
             }
-        )
+        }
     }
 }
