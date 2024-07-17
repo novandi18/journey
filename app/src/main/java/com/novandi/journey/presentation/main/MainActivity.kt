@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.main
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -27,10 +28,10 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.novandi.core.domain.model.File
-import com.novandi.journey.presentation.notification.FileDownloadWorker
 import com.novandi.journey.presentation.ui.component.state.NetworkState
 import com.novandi.journey.presentation.ui.theme.JourneyTheme
 import com.novandi.journey.presentation.viewmodel.MainViewModel
+import com.novandi.journey.presentation.worker.FileDownloadWorker
 import com.novandi.utility.consts.WorkerConsts
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -76,10 +77,11 @@ class MainActivity : ComponentActivity() {
     }
 
     fun fileDownloadStarter(
+        context: Context,
         file: File,
         running: (LiveData<WorkInfo>) -> Unit
     ) {
-        val workManager = WorkManager.getInstance(this)
+        val workManager = WorkManager.getInstance(context)
         val data = Data.Builder()
 
         data.apply {

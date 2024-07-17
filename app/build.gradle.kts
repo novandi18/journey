@@ -101,6 +101,9 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.permissions)
 
+    // Bouquet
+    implementation(libs.bouquet)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

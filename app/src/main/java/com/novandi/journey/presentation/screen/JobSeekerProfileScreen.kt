@@ -2,15 +2,11 @@ package com.novandi.journey.presentation.screen
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -74,9 +70,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.WorkInfo
 import coil.compose.AsyncImage
@@ -91,7 +84,6 @@ import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import com.novandi.core.data.response.Resource
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.ProfileJobSeeker
-import com.novandi.journey.BuildConfig
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.dialog.FileDownloadDialog
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
@@ -99,6 +91,7 @@ import com.novandi.journey.presentation.ui.component.dialog.JDialogImagePreview
 import com.novandi.journey.presentation.ui.component.dialog.LoadingDialog
 import com.novandi.journey.presentation.ui.component.skeleton.ProfileSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
+import com.novandi.journey.presentation.ui.function.cvOpen
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.Dark
 import com.novandi.journey.presentation.ui.theme.DarkGray80
@@ -136,39 +129,6 @@ fun JobSeekerProfileScreen(
     LaunchedEffect(token != null, accountId != null) {
         if (token != null && accountId != null) {
             viewModel.getProfile(token.toString(), accountId.toString())
-        }
-    }
-
-    val downloadedCv by viewModel.downloadedCv.collectAsState()
-    if (downloadedCv != null) {
-        val workInfo = downloadedCv!!.observeAsState().value
-        if (workInfo != null) {
-            when (workInfo.state) {
-                WorkInfo.State.SUCCEEDED -> {
-                    val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
-                    viewModel.setOnUpdateFile(
-                        isDownloading = false,
-                        downloadedUri = uri
-                    )
-                }
-                WorkInfo.State.FAILED -> {
-                    viewModel.setOnUpdateFile(
-                        isDownloading = false,
-                        downloadedUri = ""
-                    )
-                }
-                WorkInfo.State.RUNNING -> {
-                    viewModel.setOnUpdateFile(
-                        isDownloading = true
-                    )
-                }
-                else -> {
-                    viewModel.setOnUpdateFile(
-                        isDownloading = false,
-                        downloadedUri = ""
-                    )
-                }
-            }
         }
     }
 
@@ -223,18 +183,20 @@ fun JobSeekerProfileScreen(
         when (cv) {
             is Resource.Loading -> viewModel.setOnUploadCvLoading(true)
             is Resource.Success -> {
-                viewModel.updateCvOnProfileData(cv?.data?.cv)
-                viewModel.setOnCvFile(
-                    File(
-                        id = accountId!!,
-                        name = getFilenameFromUrl(cv?.data?.cv!!),
-                        type = "PDF",
-                        url = cv?.data?.cv!!,
+                if (cv?.data?.cv != null) {
+                    viewModel.updateCvOnProfileData(cv?.data?.cv)
+                    viewModel.setOnCvFile(
+                        File(
+                            id = accountId!!,
+                            name = getFilenameFromUrl(cv?.data?.cv!!),
+                            type = "PDF",
+                            url = cv?.data?.cv!!,
+                        )
                     )
-                )
-                Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
-                viewModel.setOnUploadCvLoading(false)
-                viewModel.resetCvState()
+                    Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
+                    viewModel.setOnUploadCvLoading(false)
+                    viewModel.resetCvState()
+                }
             }
             is Resource.Error -> {
                 Toast.makeText(context, cv?.message, Toast.LENGTH_SHORT).show()
@@ -243,6 +205,40 @@ fun JobSeekerProfileScreen(
             }
             else -> {
                 viewModel.setOnUploadCvLoading(false)
+            }
+        }
+    }
+
+    viewModel.downloadedCv.collectAsState().value.let { downloadedCv ->
+        if (downloadedCv != null) {
+            val workInfo = downloadedCv.observeAsState().value
+            if (workInfo != null) {
+                when (workInfo.state) {
+                    WorkInfo.State.SUCCEEDED -> {
+                        val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
+                        viewModel.setOnUpdateFile(
+                            isDownloading = false,
+                            downloadedUri = uri
+                        )
+                    }
+                    WorkInfo.State.FAILED -> {
+                        viewModel.setOnUpdateFile(
+                            isDownloading = false,
+                            downloadedUri = ""
+                        )
+                    }
+                    WorkInfo.State.RUNNING -> {
+                        viewModel.setOnUpdateFile(
+                            isDownloading = true
+                        )
+                    }
+                    else -> {
+                        viewModel.setOnUpdateFile(
+                            isDownloading = false,
+                            downloadedUri = ""
+                        )
+                    }
+                }
             }
         }
     }
@@ -289,49 +285,27 @@ fun JobSeekerProfileScreen(
                 )
             }
 
-            if (viewModel.cvFile != null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+            ) {
+                AnimatedVisibility(
+                    visible = viewModel.cvDownloadShowing,
+                    enter = fadeIn(),
+                    exit = fadeOut()
                 ) {
-                    AnimatedVisibility(
-                        visible = viewModel.cvDownloadShowing,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
+                    if (viewModel.cvFile != null) {
                         FileDownloadDialog(
                             file = viewModel.cvFile!!,
                             close = {
                                 viewModel.setOnCvDownloadShowing(false)
-                                viewModel.resetDownloadedCvState()
                             },
                             openFile = { file ->
-                                Log.d("please penasaran", file.downloadedUri.toString())
-                                val intent = Intent(Intent.ACTION_VIEW)
-                                val uriData = FileProvider.getUriForFile(
-                                    context,
-                                    BuildConfig.APPLICATION_ID + ".provider",
-                                    file.downloadedUri!!.toUri().toFile()
-                                )
-                                intent.setDataAndType(
-                                    uriData,
-                                    "application/pdf"
-                                )
-                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                cvOpen(context = context, file = file)
                                 viewModel.resetDownloadedCvState()
                                 viewModel.setOnCvDownloadShowing(false)
-                                try {
-                                    val activity = context as Activity
-                                    activity.startActivity(intent)
-                                } catch (e: ActivityNotFoundException) {
-                                    Toast.makeText(
-                                        context,
-                                        "Can't open Pdf",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
                             }
                         )
                     }
@@ -420,32 +394,6 @@ fun JobSeekerProfileContent(
         }
     }
 
-    val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
-        permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            listOf(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            listOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        }
-    ) { permission ->
-        val isGranted = permission.values.all { it }
-
-        if (isGranted) {
-            viewModel.setOnCvDownloadShowing(true)
-            viewModel.downloadCv(
-                viewModel.cvFile!!
-            )
-        } else {
-            Toast.makeText(
-                context,
-                context.getString(R.string.file_picker_permission_denied),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
     if(cropState != null) {
         ImageCropperDialog(state = cropState)
     }
@@ -510,6 +458,26 @@ fun JobSeekerProfileContent(
             )
         }
         loadingDialog.value -> LoadingDialog()
+    }
+
+    val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    ) { permission ->
+        val isGranted = permission.values.all { it }
+
+        if (isGranted) {
+            viewModel.setOnCvDownloadShowing(true)
+            viewModel.downloadCv(context)
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.file_picker_permission_denied),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     Column(
@@ -792,7 +760,12 @@ fun JobSeekerProfileContent(
                         if (data.cv != null) {
                             IconButton(
                                 onClick = {
-                                    pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        viewModel.setOnCvDownloadShowing(true)
+                                        viewModel.downloadCv(context)
+                                    } else {
+                                        pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
+                                    }
                                 }
                             ) {
                                 Icon(

@@ -89,16 +89,4 @@ class JobProviderApplicantProfileViewModel @Inject constructor(
                 }
         }
     }
-
-    fun downloadCv(file: File) {
-        val fileCopy = file.copy(
-            id = file.id + "3"
-        )
-        MainActivity().fileDownloadStarter(
-            file = fileCopy,
-            running = { state ->
-                _downloadedCv.value = state
-            }
-        )
-    }
 }

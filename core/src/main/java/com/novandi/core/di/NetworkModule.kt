@@ -1,10 +1,10 @@
 package com.novandi.core.di
 
+import com.novandi.core.BuildConfig
 import com.novandi.core.data.source.remote.network.ApiService
 import com.novandi.core.data.source.remote.network.MLApiService
 import com.novandi.core.data.source.remote.network.RegencyApiService
 import com.novandi.core.data.source.remote.network.WhatsappApiService
-import com.novandi.utility.consts.NetworkUrls
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,7 +42,7 @@ class NetworkModule {
     @Provides
     fun provideApi(client: OkHttpClient): ApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl(NetworkUrls.JOURNEY)
+            .baseUrl(BuildConfig.JOURNEY_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -53,7 +53,7 @@ class NetworkModule {
     @Provides
     fun provideRegencyApi(client: OkHttpClient): RegencyApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl(NetworkUrls.REGENCY)
+            .baseUrl(BuildConfig.REGENCY_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -64,7 +64,7 @@ class NetworkModule {
     @Provides
     fun provideMLApi(client: OkHttpClient): MLApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl(NetworkUrls.ML)
+            .baseUrl(BuildConfig.ML_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -75,7 +75,7 @@ class NetworkModule {
     @Provides
     fun provideWhatsappApi(client: OkHttpClient): WhatsappApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl(NetworkUrls.WHATSAPP)
+            .baseUrl(BuildConfig.WHATSAPP_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

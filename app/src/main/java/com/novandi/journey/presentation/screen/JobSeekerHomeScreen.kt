@@ -23,8 +23,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,17 +38,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.local.entity.AllVacancyEntity
 import com.novandi.core.data.source.local.entity.LatestVacancyEntity
 import com.novandi.core.data.source.local.entity.PopularVacancyEntity
 import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.data.source.remote.request.RecommendationRequest
-import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.mapper.VacancyMapper
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCard
-import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshPaging
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray40
@@ -64,9 +59,7 @@ fun JobSeekerHomeScreen(
     navigateToVacancy: (String) -> Unit,
     navigateToSearch: () -> Unit
 ) {
-    val token by viewModel.token.observeAsState()
     var tabSelected by remember { mutableIntStateOf(0) }
-    val recommendation by viewModel.recommendations.collectAsState()
 
     val tabs = listOf(
         stringResource(id = R.string.recommended_for_you),
@@ -127,62 +120,38 @@ fun JobSeekerHomeScreen(
             ) {
                 when (tabSelected) {
                     0 -> {
+                        val disability by viewModel.disability.observeAsState()
+                        val skillOne by viewModel.skillOne.observeAsState()
+                        val skillTwo by viewModel.skillTwo.observeAsState()
+
                         val vacancies = viewModel.recommendationVacancies.collectAsLazyPagingItems()
-
                         if (vacancies.itemCount == 0) {
-                            val disability by viewModel.disability.observeAsState()
-                            val skillOne by viewModel.skillOne.observeAsState()
-                            val skillTwo by viewModel.skillTwo.observeAsState()
-
-                            LaunchedEffect(skillOne, skillTwo, disability) {
-                                if (disability != null && skillOne != null && skillTwo != null) {
-                                    viewModel.getRecommendations(
-                                        RecommendationRequest(disability!!, skillOne!!, skillTwo!!)
+                            if (disability != null && skillOne != null && skillTwo != null) {
+                                viewModel.getRecommendations(
+                                    RecommendationRequest(
+                                        disabilityName = disability.toString(),
+                                        skillOne = skillOne.toString(),
+                                        skillTwo = skillTwo.toString()
                                     )
-                                }
-                            }
-
-                            LaunchedEffect(recommendation is Resource.Loading) {
-                                when (recommendation) {
-                                    is Resource.Loading -> viewModel.setOnRecommendationLoading(true)
-                                    is Resource.Success -> {
-                                        if (recommendation?.data != null)
-                                            viewModel.setOnRecommendations(recommendation?.data!!)
-                                        viewModel.setOnRecommendationLoading(false)
-                                        viewModel.resetRecommendationState()
-                                    }
-                                    is Resource.Error -> {
-                                        viewModel.setOnRecommendationLoading(false)
-                                        viewModel.resetRecommendationState()
-                                    }
-                                    else -> viewModel.setOnRecommendationLoading(false)
-                                }
-                            }
-
-                            if (viewModel.recommendation != null) {
-                                val request = RecommendationVacanciesRequest(viewModel.recommendation!!)
-                                viewModel.recommendationVacancies(request)
+                                )
                             }
                         }
 
-                        if (viewModel.recommendationLoading) {
-                            Box(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                JCardSkeleton(total = 3)
+                        RecommendationVacanciesContent(
+                            vacancies = vacancies,
+                            navigateToVacancy = { id ->
+                                navigateToVacancy(id)
                             }
-                        } else if (viewModel.recommendation != null) {
-                            RecommendationVacanciesContent(
-                                vacancies = vacancies,
-                                navigateToVacancy = { id ->
-                                    navigateToVacancy(id)
-                                }
-                            )
-                        }
+                        )
                     }
                     1 -> {
+                        val token by viewModel.token.observeAsState()
                         val vacancies = viewModel.allVacancies.collectAsLazyPagingItems()
-                        if (vacancies.itemCount == 0) viewModel.vacancies(token.toString())
+                        if (vacancies.itemCount == 0) {
+                            if (token != null) {
+                                viewModel.vacancies(token.toString())
+                            }
+                        }
 
                         AllVacanciesContent(
                             vacancies = vacancies,

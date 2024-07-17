@@ -1,8 +1,10 @@
 package com.novandi.journey.presentation.screen
 
+import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -53,6 +55,8 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.WorkInfo
 import coil.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.novandi.core.data.response.Resource
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.VacancyDetailUser
@@ -74,7 +78,7 @@ import com.novandi.utility.data.getFilenameFromUrl
 import com.novandi.utility.field.ApplicantStatus
 import kotlin.random.Random
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun VacancyScreen(
     viewModel: VacancyViewModel = hiltViewModel(),
@@ -92,21 +96,23 @@ fun VacancyScreen(
         if (accountId != null) viewModel.getVacancy(vacancyId, accountId.toString())
     }
 
-    LaunchedEffect(vacancy is Resource.Loading) {
+    LaunchedEffect(vacancy) {
         when (vacancy) {
             is Resource.Loading -> {}
             is Resource.Success -> {
                 viewModel.setOnVacancyData(vacancy?.data)
                 if (vacancy?.data != null) {
-                    viewModel.setOnCvFile(
-                        File(
-                            id = Random.nextInt().toString(),
-                            name = getFilenameFromUrl(vacancy?.data?.userCv!!),
-                            type = "PDF",
-                            url = vacancy?.data?.userCv!!,
-                            downloadedUri = null
+                    if (vacancy?.data?.userCv != null) {
+                        viewModel.setOnCvFile(
+                            File(
+                                id = Random.nextInt().toString(),
+                                name = getFilenameFromUrl(vacancy?.data?.userCv!!),
+                                type = "PDF",
+                                url = vacancy?.data?.userCv!!,
+                                downloadedUri = null
+                            )
                         )
-                    )
+                    }
                 }
                 viewModel.resetVacancyState()
                 viewModel.setOnLoading(false)
@@ -191,7 +197,6 @@ fun VacancyScreen(
                 }
             }
 
-            val downloadedCv by viewModel.downloadedCv.collectAsState()
             val cv by viewModel.cv.collectAsState()
 
             LaunchedEffect(cv is Resource.Loading) {
@@ -222,36 +227,57 @@ fun VacancyScreen(
                 }
             }
 
-            if (downloadedCv != null) {
-                val workInfo = downloadedCv!!.observeAsState().value
-
-                if (workInfo != null) {
-                    when (workInfo.state) {
-                        WorkInfo.State.SUCCEEDED -> {
-                            val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
-                            viewModel.setOnUpdateFile(
-                                isDownloading = false,
-                                downloadedUri = uri
-                            )
-                        }
-                        WorkInfo.State.FAILED -> {
-                            viewModel.setOnUpdateFile(
-                                isDownloading = false,
-                                downloadedUri = ""
-                            )
-                        }
-                        WorkInfo.State.RUNNING -> {
-                            viewModel.setOnUpdateFile(
-                                isDownloading = true
-                            )
-                        }
-                        else -> {
-                            viewModel.setOnUpdateFile(
-                                isDownloading = false,
-                                downloadedUri = ""
-                            )
+            viewModel.downloadedCv.collectAsState().value.let { downloadedCv ->
+                if (downloadedCv != null) {
+                    val workInfo = downloadedCv.observeAsState().value
+                    if (workInfo != null) {
+                        when (workInfo.state) {
+                            WorkInfo.State.SUCCEEDED -> {
+                                val uri = workInfo.outputData.getString(WorkerConsts.KEY_FILE_URI) ?: ""
+                                viewModel.setOnUpdateFile(
+                                    isDownloading = false,
+                                    downloadedUri = uri
+                                )
+                            }
+                            WorkInfo.State.FAILED -> {
+                                viewModel.setOnUpdateFile(
+                                    isDownloading = false,
+                                    downloadedUri = ""
+                                )
+                            }
+                            WorkInfo.State.RUNNING -> {
+                                viewModel.setOnUpdateFile(
+                                    isDownloading = true
+                                )
+                            }
+                            else -> {
+                                viewModel.setOnUpdateFile(
+                                    isDownloading = false,
+                                    downloadedUri = ""
+                                )
+                            }
                         }
                     }
+                }
+            }
+
+            val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
+                permissions = listOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            ) { permission ->
+                val isGranted = permission.values.all { it }
+
+                if (isGranted) {
+                    viewModel.setOnCvDownloadShowing(true)
+                    viewModel.downloadCv(context)
+                } else {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.file_picker_permission_denied),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -330,9 +356,13 @@ fun VacancyScreen(
                                     viewModel.updateCv(accountId.toString(), cv)
                                 },
                                 uploadCvLoading = viewModel.uploadCvLoading,
-                                downloadCv = { file ->
-                                    viewModel.setOnCvDownloadShowing(true)
-                                    viewModel.downloadCv(file)
+                                downloadCv = {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        viewModel.setOnCvDownloadShowing(true)
+                                        viewModel.downloadCv(context)
+                                    } else {
+                                        pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
+                                    }
                                 }
                             )
                         }

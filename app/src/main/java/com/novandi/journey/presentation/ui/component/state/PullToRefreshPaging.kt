@@ -54,26 +54,24 @@ fun <T: Any> PullToRefreshPaging(
             items.apply {
                 when {
                     loadState.refresh is LoadState.Loading -> {
-                        setIsRefreshing(true)
                         item {
                             JCardSkeleton(3)
-                        }
-                    }
-
-                    loadState.refresh is LoadState.Error -> {
-                        setIsRefreshing(false)
-                        item {
-                            LoadStateError(
-                                errorMessage = stringResource(id = R.string.network_error)
-                            ) {
-                                retry()
-                            }
                         }
                     }
 
                     loadState.append is LoadState.Loading -> {
                         item {
                             JCardSkeleton(3)
+                        }
+                    }
+
+                    loadState.refresh is LoadState.Error -> {
+                        item {
+                            LoadStateError(
+                                errorMessage = stringResource(id = R.string.network_error)
+                            ) {
+                                retry()
+                            }
                         }
                     }
 
@@ -86,24 +84,18 @@ fun <T: Any> PullToRefreshPaging(
                             }
                         }
                     }
-
-                    loadState.refresh is LoadState.NotLoading -> {
-                        setIsRefreshing(false)
-                    }
                 }
             }
         }
 
-        if (state.isRefreshing) {
-            LaunchedEffect(true) {
+        LaunchedEffect(state.isRefreshing) {
+            if (state.isRefreshing) {
                 onRefresh()
             }
         }
 
-        LaunchedEffect(isRefreshing) {
-            if (isRefreshing) {
-                state.startRefresh()
-            } else {
+        LaunchedEffect(items.loadState.refresh) {
+            if (items.loadState.refresh !is LoadState.Loading) {
                 state.endRefresh()
             }
         }
