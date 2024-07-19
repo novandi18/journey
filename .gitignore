@@ -14,3 +14,4 @@
 .cxx
 local.properties
 baseurl.properties
+/app/google-services.json

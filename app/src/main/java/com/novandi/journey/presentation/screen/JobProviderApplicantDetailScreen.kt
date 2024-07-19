@@ -54,7 +54,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
+import com.novandi.core.data.source.remote.request.MessagingRequest
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardApplicant
 import com.novandi.journey.presentation.ui.component.dialog.JDialog
@@ -115,18 +115,16 @@ fun JobProviderApplicantDetailScreen(
             is Resource.Success -> {
                 Toast.makeText(context, response!!.data?.message, Toast.LENGTH_SHORT).show()
                 viewModel.sendWhatsappMessage(
-                    request = WhatsappRequest(
-                        to = viewModel.applicantWhatsappNumber!!.first,
-                        messages = context.getString(
-                            if (viewModel.applicantWhatsappNumber!!.second) R.string.accepted_wa
-                            else R.string.rejected_wa,
-                            vacancy.data!!.companyName,
-                            vacancy.data!!.position,
-                            vacancy.data!!.disability,
-                            vacancy.data!!.skillOne,
-                            vacancy.data!!.skillTwo,
-                            viewModel.vacancyData!!.jobType
-                        )
+                    phoneNumber = viewModel.applicantWhatsappNumber!!.first,
+                    message = context.getString(
+                        if (viewModel.applicantWhatsappNumber!!.second) R.string.accepted_wa
+                        else R.string.rejected_wa,
+                        vacancy.data!!.companyName,
+                        vacancy.data!!.position,
+                        vacancy.data!!.disability,
+                        vacancy.data!!.skillOne,
+                        vacancy.data!!.skillTwo,
+                        viewModel.vacancyData!!.jobType
                     )
                 )
             }
@@ -317,11 +315,37 @@ fun JobProviderApplicantDetailScreen(
                                         applicant = applicant,
                                         request = AcceptApplicantRequest(notes)
                                     )
+                                    if (viewModel.vacancyData != null) {
+                                        viewModel.sendNotification(
+                                            MessagingRequest(
+                                                userId = applicant.id,
+                                                messageTitle = context.getString(R.string.notification_title_applicant),
+                                                messageBody = context.getString(
+                                                    R.string.notification_body_applicant_accepted,
+                                                    viewModel.vacancyData!!.companyName,
+                                                    viewModel.vacancyData!!.position
+                                                )
+                                            )
+                                        )
+                                    }
                                 } else {
                                     viewModel.rejectApplicant(
                                         token.toString(), accountId.toString(),
                                         vacancyId, applicant.id
                                     )
+                                    if (viewModel.vacancyData != null) {
+                                        viewModel.sendNotification(
+                                            MessagingRequest(
+                                                userId = applicant.id,
+                                                messageTitle = context.getString(R.string.notification_title_applicant),
+                                                messageBody = context.getString(
+                                                    R.string.notification_body_applicant_rejected,
+                                                    viewModel.vacancyData!!.position,
+                                                    viewModel.vacancyData!!.companyName
+                                                )
+                                            )
+                                        )
+                                    }
                                 }
                                 viewModel.setOnApplicantWhatsappNumber(
                                     value = applicant.phoneNumber.toWhatsappNumber(),

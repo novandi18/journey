@@ -3,12 +3,14 @@ package com.novandi.core.di
 import com.novandi.core.domain.interactor.AssistantInteractor
 import com.novandi.core.domain.interactor.JobProviderInteractor
 import com.novandi.core.domain.interactor.JobSeekerInteractor
+import com.novandi.core.domain.interactor.MessagingInteractor
 import com.novandi.core.domain.interactor.RegencyInteractor
 import com.novandi.core.domain.interactor.SearchInteractor
 import com.novandi.core.domain.interactor.VacancyInteractor
 import com.novandi.core.domain.usecase.AssistantUseCase
 import com.novandi.core.domain.usecase.JobProviderUseCase
 import com.novandi.core.domain.usecase.JobSeekerUseCase
+import com.novandi.core.domain.usecase.MessagingUseCase
 import com.novandi.core.domain.usecase.RegencyUseCase
 import com.novandi.core.domain.usecase.SearchUseCase
 import com.novandi.core.domain.usecase.VacancyUseCase
@@ -44,4 +46,8 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindAssistantUseCase(interactor: AssistantInteractor): AssistantUseCase
+
+    @Binds
+    @Singleton
+    abstract fun bindMessagingUseCase(interactor: MessagingInteractor): MessagingUseCase
 }

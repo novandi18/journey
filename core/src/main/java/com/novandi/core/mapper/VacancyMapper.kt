@@ -8,7 +8,6 @@ import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.data.source.remote.response.GeneralResponse
-import com.novandi.core.data.source.remote.response.RecommendationResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailCompanyResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailUserResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
@@ -97,10 +96,6 @@ object VacancyMapper {
 
     fun mapGeneralResponseToDomain(input: GeneralResponse): Flow<GeneralResult> = flowOf(
         GeneralResult(input.message)
-    )
-
-    fun recommendationToList(input: RecommendationResponse): Flow<List<String>> = flowOf(
-        input.predictions
     )
 
     fun mapResponseToPopularVacancyEntity(input: VacancyResponse): List<PopularVacancyEntity> =
@@ -262,4 +257,7 @@ object VacancyMapper {
             totalApplicants = input.totalApplicants,
             companyId = input.companyId ?: ""
         )
+
+    fun mapGeneralResponseToDomainNoFlow(input: GeneralResponse): GeneralResult =
+        GeneralResult(input.message)
 }

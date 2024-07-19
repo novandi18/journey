@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.secrets.gradle.plugin)
     id("kotlin-parcelize")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -28,11 +29,15 @@ android {
         val mlUrl = properties.getProperty("ML_URL") ?: ""
         val whatsappUrl = properties.getProperty("WHATSAPP_URL") ?: ""
         val regencyUrl = properties.getProperty("REGENCY_URL") ?: ""
+        val whatsappAppKey = properties.getProperty("WHATSAPP_APP_KEY") ?: ""
+        val whatsappAuthKey = properties.getProperty("WHATSAPP_AUTH_KEY") ?: ""
 
         buildConfigField("String", "JOURNEY_URL", journeyUrl)
         buildConfigField("String", "ML_URL", mlUrl)
         buildConfigField("String", "WHATSAPP_URL", whatsappUrl)
         buildConfigField("String", "REGENCY_URL", regencyUrl)
+        buildConfigField("String", "WHATSAPP_APP_KEY", whatsappAppKey)
+        buildConfigField("String", "WHATSAPP_AUTH_KEY", whatsappAuthKey)
     }
 
     buildTypes {
@@ -61,6 +66,7 @@ dependencies {
 
     // Hilt
     implementation(libs.dagger.hilt.android)
+    implementation(libs.firebase.messaging)
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
     implementation(libs.androidx.hilt.navigation)

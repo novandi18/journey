@@ -44,6 +44,9 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.compiler)
 
+    // OKHTTP
+    implementation(libs.okhttp.logging.interceptor)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

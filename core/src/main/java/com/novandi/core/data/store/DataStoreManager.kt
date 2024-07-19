@@ -39,6 +39,10 @@ class DataStoreManager @Inject constructor(
         preferences[DataStoreConsts.SKILL_TWO_KEY] ?: ""
     }
 
+    val messagingToken: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[DataStoreConsts.MESSAGING_KEY] ?: ""
+    }
+
     suspend fun setIsWelcome(isWelcome: Boolean) {
         dataStore.edit { preferences ->
             preferences[DataStoreConsts.WELCOME_KEY] = isWelcome
@@ -78,6 +82,12 @@ class DataStoreManager @Inject constructor(
     suspend fun setSkillTwo(skillTwo: String) {
         dataStore.edit { preferences ->
             preferences[DataStoreConsts.SKILL_TWO_KEY] = skillTwo
+        }
+    }
+
+    suspend fun setMessagingToken(messagingToken: String) {
+        dataStore.edit { preferences ->
+            preferences[DataStoreConsts.MESSAGING_KEY] = messagingToken
         }
     }
 }

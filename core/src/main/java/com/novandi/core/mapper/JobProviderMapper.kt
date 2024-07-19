@@ -74,8 +74,8 @@ object JobProviderMapper {
 
     fun mapWhatsappResponseToDomain(input: WhatsappResponse): Flow<WhatsappResult> = flowOf(
         WhatsappResult(
-            status = input.data.status,
-            message = input.data.message
+            status = input.data.statusCode,
+            messageStatus = input.messageStatus
         )
     )
 }

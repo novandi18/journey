@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     id("kotlin-parcelize")
     kotlin("kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -100,6 +101,10 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.permissions)
+
+    // Firebase Cloud Messaging
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

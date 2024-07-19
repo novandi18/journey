@@ -46,6 +46,7 @@ import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.mapper.VacancyMapper
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCard
+import com.novandi.journey.presentation.ui.component.dialog.RequestNotificationPermissionDialog
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshPaging
 import com.novandi.journey.presentation.ui.theme.Blue40
 import com.novandi.journey.presentation.ui.theme.DarkGray40
@@ -60,6 +61,8 @@ fun JobSeekerHomeScreen(
     navigateToSearch: () -> Unit
 ) {
     var tabSelected by remember { mutableIntStateOf(0) }
+
+    RequestNotificationPermissionDialog()
 
     val tabs = listOf(
         stringResource(id = R.string.recommended_for_you),

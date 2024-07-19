@@ -207,8 +207,17 @@
     <string name="vacancy_closed">Lowongan ini sudah ditutup</string>
 
     <!--  Notification  -->
-    <string name="vacancy_accepted_channel">Lamaran Diterima</string>
+    <string name="notification_channel_id">100</string>
+    <string name="notification_name">Journey Notification</string>
+    <string name="permission_confirm">Izinkan</string>
+    <string name="notification_permission_title">Perizinan Notifikasi</string>
+    <string name="notification_permission_desc">Perizinan notifikasi dibutuhkan agar aplikasi dapat menerima notifikasi.</string>
     <string name="vacancy_accepted_desc">Selamat! lamaran anda diterima oleh %1$s pada posisi %2$s</string>
+    <string name="notification_title_applicant">Informasi Terbaru Mengenai Lamaran Anda</string>
+    <string name="notification_body_applicant_accepted">%1$s telah menerima lamaran Anda untuk posisi %2$s. Nantikan informasi lebih lanjut dari kami.</string>
+    <string name="notification_body_applicant_rejected">Lamaran Anda untuk posisi %1$s di %2$s belum dapat kami lanjutkan saat ini. Terima kasih atas minat Anda.</string>
+    <string name="notification_title_apply">Pelamar Baru untuk Posisi %1$s</string>
+    <string name="notification_body_apply">Lamaran baru telah diterima untuk posisi %1$s. Silakan cek daftar pelamar pada lowongan anda di aplikasi Journey.</string>
 
     <!--  Whatsapp Message  -->
     <string name="accepted_wa">Selamat! anda diterima di perusahaan *%1$s* dengan detail lowongan kerja berikut:\n\nPosisi: *%2$s*\nDisabilitas: *%3$s*\nSyarat kemampuan:\n- *%4$s*\n- *%5$s*\nTipe Pekerjaan: *%6$s*\n\nSegera melakukan pengecekan informasi pada catatan yang diberikan oleh perusahaan di aplikasi Journey.</string>
