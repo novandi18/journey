@@ -13,4 +13,5 @@ object DataStoreConsts {
     val DISABILITY_KEY = stringPreferencesKey("disability_key")
     val SKILL_ONE_KEY = stringPreferencesKey("skill_one_key")
     val SKILL_TWO_KEY = stringPreferencesKey("skill_two_key")
+    val MESSAGING_KEY = stringPreferencesKey("messaging_key")
 }

@@ -10,7 +10,6 @@ import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.Vacancy
@@ -32,5 +31,5 @@ interface VacancyRepository {
     fun getRecommendation(request: RecommendationRequest): Flow<PagingData<RecommendationVacancyEntity>>
     fun closeVacancy(token: String, request: CloseVacancyRequest): Flow<Resource<GeneralResult>>
     fun getVacancyCompany(companyId: String): Flow<Resource<ProfileJobProvider>>
-    fun sendWhatsappMessage(request: WhatsappRequest): Flow<Resource<WhatsappResult>>
+    fun sendWhatsappMessage(phoneNumber: String, message: String): Flow<Resource<WhatsappResult>>
 }

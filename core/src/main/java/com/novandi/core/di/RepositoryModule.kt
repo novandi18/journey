@@ -3,12 +3,14 @@ package com.novandi.core.di
 import com.novandi.core.data.repository.AssistantRepositoryImpl
 import com.novandi.core.data.repository.JobProviderRepositoryImpl
 import com.novandi.core.data.repository.JobSeekerRepositoryImpl
+import com.novandi.core.data.repository.MessagingRepositoryImpl
 import com.novandi.core.data.repository.RegencyRepositoryImpl
 import com.novandi.core.data.repository.SearchRepositoryImpl
 import com.novandi.core.data.repository.VacancyRepositoryImpl
 import com.novandi.core.domain.repository.AssistantRepository
 import com.novandi.core.domain.repository.JobProviderRepository
 import com.novandi.core.domain.repository.JobSeekerRepository
+import com.novandi.core.domain.repository.MessagingRepository
 import com.novandi.core.domain.repository.RegencyRepository
 import com.novandi.core.domain.repository.SearchRepository
 import com.novandi.core.domain.repository.VacancyRepository
@@ -37,4 +39,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindAssistantRepository(repository: AssistantRepositoryImpl): AssistantRepository
+
+    @Binds
+    abstract fun bindMessagingRepository(repository: MessagingRepositoryImpl): MessagingRepository
 }

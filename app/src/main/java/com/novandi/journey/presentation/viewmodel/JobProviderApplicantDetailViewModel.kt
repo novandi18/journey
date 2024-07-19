@@ -12,7 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.AcceptApplicantRequest
 import com.novandi.core.data.source.remote.request.CloseVacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
+import com.novandi.core.data.source.remote.request.MessagingRequest
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.Applicant
 import com.novandi.core.domain.model.ApplicantItemStatus
@@ -20,6 +20,7 @@ import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.VacancyDetailCompany
 import com.novandi.core.domain.model.WhatsappResult
 import com.novandi.core.domain.usecase.JobProviderUseCase
+import com.novandi.core.domain.usecase.MessagingUseCase
 import com.novandi.core.domain.usecase.VacancyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,7 @@ import javax.inject.Inject
 class JobProviderApplicantDetailViewModel @Inject constructor(
     private val jobProviderUseCase: JobProviderUseCase,
     private val vacancyUseCase: VacancyUseCase,
+    private val messagingUseCase: MessagingUseCase,
     dataStoreManager: DataStoreManager
 ): ViewModel() {
     private val _applicants = MutableLiveData<Resource<List<Applicant>>>(Resource.Loading())
@@ -182,9 +184,9 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
         }
     }
 
-    fun sendWhatsappMessage(request: WhatsappRequest) {
+    fun sendWhatsappMessage(phoneNumber: String, message: String) {
         viewModelScope.launch {
-            vacancyUseCase.sendWhatsappMessage(request)
+            vacancyUseCase.sendWhatsappMessage(phoneNumber, message)
                 .catch { err ->
                     _whatsappResponse.value = Resource.Error(err.message.toString())
                 }
@@ -203,6 +205,12 @@ class JobProviderApplicantDetailViewModel @Inject constructor(
                 .collect { result ->
                     _close.value = result
                 }
+        }
+    }
+
+    fun sendNotification(request: MessagingRequest) {
+        viewModelScope.launch {
+            messagingUseCase.sendNotification(request)
         }
     }
 }

@@ -16,13 +16,13 @@ import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
 import com.novandi.core.data.source.remote.request.JobSeekerRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
+import com.novandi.core.data.source.remote.request.MessagingRegisterRequest
+import com.novandi.core.data.source.remote.request.MessagingRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
-import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.source.remote.response.ApplicantItem
 import com.novandi.core.data.source.remote.response.AssistantResponse
 import com.novandi.core.data.source.remote.response.GeneralResponse
@@ -40,6 +40,7 @@ import com.novandi.core.data.source.remote.response.VacancyDetailCompanyResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailUserResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import com.novandi.core.data.source.remote.response.WhatsappResponse
+import com.novandi.utility.data.createRequestBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -674,14 +675,14 @@ class RemoteDataSource @Inject constructor(
     suspend fun getRecommendation(request: RecommendationRequest, page: Int, limit: Int) =
         mlApiService.getRecommendation(request, page, limit)
 
-    suspend fun getRecommendationVacancies(
-        page: Int, limit: Int, recommendations: RecommendationVacanciesRequest
-    ) = apiService.getRecommendationVacancies(page, limit, recommendations)
-
-    suspend fun sendWhatsappMessage(request: WhatsappRequest): Flow<ApiResponse<WhatsappResponse>> =
+    suspend fun sendWhatsappMessage(phoneNumber: String, message: String)
+    : Flow<ApiResponse<WhatsappResponse>> =
         flow {
             try {
-                val response = whatsappApiService.sendMessage(request)
+                val response = whatsappApiService.sendMessage(
+                    to = createRequestBody(phoneNumber),
+                    message = createRequestBody(message)
+                )
                 emit(ApiResponse.Success(response))
             } catch (e: HttpException) {
                 val errorBody = e.response()?.errorBody()?.string()
@@ -730,6 +731,11 @@ class RemoteDataSource @Inject constructor(
             Log.e("RemoteDataSource", e.toString())
         }
     }.flowOn(Dispatchers.IO)
+
+    suspend fun registerFcmToken(request: MessagingRegisterRequest) =
+        apiService.registerFcmToken(request)
+
+    suspend fun sendNotification(request: MessagingRequest) = apiService.sendNotification(request)
 
     companion object {
         const val TIMEOUT_MILLIS: Long = 10_000

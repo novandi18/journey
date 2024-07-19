@@ -22,7 +22,6 @@ import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.VacancyDetailCompanyResponse
@@ -187,13 +186,13 @@ class VacancyRepositoryImpl @Inject constructor(
                 remoteDataSource.getVacancyCompanyDetail(companyId)
         }.asFlow()
 
-    override fun sendWhatsappMessage(request: WhatsappRequest): Flow<Resource<WhatsappResult>> =
+    override fun sendWhatsappMessage(phoneNumber: String, message: String): Flow<Resource<WhatsappResult>> =
         object : NetworkOnlyResource<WhatsappResult, WhatsappResponse>() {
             override fun loadFromNetwork(data: WhatsappResponse): Flow<WhatsappResult> =
                 JobProviderMapper.mapWhatsappResponseToDomain(data)
 
             override suspend fun createCall(): Flow<ApiResponse<WhatsappResponse>> =
-                remoteDataSource.sendWhatsappMessage(request)
+                remoteDataSource.sendWhatsappMessage(phoneNumber, message)
 
         }.asFlow()
 }

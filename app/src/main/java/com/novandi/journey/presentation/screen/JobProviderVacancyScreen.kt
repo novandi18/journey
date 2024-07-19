@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -98,7 +99,7 @@ fun JobProviderVacancyScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.add_vacancy),
+                        text = stringResource(id = R.string.edit_vacancy),
                         fontSize = 18.sp
                     )
                 },
@@ -186,6 +187,7 @@ fun JobProviderVacancyScreen(
                     .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
                 onClick = {
                     if (viewModel.validateFields()) {
+                        Log.d("Woilah", viewModel.deadline)
                         val request = VacancyRequest(
                             placementAddress = viewModel.position,
                             description = viewModel.description,

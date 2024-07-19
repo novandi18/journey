@@ -27,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.novandi.core.data.response.Resource
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCardVacancy
+import com.novandi.journey.presentation.ui.component.dialog.RequestNotificationPermissionDialog
 import com.novandi.journey.presentation.ui.component.skeleton.JCardSkeleton
 import com.novandi.journey.presentation.ui.component.state.NetworkError
 import com.novandi.journey.presentation.ui.component.state.PullToRefreshLazyColumn
@@ -45,6 +46,8 @@ fun JobProviderHomeScreen(
     val token by viewModel.token.observeAsState()
     val accountId by viewModel.accountId.observeAsState()
     val vacancies by viewModel.vacancies.observeAsState(Resource.Loading())
+
+    RequestNotificationPermissionDialog()
 
     LaunchedEffect(token != null, accountId != null) {
         if (token != null && accountId != null) {

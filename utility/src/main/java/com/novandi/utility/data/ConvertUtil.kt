@@ -11,9 +11,9 @@ object ConvertUtil {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = milliseconds
 
-        calendar.set(Calendar.HOUR_OF_DAY, 23)
-        calendar.set(Calendar.MINUTE, 59)
-        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
 
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
@@ -32,9 +32,9 @@ object ConvertUtil {
 
         val calendar = Calendar.getInstance().apply {
             time = originalDate
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
         }
 
         val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())

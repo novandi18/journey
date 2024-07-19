@@ -58,6 +58,7 @@ import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.MessagingRequest
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.VacancyDetailUser
 import com.novandi.journey.BuildConfig
@@ -91,6 +92,7 @@ fun VacancyScreen(
     val accountId by viewModel.accountId.observeAsState()
     val vacancy by viewModel.vacancy.collectAsState()
     val applyStatus by viewModel.applyResult.collectAsState()
+    val cv by viewModel.cv.collectAsState()
 
     LaunchedEffect(accountId) {
         if (accountId != null) viewModel.getVacancy(vacancyId, accountId.toString())
@@ -131,6 +133,21 @@ fun VacancyScreen(
             is Resource.Loading -> {}
             is Resource.Success -> {
                 viewModel.setOnUpdateStatusApply(ApplicantStatus.PENDING.value)
+                if (viewModel.vacancyData != null) {
+                    viewModel.sendNotification(
+                        request = MessagingRequest(
+                            userId = viewModel.vacancyData!!.companyId,
+                            messageTitle = context.getString(
+                                R.string.notification_title_apply,
+                                viewModel.vacancyData!!.position
+                            ),
+                            messageBody = context.getString(
+                                R.string.notification_body_apply,
+                                viewModel.vacancyData!!.position
+                            )
+                        )
+                    )
+                }
                 viewModel.setOnApplyLoading(false)
                 viewModel.resetApplyResultState()
             }
@@ -140,6 +157,36 @@ fun VacancyScreen(
                 viewModel.resetApplyResultState()
             }
             else -> viewModel.setOnApplyLoading(false)
+        }
+    }
+
+    LaunchedEffect(cv is Resource.Loading) {
+        when (cv) {
+            is Resource.Loading -> viewModel.setOnUploadCvLoading(true)
+            is Resource.Success -> {
+                if (cv?.data?.cv != null) {
+                    viewModel.updateCvOnVacancyData(cv?.data?.cv)
+                    viewModel.setOnCvFile(
+                        File(
+                            id = accountId!!,
+                            name = getFilenameFromUrl(cv?.data?.cv!!),
+                            type = "PDF",
+                            url = cv?.data?.cv!!,
+                        )
+                    )
+                    Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
+                    viewModel.setOnUploadCvLoading(false)
+                    viewModel.resetCvState()
+                }
+            }
+            is Resource.Error -> {
+                Toast.makeText(context, cv?.message, Toast.LENGTH_SHORT).show()
+                viewModel.setOnUploadCvLoading(false)
+                viewModel.resetCvState()
+            }
+            else -> {
+                viewModel.setOnUploadCvLoading(false)
+            }
         }
     }
 
@@ -193,36 +240,6 @@ fun VacancyScreen(
                 } else {
                     NetworkError {
                         viewModel.getVacancy(vacancyId, accountId.toString())
-                    }
-                }
-            }
-
-            val cv by viewModel.cv.collectAsState()
-
-            LaunchedEffect(cv is Resource.Loading) {
-                when (cv) {
-                    is Resource.Loading -> viewModel.setOnUploadCvLoading(true)
-                    is Resource.Success -> {
-                        viewModel.updateCvOnVacancyData(cv?.data?.cv)
-                        viewModel.setOnCvFile(
-                            File(
-                                id = Random.nextInt().toString(),
-                                name = getFilenameFromUrl(cv?.data?.cv!!),
-                                type = "PDF",
-                                url = cv?.data?.cv!!,
-                            )
-                        )
-                        Toast.makeText(context, cv?.data?.message, Toast.LENGTH_SHORT).show()
-                        viewModel.setOnUploadCvLoading(false)
-                        viewModel.resetCvState()
-                    }
-                    is Resource.Error -> {
-                        Toast.makeText(context, cv?.message, Toast.LENGTH_SHORT).show()
-                        viewModel.setOnUploadCvLoading(false)
-                        viewModel.resetCvState()
-                    }
-                    else -> {
-                        viewModel.setOnUploadCvLoading(false)
                     }
                 }
             }

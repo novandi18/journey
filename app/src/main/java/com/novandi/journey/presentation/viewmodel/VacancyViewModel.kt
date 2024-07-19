@@ -10,12 +10,14 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import com.novandi.core.data.response.Resource
+import com.novandi.core.data.source.remote.request.MessagingRequest
 import com.novandi.core.data.store.DataStoreManager
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.UpdateCvResult
 import com.novandi.core.domain.model.VacancyDetailUser
 import com.novandi.core.domain.usecase.JobSeekerUseCase
+import com.novandi.core.domain.usecase.MessagingUseCase
 import com.novandi.core.domain.usecase.VacancyUseCase
 import com.novandi.journey.presentation.main.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +32,7 @@ import javax.inject.Inject
 class VacancyViewModel @Inject constructor(
     private val vacancyUseCase: VacancyUseCase,
     private val jobSeekerUseCase: JobSeekerUseCase,
+    private val messagingUseCase: MessagingUseCase,
     dataStoreManager: DataStoreManager
 ): ViewModel() {
     private val _vacancy = MutableStateFlow<Resource<VacancyDetailUser>?>(null)
@@ -167,6 +170,12 @@ class VacancyViewModel @Inject constructor(
                     }
                 )
             }
+        }
+    }
+
+    fun sendNotification(request: MessagingRequest) {
+        viewModelScope.launch {
+            messagingUseCase.sendNotification(request)
         }
     }
 }

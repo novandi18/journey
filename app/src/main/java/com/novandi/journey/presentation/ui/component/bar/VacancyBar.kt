@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.VacancyDetailUser
@@ -98,27 +97,6 @@ fun VacancyBar(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        }
-    }
-
-    val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
-        permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            listOf(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            listOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        }
-    ) { permissions ->
-        if (permissions.all { it.value }) {
-            if (cvFile != null) downloadCv(cvFile)
-        } else {
-            Toast.makeText(
-                context,
-                context.getString(R.string.file_picker_permission_denied),
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 
@@ -223,7 +201,7 @@ fun VacancyBar(
                     if (vacancy.userCv != null) {
                         IconButton(
                             onClick = {
-                                pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
+                                if (cvFile != null) downloadCv(cvFile)
                             }
                         ) {
                             Icon(

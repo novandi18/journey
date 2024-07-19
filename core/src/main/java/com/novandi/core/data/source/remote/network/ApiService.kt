@@ -8,7 +8,8 @@ import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
 import com.novandi.core.data.source.remote.request.JobSeekerEditRequest
 import com.novandi.core.data.source.remote.request.JobSeekerRegisterRequest
 import com.novandi.core.data.source.remote.request.LoginRequest
-import com.novandi.core.data.source.remote.request.RecommendationVacanciesRequest
+import com.novandi.core.data.source.remote.request.MessagingRegisterRequest
+import com.novandi.core.data.source.remote.request.MessagingRequest
 import com.novandi.core.data.source.remote.request.UpdateEmailRequest
 import com.novandi.core.data.source.remote.request.UpdatePasswordRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
@@ -250,13 +251,6 @@ interface ApiService {
         @Part cv: MultipartBody.Part
     ): UpdateCvResponse
 
-    @POST("vacancies/recommendation")
-    suspend fun getRecommendationVacancies(
-        @Query("page") page: Int = 1,
-        @Query("limit") limit: Int = 10,
-        @Body recommendations: RecommendationVacanciesRequest
-    ): VacancyResponse
-
     @PUT("vacancies/closed")
     suspend fun closeVacancy(
         @Header("Authorization") token: String,
@@ -273,4 +267,14 @@ interface ApiService {
         @Path("vacancyId") vacancyId: String,
         @Path("userId") userId: String,
     ): VacancyDetailUserResponse
+
+    @POST("fcm/register")
+    suspend fun registerFcmToken(
+        @Body request: MessagingRegisterRequest
+    ): GeneralResponse
+
+    @POST("fcm/notification")
+    suspend fun sendNotification(
+        @Body request: MessagingRequest
+    ): GeneralResponse
 }

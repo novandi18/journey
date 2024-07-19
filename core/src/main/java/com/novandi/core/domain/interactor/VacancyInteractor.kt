@@ -10,7 +10,6 @@ import com.novandi.core.data.source.remote.request.CloseVacancyRequest
 import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.data.source.remote.request.VacanciesSearchRequest
 import com.novandi.core.data.source.remote.request.VacancyRequest
-import com.novandi.core.data.source.remote.request.WhatsappRequest
 import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.Vacancy
@@ -68,6 +67,6 @@ class VacancyInteractor @Inject constructor(
     override fun getVacancyCompany(companyId: String): Flow<Resource<ProfileJobProvider>> =
         vacancyRepository.getVacancyCompany(companyId)
 
-    override fun sendWhatsappMessage(request: WhatsappRequest): Flow<Resource<WhatsappResult>> =
-        vacancyRepository.sendWhatsappMessage(request)
+    override fun sendWhatsappMessage(phoneNumber: String, message: String): Flow<Resource<WhatsappResult>> =
+        vacancyRepository.sendWhatsappMessage(phoneNumber, message)
 }

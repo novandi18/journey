@@ -21,7 +21,8 @@ fun JDialog(
     dialogTitle: String,
     dialogText: String,
     confirmText: String,
-    icon: ImageVector
+    icon: ImageVector,
+    cancelShowing: Boolean = true
 ) {
     AlertDialog(
         icon = {
@@ -53,12 +54,14 @@ fun JDialog(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
+            if (cancelShowing) {
+                TextButton(
+                    onClick = {
+                        onDismissRequest()
+                    }
+                ) {
+                    Text(stringResource(id = R.string.cancel))
                 }
-            ) {
-                Text(stringResource(id = R.string.cancel))
             }
         },
         containerColor = Light,
