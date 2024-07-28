@@ -3,7 +3,7 @@ package com.novandi.core.data.source.remote.request
 import com.google.gson.annotations.SerializedName
 
 data class JobProviderRegisterRequest(
-    @SerializedName("email")
+    @SerializedName("name")
     val name: String,
 
     @SerializedName("address")

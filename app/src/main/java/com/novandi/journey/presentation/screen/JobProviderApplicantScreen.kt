@@ -11,9 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,25 +34,10 @@ fun JobProviderApplicantScreen(
     viewModel: JobProviderApplicantViewModel = hiltViewModel(),
     navigateToApplicant: (String) -> Unit
 ) {
-    val token by viewModel.token.observeAsState()
-    val accountId by viewModel.accountId.observeAsState()
-    val vacancies by viewModel.vacancies.observeAsState(Resource.Loading())
-
-    LaunchedEffect(token != null, accountId != null) {
-        viewModel.vacancies(token.toString(), accountId.toString())
-    }
-
-    LaunchedEffect(vacancies is Resource.Loading) {
-        when (vacancies) {
-            is Resource.Loading -> viewModel.setOnLoading(true)
-            is Resource.Success -> {
-                viewModel.setOnData(vacancies.data)
-                viewModel.setOnLoading(false)
-            }
-            is Resource.Error -> viewModel.setOnLoading(false)
-            else -> viewModel.setOnLoading(false)
-        }
-    }
+    val vacancies by viewModel.vacancies.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val accountId by viewModel.accountId.collectAsState()
+    val token by viewModel.token.collectAsState()
 
     Scaffold(
         topBar = {
@@ -77,32 +61,36 @@ fun JobProviderApplicantScreen(
                 .padding(paddingValues)
                 .background(Light)
         ) {
-            if (viewModel.loading) {
-                Box(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    JCardSkeleton()
+            when (vacancies) {
+                is Resource.Loading -> {
+                    Box(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        JCardSkeleton()
+                    }
                 }
-            } else if (viewModel.data == null) {
-                NetworkError {
-                    viewModel.vacancies(token.toString(), accountId.toString())
-                }
-            } else {
-                PullToRefreshLazyColumn(
-                    items = viewModel.data!!,
-                    content = { vacancy ->
-                        JCardVacancy(
-                            vacancy = vacancy,
-                            navigateToDetail = navigateToApplicant,
-                            simple = true,
-                            totalApplicants = vacancy.totalApplicants ?: 0
-                        )
-                    },
-                    isRefreshing = viewModel.loading,
-                    onRefresh = {
+
+                is Resource.Error -> {
+                    NetworkError {
                         viewModel.vacancies(token.toString(), accountId.toString())
                     }
-                )
+                }
+
+                else -> {
+                    PullToRefreshLazyColumn(
+                        items = if (vacancies is Resource.Success) vacancies.data ?: emptyList() else emptyList(),
+                        content = { vacancy ->
+                            JCardVacancy(
+                                vacancy = vacancy,
+                                navigateToDetail = navigateToApplicant,
+                                simple = true,
+                                totalApplicants = vacancy.totalApplicants ?: 0
+                            )
+                        },
+                        isRefreshing = isRefreshing,
+                        onRefresh = viewModel::onRefresh
+                    )
+                }
             }
         }
     }

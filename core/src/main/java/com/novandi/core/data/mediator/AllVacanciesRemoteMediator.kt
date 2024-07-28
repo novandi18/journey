@@ -16,7 +16,8 @@ import java.io.IOException
 class AllVacanciesRemoteMediator(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
-    private val appExecutors: AppExecutors
+    private val appExecutors: AppExecutors,
+    private val token: String
 ): RemoteMediator<Int, AllVacancyEntity>() {
     override suspend fun load(
         loadType: LoadType,
@@ -38,7 +39,8 @@ class AllVacanciesRemoteMediator(
                 }
             }
 
-            val vacancyFeed = remoteDataSource.getLatestVacancies(
+            val vacancyFeed = remoteDataSource.getVacancies(
+                key = token,
                 page = loadKey,
                 limit = state.config.pageSize
             )

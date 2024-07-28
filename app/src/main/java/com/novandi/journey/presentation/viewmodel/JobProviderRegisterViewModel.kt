@@ -11,8 +11,8 @@ import com.novandi.core.consts.Provinces
 import com.novandi.core.consts.Sectors
 import com.novandi.core.data.response.Resource
 import com.novandi.core.data.source.remote.request.JobProviderRegisterRequest
+import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.Regency
-import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.usecase.JobProviderUseCase
 import com.novandi.core.domain.usecase.RegencyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,8 +30,8 @@ class JobProviderRegisterViewModel @Inject constructor(
     private val _regenciesData: MutableLiveData<Resource<List<Regency>>> = MutableLiveData(Resource.Loading())
     val regenciesData: MutableLiveData<Resource<List<Regency>>> get() = _regenciesData
 
-    private val _register = MutableStateFlow<Resource<RegisterResult>?>(null)
-    val register: StateFlow<Resource<RegisterResult>?> get() = _register
+    private val _register = MutableStateFlow<Resource<GeneralResult>?>(null)
+    val register: StateFlow<Resource<GeneralResult>?> get() = _register
 
     val provinces = Provinces.getProvinces().map { it.province }
     val sectors = Sectors.getSectors()

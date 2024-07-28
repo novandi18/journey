@@ -23,8 +23,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,13 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.novandi.core.data.source.local.entity.AllVacancyEntity
-import com.novandi.core.data.source.local.entity.LatestVacancyEntity
-import com.novandi.core.data.source.local.entity.PopularVacancyEntity
-import com.novandi.core.data.source.local.entity.RecommendationVacancyEntity
-import com.novandi.core.data.source.remote.request.RecommendationRequest
 import com.novandi.core.mapper.VacancyMapper
 import com.novandi.journey.R
 import com.novandi.journey.presentation.ui.component.card.JCard
@@ -123,63 +117,32 @@ fun JobSeekerHomeScreen(
             ) {
                 when (tabSelected) {
                     0 -> {
-                        val disability by viewModel.disability.observeAsState()
-                        val skillOne by viewModel.skillOne.observeAsState()
-                        val skillTwo by viewModel.skillTwo.observeAsState()
-
-                        val vacancies = viewModel.recommendationVacancies.collectAsLazyPagingItems()
-                        if (vacancies.itemCount == 0) {
-                            if (disability != null && skillOne != null && skillTwo != null) {
-                                viewModel.getRecommendations(
-                                    RecommendationRequest(
-                                        disabilityName = disability.toString(),
-                                        skillOne = skillOne.toString(),
-                                        skillTwo = skillTwo.toString()
-                                    )
-                                )
-                            }
-                        }
-
                         RecommendationVacanciesContent(
-                            vacancies = vacancies,
+                            viewModel = viewModel,
                             navigateToVacancy = { id ->
                                 navigateToVacancy(id)
                             }
                         )
                     }
                     1 -> {
-                        val token by viewModel.token.observeAsState()
-                        val vacancies = viewModel.allVacancies.collectAsLazyPagingItems()
-                        if (vacancies.itemCount == 0) {
-                            if (token != null) {
-                                viewModel.vacancies(token.toString())
-                            }
-                        }
-
                         AllVacanciesContent(
-                            vacancies = vacancies,
+                            viewModel = viewModel,
                             navigateToVacancy = { id ->
                                 navigateToVacancy(id)
                             }
                         )
                     }
                     2 -> {
-                        val vacancies = viewModel.latestVacancies.collectAsLazyPagingItems()
-                        if (vacancies.itemCount == 0) viewModel.latestVacancies()
-
                         LatestVacanciesContent(
-                            vacancies = vacancies,
+                            viewModel = viewModel,
                             navigateToVacancy = { id ->
                                 navigateToVacancy(id)
                             }
                         )
                     }
                     3 -> {
-                        val vacancies = viewModel.popularVacancies.collectAsLazyPagingItems()
-                        if (vacancies.itemCount == 0) viewModel.popularVacancies()
-
                         PopularVacanciesContent(
-                            vacancies = vacancies,
+                            viewModel = viewModel,
                             navigateToVacancy = { id ->
                                 navigateToVacancy(id)
                             }
@@ -234,9 +197,16 @@ fun JobSeekerHomeScreen(
 
 @Composable
 fun RecommendationVacanciesContent(
-    vacancies: LazyPagingItems<RecommendationVacancyEntity>,
+    viewModel: JobSeekerHomeViewModel,
     navigateToVacancy: (String) -> Unit
 ) {
+    val vacancies = viewModel.recommendationVacancies.collectAsLazyPagingItems()
+    viewModel.hasRecommendationFetched.collectAsState().value.let { hasFetched ->
+        if (!hasFetched) {
+            viewModel.getRecommendations()
+            viewModel.setHasRecommendationFetched(true)
+        }
+    }
     var isRefreshing by remember {
         mutableStateOf(false)
     }
@@ -261,9 +231,16 @@ fun RecommendationVacanciesContent(
 
 @Composable
 private fun AllVacanciesContent(
-    vacancies: LazyPagingItems<AllVacancyEntity>,
+    viewModel: JobSeekerHomeViewModel,
     navigateToVacancy: (String) -> Unit
 ) {
+    val vacancies = viewModel.allVacancies.collectAsLazyPagingItems()
+    viewModel.hasAllVacanciesFetched.collectAsState().value.let { hasFetched ->
+        if (!hasFetched) {
+            viewModel.vacancies()
+            viewModel.setHasAllVacanciesFetched(true)
+        }
+    }
     var isRefreshing by remember {
         mutableStateOf(false)
     }
@@ -288,9 +265,16 @@ private fun AllVacanciesContent(
 
 @Composable
 private fun LatestVacanciesContent(
-    vacancies: LazyPagingItems<LatestVacancyEntity>,
+    viewModel: JobSeekerHomeViewModel,
     navigateToVacancy: (String) -> Unit
 ) {
+    val vacancies = viewModel.latestVacancies.collectAsLazyPagingItems()
+    viewModel.hasLatestVacanciesFetched.collectAsState().value.let { hasFetched ->
+        if (!hasFetched) {
+            viewModel.latestVacancies()
+            viewModel.setHasLatestVacanciesFetched(true)
+        }
+    }
     var isRefreshing by remember {
         mutableStateOf(false)
     }
@@ -315,9 +299,16 @@ private fun LatestVacanciesContent(
 
 @Composable
 private fun PopularVacanciesContent(
-    vacancies: LazyPagingItems<PopularVacancyEntity>,
+    viewModel: JobSeekerHomeViewModel,
     navigateToVacancy: (String) -> Unit
 ) {
+    val vacancies = viewModel.popularVacancies.collectAsLazyPagingItems()
+    viewModel.hasPopularVacanciesFetched.collectAsState().value.let { hasFetched ->
+        if (!hasFetched) {
+            viewModel.popularVacancies()
+            viewModel.setHasPopularVacanciesFetched(true)
+        }
+    }
     var isRefreshing by remember {
         mutableStateOf(false)
     }

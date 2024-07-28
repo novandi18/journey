@@ -1,9 +1,11 @@
 package com.novandi.journey.presentation.screen
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -57,6 +59,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.WorkInfo
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.novandi.core.data.response.Resource
 import com.novandi.core.domain.model.File
 import com.novandi.core.domain.model.ProfileJobSeeker
@@ -196,12 +200,14 @@ fun JobProviderApplicantProfileScreen(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("NewApi")
 @Composable
 private fun Content(
     viewModel: JobProviderApplicantProfileViewModel = hiltViewModel(),
     data: ProfileJobSeeker
 ) {
+    val context = LocalContext.current
     val downloadedCv by viewModel.downloadedCv.collectAsState()
     if (downloadedCv != null) {
         val workInfo = downloadedCv!!.observeAsState().value
@@ -232,6 +238,26 @@ private fun Content(
                     )
                 }
             }
+        }
+    }
+
+    val pdfDownloadPermissionLauncher = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    ) { permission ->
+        val isGranted = permission.values.all { it }
+
+        if (isGranted) {
+            viewModel.setOnCvDownloadShowing(true)
+            viewModel.downloadCv(context)
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.file_picker_permission_denied),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -418,7 +444,12 @@ private fun Content(
                     if (data.cv != null) {
                         IconButton(
                             onClick = {
-
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    viewModel.setOnCvDownloadShowing(true)
+                                    viewModel.downloadCv(context)
+                                } else {
+                                    pdfDownloadPermissionLauncher.launchMultiplePermissionRequest()
+                                }
                             }
                         ) {
                             Icon(

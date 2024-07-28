@@ -160,6 +160,7 @@
     <string name="voice_search_not_available">Pencarian Suara tidak tersedia</string>
     <string name="connection_error">Koneksi bermasalah, silahkan coba lagi</string>
     <string name="crop_error">Gagal memotong gambar, silahkan coba lagi</string>
+    <string name="cv_required">CV harus di unggah</string>
 
     <!--  Profile  -->
     <string name="title_update_profile">Ubah Profil</string>

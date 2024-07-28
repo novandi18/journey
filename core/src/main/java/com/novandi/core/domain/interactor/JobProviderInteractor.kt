@@ -13,7 +13,6 @@ import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.ProfileJobSeeker
-import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.domain.repository.JobProviderRepository
@@ -28,7 +27,7 @@ class JobProviderInteractor @Inject constructor(
     override fun loginJobProvider(loginRequest: LoginRequest): Flow<Resource<LoginResult>> =
         jobProviderRepository.loginJobProvider(loginRequest)
 
-    override fun registerJobProvider(request: JobProviderRegisterRequest): Flow<Resource<RegisterResult>> =
+    override fun registerJobProvider(request: JobProviderRegisterRequest): Flow<Resource<GeneralResult>> =
         jobProviderRepository.registerJobProvider(request)
 
     override fun getJobProvider(token: String, id: String): Flow<Resource<ProfileJobProvider>> =

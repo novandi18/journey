@@ -1,7 +1,6 @@
 package com.novandi.journey.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -15,14 +14,14 @@ import com.novandi.core.domain.usecase.VacancyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class JobSeekerHomeViewModel @Inject constructor(
     private val vacancyUseCase: VacancyUseCase,
-    dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager
 ): ViewModel() {
     private val _recommendationVacancies = MutableStateFlow<PagingData<RecommendationVacancyEntity>>(PagingData.empty())
     val recommendationVacancies: StateFlow<PagingData<RecommendationVacancyEntity>> = _recommendationVacancies
@@ -36,47 +35,70 @@ class JobSeekerHomeViewModel @Inject constructor(
     private val _popularVacancies = MutableStateFlow<PagingData<PopularVacancyEntity>>(PagingData.empty())
     val popularVacancies: StateFlow<PagingData<PopularVacancyEntity>> = _popularVacancies
 
-    val token = dataStoreManager.token.asLiveData()
-    val disability = dataStoreManager.disability.asLiveData()
-    val skillOne = dataStoreManager.skillOne.asLiveData()
-    val skillTwo = dataStoreManager.skillTwo.asLiveData()
+    private val _hasRecommendationFetched = MutableStateFlow(false)
+    val hasRecommendationFetched: StateFlow<Boolean> = _hasRecommendationFetched
 
-//    private val _recommendations = MutableStateFlow<Resource<List<String>>?>(null)
-//    val recommendations: StateFlow<Resource<List<String>>?> get() = _recommendations
-//
-//    var recommendation by mutableStateOf<List<String>?>(null)
-//        private set
-//
-//    var recommendationLoading by mutableStateOf(false)
-//        private set
-//
-//    fun setOnRecommendations(recommendations: List<String>) {
-//        recommendation = recommendations
-//    }
-//
-//    fun resetRecommendationState() {
-//        _recommendations.value = null
-//    }
-//
-//    fun setOnRecommendationLoading(isLoading: Boolean) {
-//        recommendationLoading = isLoading
-//    }
+    private val _hasAllVacanciesFetched = MutableStateFlow(false)
+    val hasAllVacanciesFetched: StateFlow<Boolean> = _hasAllVacanciesFetched
 
-    fun vacancies(token: String) {
+    private val _hasLatestVacanciesFetched = MutableStateFlow(false)
+    val hasLatestVacanciesFetched: StateFlow<Boolean> = _hasLatestVacanciesFetched
+
+    private val _hasPopularVacanciesFetched = MutableStateFlow(false)
+    val hasPopularVacanciesFetched: StateFlow<Boolean> = _hasPopularVacanciesFetched
+
+    fun setHasRecommendationFetched(value: Boolean) {
+        _hasRecommendationFetched.value = value
+    }
+
+    fun setHasAllVacanciesFetched(value: Boolean) {
+        _hasAllVacanciesFetched.value = value
+    }
+
+    fun setHasLatestVacanciesFetched(value: Boolean) {
+        _hasLatestVacanciesFetched.value = value
+    }
+
+    fun setHasPopularVacanciesFetched(value: Boolean) {
+        _hasPopularVacanciesFetched.value = value
+    }
+
+    fun getRecommendations() {
         viewModelScope.launch {
-            vacancyUseCase.getVacancies(token)
-                .distinctUntilChanged()
-                .cachedIn(viewModelScope)
-                .collect {
-                    _allVacancies.value = it
+            combine(
+                dataStoreManager.disability,
+                dataStoreManager.skillOne,
+                dataStoreManager.skillTwo
+            ) { disability, skillOne, skillTwo ->
+                if (disability != null && skillOne != null && skillTwo != null) {
+                    val request = RecommendationRequest(disability, skillOne, skillTwo)
+                    vacancyUseCase.getRecommendation(request)
+                        .cachedIn(viewModelScope)
+                        .collect {
+                            _recommendationVacancies.value = it
+                        }
                 }
+            }.collect {}
+        }
+    }
+
+    fun vacancies() {
+        viewModelScope.launch {
+            dataStoreManager.token.collect { token ->
+                if (token != null) {
+                    vacancyUseCase.getVacancies(token)
+                        .cachedIn(viewModelScope)
+                        .collect {
+                            _allVacancies.value = it
+                        }
+                }
+            }
         }
     }
 
     fun latestVacancies() {
         viewModelScope.launch {
             vacancyUseCase.getLatestVacancies()
-                .distinctUntilChanged()
                 .cachedIn(viewModelScope)
                 .collect {
                     _latestVacancies.value = it
@@ -87,32 +109,9 @@ class JobSeekerHomeViewModel @Inject constructor(
     fun popularVacancies() {
         viewModelScope.launch {
             vacancyUseCase.getPopularVacancies()
-                .distinctUntilChanged()
                 .cachedIn(viewModelScope)
                 .collect {
                     _popularVacancies.value = it
-                }
-        }
-    }
-
-//    fun recommendationVacancies(recommendations: RecommendationVacanciesRequest) {
-//        viewModelScope.launch {
-//            vacancyUseCase.getRecommendationVacancies(recommendations)
-//                .distinctUntilChanged()
-//                .cachedIn(viewModelScope)
-//                .collect {
-//                    _recommendationVacancies.value = it
-//                }
-//        }
-//    }
-
-    fun getRecommendations(request: RecommendationRequest) {
-        viewModelScope.launch {
-            vacancyUseCase.getRecommendation(request)
-                .distinctUntilChanged()
-                .cachedIn(viewModelScope)
-                .collect {
-                    _recommendationVacancies.value = it
                 }
         }
     }
