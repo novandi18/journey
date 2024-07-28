@@ -62,6 +62,14 @@ class VacancyDetailCompanyViewModel @Inject constructor(
         closeLoading = value
     }
 
+    fun resetVacancyState() {
+        _vacancy.value = null
+    }
+
+    fun resetCloseState() {
+        _closeVacancy.value = null
+    }
+
     fun getVacancy(vacancyId: String) {
         viewModelScope.launch {
             vacancyUseCase.getVacancyInCompany(vacancyId)

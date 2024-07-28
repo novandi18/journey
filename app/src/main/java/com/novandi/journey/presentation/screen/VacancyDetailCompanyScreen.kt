@@ -109,10 +109,12 @@ fun VacancyDetailCompanyScreen(
                 viewModel.setOnDeadlineTime()
                 Toast.makeText(context, closeVacancy?.data?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnCloseLoading(false)
+                viewModel.resetCloseState()
             }
             is Resource.Error -> {
                 Toast.makeText(context, closeVacancy?.message, Toast.LENGTH_SHORT).show()
                 viewModel.setOnCloseLoading(false)
+                viewModel.resetCloseState()
             }
             else -> viewModel.setOnCloseLoading(false)
         }

@@ -53,7 +53,8 @@ class VacancyRepositoryImpl @Inject constructor(
             remoteMediator = AllVacanciesRemoteMediator(
                 remoteDataSource = remoteDataSource,
                 localDataSource = localDataSource,
-                appExecutors = appExecutors
+                appExecutors = appExecutors,
+                token = key
             ),
             pagingSourceFactory = {
                 localDataSource.getAllVacancies()

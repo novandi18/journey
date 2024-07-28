@@ -185,7 +185,7 @@ class RemoteDataSource @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     suspend fun registerJobProvider(request: JobProviderRegisterRequest)
-        : Flow<ApiResponse<RegisterResponse>> = flow {
+        : Flow<ApiResponse<GeneralResponse>> = flow {
         try {
             val response = apiService.registerJobProvider(request)
             emit(ApiResponse.Success(response))
@@ -738,6 +738,6 @@ class RemoteDataSource @Inject constructor(
     suspend fun sendNotification(request: MessagingRequest) = apiService.sendNotification(request)
 
     companion object {
-        const val TIMEOUT_MILLIS: Long = 10_000
+        const val TIMEOUT_MILLIS: Long = 30_000
     }
 }

@@ -269,7 +269,15 @@ fun VacancyBar(
                 ) {
                     Button(
                         onClick = {
-                            applyDialog.value = true
+                            if (vacancy.userCv != null) {
+                                applyDialog.value = true
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.cv_required),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         },
                         enabled = !loading,
                         colors = ButtonDefaults.buttonColors(

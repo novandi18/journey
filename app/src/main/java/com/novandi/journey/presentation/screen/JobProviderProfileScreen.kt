@@ -101,7 +101,7 @@ fun JobProviderProfileScreen(
     val profileData by viewModel.profileData.observeAsState()
     val logoResponse by viewModel.logoResponse.collectAsState()
 
-    LaunchedEffect(token != null, accountId != null) {
+    LaunchedEffect(Unit) {
         if (token != null && accountId != null) {
             viewModel.getProfile(token.toString(), accountId.toString())
         }

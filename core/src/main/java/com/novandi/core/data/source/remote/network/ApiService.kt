@@ -83,7 +83,7 @@ interface ApiService {
     @POST("companies")
     suspend fun registerJobProvider(
         @Body request: JobProviderRegisterRequest
-    ): RegisterResponse
+    ): GeneralResponse
 
     @GET("users/{id}")
     suspend fun getJobSeeker(

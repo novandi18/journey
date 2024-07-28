@@ -16,9 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -43,29 +42,11 @@ fun JobProviderHomeScreen(
     navigateToAdd: () -> Unit,
     navigateToSearch: (companyId: String) -> Unit
 ) {
-    val token by viewModel.token.observeAsState()
-    val accountId by viewModel.accountId.observeAsState()
-    val vacancies by viewModel.vacancies.observeAsState(Resource.Loading())
+    val vacancies by viewModel.vacancies.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val accountId by viewModel.accountId.collectAsState()
 
     RequestNotificationPermissionDialog()
-
-    LaunchedEffect(token != null, accountId != null) {
-        if (token != null && accountId != null) {
-            viewModel.vacancies(token.toString(), accountId.toString())
-        }
-    }
-
-    LaunchedEffect(vacancies is Resource.Loading) {
-        when (vacancies) {
-            is Resource.Loading -> viewModel.setOnLoading(true)
-            is Resource.Success -> {
-                viewModel.setOnData(vacancies.data)
-                viewModel.setOnLoading(false)
-            }
-            is Resource.Error -> viewModel.setOnLoading(false)
-            else -> viewModel.setOnLoading(false)
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -83,7 +64,7 @@ fun JobProviderHomeScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            navigateToSearch(accountId.toString())
+                            accountId?.let { navigateToSearch(it) }
                         }
                     ) {
                         Icon(
@@ -114,29 +95,33 @@ fun JobProviderHomeScreen(
                 .padding(paddingValues)
                 .background(Light)
         ) {
-            if (viewModel.loading) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                ) {
-                    JCardSkeleton()
-                }
-            } else if (viewModel.data != null) {
-                PullToRefreshLazyColumn(
-                    items = viewModel.data!!,
-                    content = { vacancy ->
-                        JCardVacancy(
-                            vacancy = vacancy,
-                            navigateToDetail = navigateToVacancy
-                        )
-                    },
-                    isRefreshing = viewModel.loading,
-                    onRefresh = {
-                        viewModel.vacancies(token.toString(), accountId.toString())
+            when (vacancies) {
+                is Resource.Loading -> {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                    ) {
+                        JCardSkeleton()
                     }
-                )
-            } else {
-                NetworkError {
-                    viewModel.vacancies(token.toString(), accountId.toString())
+                }
+
+                is Resource.Error -> {
+                    NetworkError {
+                        viewModel.onRefresh()
+                    }
+                }
+
+                else -> {
+                    PullToRefreshLazyColumn(
+                        items = if (vacancies is Resource.Success) vacancies.data ?: emptyList() else emptyList(),
+                        content = { vacancy ->
+                            JCardVacancy(
+                                vacancy = vacancy,
+                                navigateToDetail = navigateToVacancy
+                            )
+                        },
+                        isRefreshing = isRefreshing,
+                        onRefresh = viewModel::onRefresh
+                    )
                 }
             }
         }

@@ -76,6 +76,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.crop
@@ -373,20 +374,21 @@ fun JobSeekerProfileContent(
         }
     }
 
-    val pdfPermissionLauncher = rememberMultiplePermissionsState(
-        permissions = listOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-    ) { permissions ->
-        if (permissions.all { it.value }) {
+    val pdfPermissionLauncher = rememberPermissionState(
+        permission = Manifest.permission.READ_EXTERNAL_STORAGE
+    ) { isGranted ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             pdfLauncher.launch(arrayOf("application/pdf"))
         } else {
-            Toast.makeText(
-                context,
-                context.getString(R.string.file_picker_permission_denied),
-                Toast.LENGTH_SHORT
-            ).show()
+            if (isGranted) {
+                pdfLauncher.launch(arrayOf("application/pdf"))
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.file_picker_permission_denied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -773,7 +775,7 @@ fun JobSeekerProfileContent(
                         }
                         IconButton(
                             onClick = {
-                                pdfPermissionLauncher.launchMultiplePermissionRequest()
+                                pdfPermissionLauncher.launchPermissionRequest()
                             }
                         ) {
                             Icon(

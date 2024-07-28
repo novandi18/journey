@@ -13,7 +13,6 @@ import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.ProfileJobSeeker
-import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +20,7 @@ import okhttp3.MultipartBody
 
 interface JobProviderRepository {
     fun loginJobProvider(loginRequest: LoginRequest): Flow<Resource<LoginResult>>
-    fun registerJobProvider(request: JobProviderRegisterRequest): Flow<Resource<RegisterResult>>
+    fun registerJobProvider(request: JobProviderRegisterRequest): Flow<Resource<GeneralResult>>
     fun getJobProvider(token: String, id: String): Flow<Resource<ProfileJobProvider>>
     fun getApplicants(token: String, companyId: String, vacancyId: String): Flow<Resource<List<Applicant>>>
     fun postAcceptApplicants(

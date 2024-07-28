@@ -16,7 +16,6 @@ import com.novandi.core.data.source.remote.response.GeneralResponse
 import com.novandi.core.data.source.remote.response.LoginJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobProviderResponse
 import com.novandi.core.data.source.remote.response.ProfileJobSeekerResponse
-import com.novandi.core.data.source.remote.response.RegisterResponse
 import com.novandi.core.data.source.remote.response.UpdateProfilePhotoResponse
 import com.novandi.core.data.source.remote.response.VacancyResponse
 import com.novandi.core.domain.model.Applicant
@@ -24,7 +23,6 @@ import com.novandi.core.domain.model.GeneralResult
 import com.novandi.core.domain.model.LoginResult
 import com.novandi.core.domain.model.ProfileJobProvider
 import com.novandi.core.domain.model.ProfileJobSeeker
-import com.novandi.core.domain.model.RegisterResult
 import com.novandi.core.domain.model.UpdateProfilePhotoResult
 import com.novandi.core.domain.model.Vacancy
 import com.novandi.core.domain.repository.JobProviderRepository
@@ -47,12 +45,12 @@ class JobProviderRepositoryImpl @Inject constructor(
                 remoteDataSource.loginJobProvider(loginRequest)
         }.asFlow()
 
-    override fun registerJobProvider(request: JobProviderRegisterRequest): Flow<Resource<RegisterResult>> =
-        object : NetworkOnlyResource<RegisterResult, RegisterResponse>() {
-            override fun loadFromNetwork(data: RegisterResponse): Flow<RegisterResult> =
-                JobProviderMapper.mapRegisterResponseToDomain(data)
+    override fun registerJobProvider(request: JobProviderRegisterRequest): Flow<Resource<GeneralResult>> =
+        object : NetworkOnlyResource<GeneralResult, GeneralResponse>() {
+            override fun loadFromNetwork(data: GeneralResponse): Flow<GeneralResult> =
+                JobProviderMapper.mapGeneralResponseToDomain(data)
 
-            override suspend fun createCall(): Flow<ApiResponse<RegisterResponse>> =
+            override suspend fun createCall(): Flow<ApiResponse<GeneralResponse>> =
                 remoteDataSource.registerJobProvider(request)
         }.asFlow()
 

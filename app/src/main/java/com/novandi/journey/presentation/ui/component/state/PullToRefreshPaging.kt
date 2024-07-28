@@ -89,7 +89,7 @@ fun <T: Any> PullToRefreshPaging(
         }
 
         LaunchedEffect(state.isRefreshing) {
-            if (state.isRefreshing) {
+            if (state.isRefreshing && (items.loadState.refresh !is LoadState.Loading)) {
                 onRefresh()
             }
         }

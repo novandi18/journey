@@ -1,5 +1,6 @@
 package com.novandi.journey.presentation.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -87,6 +88,20 @@ class JobProviderApplicantProfileViewModel @Inject constructor(
                 .collect { result ->
                     _profile.value = result
                 }
+        }
+    }
+
+    fun downloadCv(context: Context) {
+        viewModelScope.launch {
+            if (cvFile != null) {
+                MainActivity().fileDownloadStarter(
+                    context = context,
+                    file = cvFile!!,
+                    running = { state ->
+                        _downloadedCv.value = state
+                    }
+                )
+            }
         }
     }
 }
