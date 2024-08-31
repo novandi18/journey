@@ -1,5 +1,8 @@
 package com.novandi.core.domain.model
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class AssistantChat(
     val id: Int? = null,
     val userMessage: String? = null,

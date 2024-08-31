@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -93,6 +94,7 @@ fun VacancyScreen(
     val vacancy by viewModel.vacancy.collectAsState()
     val applyStatus by viewModel.applyResult.collectAsState()
     val cv by viewModel.cv.collectAsState()
+    val notification by viewModel.notification.collectAsState()
 
     LaunchedEffect(accountId) {
         if (accountId != null) viewModel.getVacancy(vacancyId, accountId.toString())
@@ -187,6 +189,19 @@ fun VacancyScreen(
             else -> {
                 viewModel.setOnUploadCvLoading(false)
             }
+        }
+    }
+
+    LaunchedEffect(notification is Resource.Loading) {
+        when (notification) {
+            is Resource.Loading -> {}
+            is Resource.Success -> {
+                viewModel.resetNotificationState()
+            }
+            is Resource.Error -> {
+                Log.d("Notification", "Error: ${notification?.message}")
+            }
+            else -> {}
         }
     }
 

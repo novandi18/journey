@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "548628612444",
+    "firebase_url": "https://journey-android-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "journey-android",
+    "storage_bucket": "journey-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548628612444:android:458e66b5bae78e9069ad99",
+        "android_client_info": {
+          "package_name": "com.novandi.journey"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhBsWsCFLxRArQ-7V1H-hsj5Gzi0D-za0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

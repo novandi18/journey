@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.1"
+agp = "8.6.0"
 kotlin = "1.9.22"
 core-ktx = "1.13.1"
 junit = "4.13.2"
@@ -7,16 +7,16 @@ androidx-test-ext-junit = "1.2.1"
 espresso-core = "3.6.1"
 lifecycle-runtime-ktx = "2.8.4"
 activity-compose = "1.9.1"
-compose-bom = "2024.06.00"
+compose-bom = "2024.08.00"
 retrofit = "2.11.0"
 okHttp = "4.12.0"
 ksp = "1.9.22-1.0.17"
 hilt = "2.51.1"
 composeNavigation = "2.7.7"
 androidxHiltNavigation = "1.2.0"
-androidxFoundation = "1.7.0-beta06"
+androidxFoundation = "1.7.0-rc01"
 datastore = "1.1.1"
-paging = "3.3.1"
+paging = "3.3.2"
 splashscreen = "1.0.1"
 secretsGradle = "2.0.1"
 appcompat = "1.7.0"
@@ -25,7 +25,7 @@ coil = "2.6.0"
 compose-shimmer = "1.3.0"
 room = "2.6.1"
 easycrop = "0.1.1"
-work-manager = "2.9.0"
+work-manager = "2.9.1"
 hilt-work = "1.2.0"
 text-to-speech = "2.47.0"
 oauth2-http = "1.23.0"
@@ -33,8 +33,8 @@ playServicesBasement = "18.4.0"
 grpc-okhttp = "1.65.1"
 accompanist-permissions = "0.35.1-alpha"
 googleGmsGoogleServices = "4.4.2"
-firebaseMessaging = "24.0.0"
-firebaseBom = "33.1.2"
+firebaseMessaging = "24.0.1"
+firebaseBom = "33.2.0"
 truth = "1.1.3"
 mockk = "1.12.0"
 kotlinxCoroutinesTest = "1.6.4"
@@ -96,6 +96,8 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
+hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
+hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

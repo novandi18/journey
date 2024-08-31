@@ -1,5 +1,6 @@
 package com.novandi.core.mapper
 
+import com.novandi.core.consts.Disabilities
 import com.novandi.core.consts.JobTypes
 import com.novandi.core.data.source.local.entity.AllVacancyEntity
 import com.novandi.core.data.source.local.entity.LatestVacancyEntity
@@ -30,7 +31,8 @@ object VacancyMapper {
                 jobType = it.jobType,
                 skillOne = it.skillOne,
                 skillTwo = it.skillTwo,
-                disabilityName = it.disabilityName,
+                disabilityName = Disabilities.getDisabilities()
+                    .first { d -> d.en == it.disabilityName }.disability,
                 companyLogo = it.companyLogo,
                 sectorName = it.sectorName,
                 companyName = it.companyName

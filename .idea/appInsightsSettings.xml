@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.novandi.journey" />
+                  <option name="mobileSdkAppId" value="1:548628612444:android:458e66b5bae78e9069ad99" />
+                  <option name="projectId" value="journey-android" />
+                  <option name="projectNumber" value="548628612444" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
