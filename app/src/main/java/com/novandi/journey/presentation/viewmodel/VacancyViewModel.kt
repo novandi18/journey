@@ -47,6 +47,9 @@ class VacancyViewModel @Inject constructor(
     private val _downloadedCv = MutableStateFlow<LiveData<WorkInfo>?>(null)
     val downloadedCv: StateFlow<LiveData<WorkInfo>?> get() = _downloadedCv
 
+    private val _notification = MutableStateFlow<Resource<GeneralResult>?>(null)
+    val notification: StateFlow<Resource<GeneralResult>?> get() = _notification
+
     val token = dataStoreManager.token.asLiveData()
     val accountId = dataStoreManager.accountId.asLiveData()
 
@@ -176,6 +179,16 @@ class VacancyViewModel @Inject constructor(
     fun sendNotification(request: MessagingRequest) {
         viewModelScope.launch {
             messagingUseCase.sendNotification(request)
+                .catch { err ->
+                    _notification.value = Resource.Error(err.message.toString())
+                }
+                .collect {
+                    _notification.value = it
+                }
         }
+    }
+
+    fun resetNotificationState() {
+        _notification.value = null
     }
 }

@@ -1,5 +1,8 @@
 package com.novandi.core.domain.model
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class VacancyDetailUser(
     val vacancyId: String,
     val position: String,

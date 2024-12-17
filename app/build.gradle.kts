@@ -7,16 +7,17 @@ plugins {
     id("kotlin-parcelize")
     kotlin("kapt")
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.novandi.journey"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.novandi.journey"
         minSdk = 22
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -107,6 +108,11 @@ dependencies {
     implementation(libs.firebase.messaging)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.truth)
+    testImplementation(libs.core.testing)
+    testImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
