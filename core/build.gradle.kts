@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.secrets.gradle.plugin)
     id("kotlin-parcelize")
-    alias(libs.plugins.google.gms.google.services)
 }
 
 android {

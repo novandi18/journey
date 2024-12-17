@@ -7,6 +7,7 @@ plugins {
     id("kotlin-parcelize")
     kotlin("kapt")
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
