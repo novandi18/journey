@@ -40,5 +40,8 @@ Multi-Module Architecture
 ## Design Pattern
 Model-View-ViewModel (MVVM)
 
+## Screenshots
+![Journey](https://github.com/user-attachments/assets/bc9db489-e2b3-4575-a380-6e83ec0e431f)
+
 ## Others
 Soon...
